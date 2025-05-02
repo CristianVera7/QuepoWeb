@@ -1,0 +1,151 @@
+//imports
+@use '../mixins/breakpoint.scss' as mix;
+// Montserrat
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+// Work Sans
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: #1A1A1A;
+}
+
+//Variables
+$base-color: #12ab9e;
+$second-color: white;
+
+//Style code
+.form-wrapper {
+    display: grid;
+    justify-content: center;
+
+    ::placeholder {
+        color: $base-color;
+    }
+
+    .form {
+        display: grid;
+        justify-content: center;
+        place-content: center;
+        width: 22rem;
+        gap: 1em 0em;
+
+        .field {
+            font-size:larger;
+            font-weight: 500;
+            display: grid;
+            // margin: 1em 0.6em;
+            border-radius: 0.5em;
+            border: none;
+            color: $base-color;
+            padding: 0px 15px;
+            height: 2.5em;
+            width: 22rem;
+            background-color: rgb(250, 249, 247);
+        }
+
+        .field:focus {
+            box-shadow:
+                0 1px 1px rgba(245, 94, 0, 0.075) inset,
+                0 0 5px rgba(2, 241, 241, 0.753);
+            outline: $base-color;
+        }
+
+        .fieldError {
+            font-size: larger;
+            font-weight:500;
+            border-style: solid;
+            border-color: rgba(252, 3, 3, 0.536);
+            background-color: rgba(255, 255, 255, 0.712);
+            margin: 0.5em 0em;
+            border-radius: 0.5em;
+            color: $base-color;
+            padding: 0px 15px;
+            height: 2.5em;
+            width: 22.2rem;
+            animation: shake 0.12s ease-in-out 0s 2;
+        }
+
+        .fieldError:focus {
+            outline-style: solid;
+            outline-color: rgb(231, 9, 9);
+            animation: moveElement 0.2s ease-in-out 1;
+        }
+
+        .msgError {
+            color: rgb(204, 32, 32);
+            margin: 0 1rem;
+            min-height: 2rem;
+            animation: moveElement 0.2s ease-in-out 1;
+        }
+
+        .btnForm {
+            font-size: larger;
+            font-weight:500;
+            display: grid;
+            place-content: center;
+            justify-content: center;
+            color: white;
+            background-color: rgb(0, 89, 255);
+            margin-top: 1rem;
+            border-radius: 0.8em;
+            border: none;
+            height: 2.5em;
+            width: 22.2rem;
+        }
+
+        .btnForm:focus {
+            box-shadow:
+                0 1px 1px rgba(245, 94, 0, 0.075) inset,
+                0 0 5px rgba(2, 241, 241, 0.753);
+            outline: 0 none;
+        }
+
+        .divRouteLogin {
+            color: rgb(0, 0, 44);
+            margin: 0.5em 0em;
+            display: grid;
+            justify-content: center;
+
+            .routeLogin {
+                margin: 0em 0.5em;
+                text-decoration: none;
+                font-weight: bold;
+                color: rgb(0, 68, 255);
+            }
+        }
+    }
+}
+
+.divLogoMobile {
+    display: flex;
+    justify-content: center;
+    margin: 1rem;
+    img {
+        width: 13em;
+        height: 10em;
+    }
+
+    @include mix.respond(md) {
+        //divLogoMobile
+        display: none;
+    }
+}
+
+
+@keyframes shake {
+    100% {
+        margin-right: -0.2rem;
+        margin-left: 0.2rem;
+    }
+}
+
+@keyframes moveElement {
+    from {
+        transform: translateY(0.2rem);
+    }
+
+    to {
+        transform: translateY(0rem);
+    }
+}

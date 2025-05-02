@@ -1,0 +1,41 @@
+//imports
+@use '../mixins/breakpoint.scss' as mix;
+
+//Variables
+$base-color: #12ab9e;
+$second-color: white;
+
+//
+.secondWrapper {
+    display: none;
+    background-color: $second-color;
+    min-width: 50%;
+    justify-content: space-around;
+    flex-direction: column;
+
+    .divLogoDesktop {
+        padding-top: 10em;
+        display: grid;
+        place-content: center;
+
+        img {
+            margin: 2em;
+            width: 13em;
+            height: 10em;
+        }
+    }
+
+    .sponsors {
+        margin: 2em;
+
+        .sponsor {
+            width: 15dvh;
+            height: 13dvh;
+        }
+    }
+
+    @include mix.respond(md) {
+        //secondWrapper
+        display: flex;
+    }
+}

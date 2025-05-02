@@ -1,0 +1,105 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vee-validate/yup": "^4.15.0",
+    "axios": "^1.8.1",
+    "leaflet": "^1.9.4",
+    "pinia": "^3.0.1",
+    "sass": "^1.85.1",
+    "vee-validate": "^4.15.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vuetify": "^3.7.15"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.17",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/language-plugin-pug": "^2.2.2",
+    "@vue/tsconfig": "^0.7.0",
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-pug": "^1.2.5",
+    "eslint-plugin-vue": "^9.32.0",
+    "prettier": "^3.5.1",
+    "prettier-plugin-pug": "^1.0.0-alpha.8",
+    "pug": "^3.0.3",
+    "typescript": "~5.7.2",
+    "vite": "^6.1.0",
+    "vue-eslint-parser": "^9.4.3",
+    "vue-tsc": "^2.2.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "node": true
+    },
+    "parser": "vue-eslint-parser",
+    "parserOptions": {
+      "parser": "@typescript-eslint/parser",
+      "sourceType": "module"
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:vue/vue3-recommended",
+      "prettier"
+    ],
+    "plugins": [
+      "vue",
+      "prettier"
+    ],
+    "rules": {
+      "no-console": "warn",
+      "no-undef": "off",
+      "no-unused-vars": "off",
+      "prettier/prettier": "error",
+      "@typescript-eslint/no-explicit-any": "off",
+      "vue/multi-word-component-names": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "vue/require-default-prop": "off"
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 120,
+    "tabWidth": 4,
+    "useTabs": false,
+    "quoteProps": "as-needed",
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "pugPrintWidth": 140,
+    "bracketSameLine": true,
+    "trailingComma": "es5",
+    "plugins": [
+      "prettier-plugin-pug"
+    ],
+    "overrides": [
+      {
+        "files": "*.pug",
+        "options": {
+          "parser": "pug"
+        }
+      },
+      {
+        "files": "*.ts",
+        "options": {
+          "parser": "typescript"
+        }
+      }
+    ]
+  }
+}

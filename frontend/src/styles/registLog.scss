@@ -1,0 +1,115 @@
+//imports
+@use './mixins/breakpoint.scss' as mix;
+
+// Montserrat
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+// Work Sans
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&display=swap');
+
+
+//Variables
+$base-color: #12ab9e;
+$second-color: white;
+
+//Style code
+.register-view {
+    background-color: $base-color;
+    display: flex;
+    place-content: center;
+    text-align: center;
+    min-height: 100vh;
+
+    .firstWrapper {
+        display: grid;
+        justify-content: center;
+        place-content: center;
+
+        .formContainer {
+            display: grid;
+            margin: 1em 2em;
+
+            .view {
+            //    background-color: red;
+               .h2 {
+                    display: grid;
+                    place-content: center;
+                    font-family: 'montserrat', sans-serif;
+                    color: rgb(0, 0, 44);
+                    font-size: 3em;
+                    font-weight:normal;
+                    margin: 0.5em 0 1em;
+
+                    
+                }
+            }
+
+            .socialIcons {
+                display: flex;
+                justify-content: space-between;
+
+                .icon {
+                    display: grid;
+                    place-content: center;
+                    background-color: $second-color;
+                    border: none;
+                    width: 4.5em;
+                    height: 4.5em;
+                    border-radius: 3em;
+                    text-decoration: none;
+
+                    .svg-icon {
+                        width: 4em;
+                        height: 4em;
+                    }
+
+                    .linkedin {
+                        background: url('../img/icons/facebook.png');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+
+                    .google {
+                        background: url('../img/icons/google.png');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+
+                    .github {
+                        background: url('../img/icons/manzana.png');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+                }
+            }
+
+            .divSeparator {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: 6em;
+
+                .lineSeparator {
+                    width: 100%;
+                    height: 2px;
+                    border-color: rgb(0, 0, 44);
+                    margin: 6px 0;
+                }
+
+                .textSeparator {
+                    color:rgb(0, 0, 44);
+                    margin: 0 1em;
+                    font-size: 1.3em;
+                }
+            }
+        }
+
+        @include mix.respond(md) {
+            //firstWrapper
+            min-width: 50%;
+            place-content: center;
+        }
+    }
+}
