@@ -12,9 +12,9 @@ export interface User {
 const userSchema = new mongoose.Schema({
   //Hacer unico el nickName
   nickName: { type: String, required: true, trim: true },
-  email: { type: String, required: true,unique: true, trim: true ,match: VALID_EMAIL},
+  email: { type: String, required: true, unique: true, trim: true, match: VALID_EMAIL },
   password: { type: String, required: true, select: false },
-  dni: { type: String, unique: true, trim: true },
+  dni: { type: String, unique: true, trim: true, sparse: true, },
 })
 
 export default mongoose.model('User', userSchema)

@@ -67,19 +67,25 @@ const loginUser = async () => {
     try {
         const response = await axios.post('http://localhost:8000/user/login', user.value)
         if (response.data.ok) {
+            // Primero guardamos el token en localStorage
             localStorage.setItem('User loged', response.data.token)
-            if (!emailStore.value) {
-                emailStore.value = user.value.email
-                localStorage.setItem('User registered', emailStore.value)
-            }
-            if (localStorage.getItem('User registered')) useRegisterStore().tokenStore = response.data.token
+            
+            // Actualizamos el email al usuario actual que está haciendo login
+            emailStore.value = user.value.email
+            localStorage.setItem('User registered', JSON.stringify(user.value.email))
+            
+            // Actualizamos el token en el store
+            useRegister.tokenStore = response.data.token
+            useRegister.isLogged = true
+            
             console.log('EL USUARIO EXISTE EN BD, ESTÁS LOGUEADO 👍')
             router.push({ name: 'dashboard' })
         }
 
         setTimeout(() => {
             localStorage.removeItem('User loged')
-            useRegisterStore().tokenStore = ''
+            useRegister.tokenStore = ''
+            useRegister.isLogged = false
             alert('Sesion finalizada ❌')
             router.push({ name: 'login' })
         }, response.data.expires)

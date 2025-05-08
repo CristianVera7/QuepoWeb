@@ -35,20 +35,29 @@ export const useRegisterStore = defineStore('registerUser', {
             this.emailStore = ''
             this.isRegistered = false
             this.tokenStore = ''
+            this.isLogged = false
             this.hasDni = false
         },
         cleanStorage() {
             localStorage.removeItem('User loged')
             localStorage.removeItem('User registered')
         },
-        setMailStore(mail: string) {
-            this.emailStore = mail
+        setMailStore(email: string) {
+            this.emailStore = email
+            localStorage.setItem('User registered', JSON.stringify(email))
         },
         setisRegisteredStore(value: boolean) {
             this.isRegistered = value
         },
         setDniStore(value: boolean) {
             this.hasDni = value
+        },
+        updateSession(email: string, token: string) {
+            this.emailStore = email
+            this.tokenStore = token
+            this.isLogged = true
+            localStorage.setItem('User registered', JSON.stringify(email))
+            localStorage.setItem('User loged', token)
         },
         async checkUser() {
             try {
@@ -58,7 +67,6 @@ export const useRegisterStore = defineStore('registerUser', {
                 }
 
                 const params = { email: this.emailStore }
-                //.env front?
                 const URI = 'http://localhost:8000'
                 const response = await axios.post(`${URI}/user/find`, params)
                 if (!response.data.ok) {
@@ -93,7 +101,13 @@ export const useRegisterStore = defineStore('registerUser', {
                     this.isLogged = false
                     return
                 }
-                return this.isLogged = true
+
+                if (response.data.email && response.data.email !== this.emailStore) {
+                    this.setMailStore(response.data.email)
+                }
+
+                this.isLogged = true
+                return true
             } catch (error) {
                 console.log(error)
             }
@@ -106,13 +120,12 @@ export const useRegisterStore = defineStore('registerUser', {
                     }
                 })
 
-                
+
                 if (response.data.hasDni === true) {
                     this.setDniStore(true)
                 } else {
                     this.setDniStore(false)
                 }
-                // return this.hasDni = response.data.hasDni
             } catch (error) {
                 console.log(error)
             }

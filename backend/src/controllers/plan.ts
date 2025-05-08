@@ -71,12 +71,27 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
 }
 
 async function listPlans(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
     try {
         const plans = await Plan.find()
+
+        const plansWithRoles = plans.map(plan => {
+            const isCreator = plan.creatorUser.toString() === userId;
+            const isPassenger = plan.passengers.some(passenger => passenger.id.toString() === userId);
+
+            return {
+                ...plan.toObject(),
+                isCreator,
+                isPassenger
+            };
+        });
+
+
         res.status(200).json({
             message: 'Lista de planes',
             ok: true,
-            data: plans
+            data: plansWithRoles
         })
     } catch (err) {
         next(err)
@@ -98,84 +113,375 @@ async function listPlansByCategory(req: Request, res: Response, next: NextFuncti
 }
 
 async function getPlanById(req: Request, res: Response, next: NextFunction) {
-    try {
-        const planId = req.params.id
+    const { id } = req.params;
+    const userId = req.user?.id;
 
-        const plan = await Plan.findById(planId)
+    if (!userId) {
+        res.status(403).json({
+            message: 'Usuario no autenticado',
+            ok: false
+        });
+        return
+    }
+
+    try {
+        const plan = await Plan.findById(id);
+
         if (!plan) {
-            res.status(404).json({ message: 'Plan no encontrado', ok: false })
+            res.status(404).json({
+                message: 'Plan no encontrado.',
+                ok: false
+            });
+            return
+        }
+
+        const isCreator = plan.creatorUser.toString() === userId.toString();
+        if (!isCreator) {
+            res.status(404).json({
+                message: 'Usted no es el creador de este plan.',
+                ok: false
+            });
             return
         }
 
         res.status(200).json({
-            message: 'Detalles del plan',
+            message: `Encontrado el plan: ${plan.title}`,
             ok: true,
-            data: plan,
-        })
+            plan: plan,
+            isCreator
+        });
+
     } catch (err) {
-        next(err)
+        next(err);
     }
 }
 
-async function joinPlan(req: Request, res: Response, next: NextFunction) {
-    //id del plan
+async function updatePlan(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const userId = req.user?.id;
-    const userNickName = req.user?.nickName;
 
     if (!userId) {
-        console.log('No hay id de usuario en el token')
-        res.status(403).json({ message: 'Usuario no autenticado', ok: false });
-        return;
+        res.status(403).json({
+            message: 'Usuario no autenticado',
+            ok: false
+        });
+        return
     }
 
     try {
-        const user = await User.findById(userId).select('dni')
+        // Buscar el plan existente
+        const plan = await Plan.findById(id);
+
+        if (!plan) {
+            res.status(404).json({
+                message: 'Plan no encontrado.',
+                ok: false
+            });
+            return
+        }
+
+        const {
+            title,
+            category,
+            description,
+            route,
+            dateTime,
+            placesAvailable,
+            price,
+            carInformation
+        } = req.body;
+
+        // Actualizar los campos del plan
+        plan.title = title;
+        plan.category = category;
+        plan.description = description;
+        plan.route = route;
+        plan.dateTime = new Date(dateTime);
+        plan.placesAvailable = Number(placesAvailable);
+        plan.price = Number(price);
+        plan.carInformation = carInformation;
+
+        // Guardar los cambios
+        await plan.save();
+
+        // Responder con éxito
+        res.status(200).json({
+            message: 'Plan actualizado con éxito',
+            plan,
+            ok: true
+        });
+        return
+
+    } catch (err) {
+        console.error('Error al actualizar plan:', err);
+        next(err);
+    }
+}
+
+
+
+
+async function joinPlan(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
+    const { message } = req.body
+
+    if (!userId) {
+        res.status(403).json({ message: 'Usuario no autenticado', ok: false });
+        return
+    }
+
+    try {
+        const user = await User.findById(userId).select('dni');
         if (!user || !user.dni || user.dni.trim() === '') {
-            console.log('El usuario no tiene DNI registrado')
-            res.status(400).json({ message: 'Debes registrar tu DNI para unirte a un plan', ok: false })
+            res.status(400).json({ message: 'Debes registrar tu DNI para unirte a un plan', ok: false });
             return
         }
 
         const plan = await Plan.findById(id);
         if (!plan) {
-            console.log('No se ha encontrado el plan')
             res.status(404).json({ message: 'Plan no encontrado', ok: false });
-            return;
+            return
         }
 
         if (plan.creatorUser.toString() === userId.toString()) {
-            console.log('El usuario no puede unirse a su propio plan')
             res.status(400).json({ message: 'No puedes unirte a tu propio plan', ok: false });
-            return;
+            return
         }
 
-        if (plan.passengers.find((passenger) => passenger.id === userId)) {
-            console.log('Ya hay una plaza reservada para esta persona en este coche')
-            res.status(400).json({ message: 'Ya hay una plaza reservada para esta persona en este coche', ok: false });
-            return;
+        const alreadyPending = plan.pendingPassengers.some(p => p.id === userId);
+        const alreadyIn = plan.passengers.some(p => p.id === userId);
+
+        if (alreadyPending || alreadyIn) {
+            res.status(400).json({ message: 'Ya solicitaste o participas en este plan', ok: false });
+            return
         }
 
-        if (plan.placesAvailable <= 0) {
-            console.log('No hay lugares disponibles')
-            res.status(400).json({ message: 'No hay lugares disponibles', ok: false });
-            return;
-        }
+        plan.pendingPassengers.push({
+            id: userId,
+            nickName: userNickName,
+            dni: user.dni,
+            message: message
+        });
 
-        plan.passengers.push({ id: userId, nickName: userNickName, dni: user.dni });
-        plan.placesAvailable -= 1;
         await plan.save();
 
         res.status(200).json({
-            message: `Te has unido al plan de ${plan.title}`,
+            message: `Solicitud enviada al creador del plan: ${plan.title}`,
             ok: true,
-            data: plan,
         });
-        return;
     } catch (err) {
         next(err);
     }
 }
 
 
-export default { createPlan, listPlans, listPlansByCategory, getPlanById, joinPlan }
+async function approvePassenger(req: Request, res: Response, next: NextFunction) {
+    const { planId, passengerId } = req.params;
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
+
+    if (!userId) {
+        res.status(403).json({ message: 'Usuario no autenticado', ok: false });
+        return
+    }
+
+    try {
+        const plan = await Plan.findById(planId);
+        if (!plan) {
+            res.status(404).json({ message: 'Plan no encontrado', ok: false });
+            return
+        }
+
+        if (plan.creatorUser.toString() !== userId.toString()) {
+            res.status(403).json({ message: 'No autorizado para aprobar pasajeros', ok: false });
+            return
+        }
+
+        const passenger = plan.pendingPassengers.find(p => p.id === passengerId);
+        if (!passenger) {
+            res.status(404).json({ message: 'Pasajero no encontrado en pendientes', ok: false });
+            return
+        }
+
+        plan.passengers.push(passenger);
+        plan.pendingPassengers.pull({ id: passengerId });
+        plan.placesAvailable = Math.max(0, plan.placesAvailable - 1);
+        await plan.save();
+
+        res.status(200).json({ message: 'Pasajero aprobado', ok: true });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function rejectPassenger(req: Request, res: Response, next: NextFunction) {
+    const { planId, passengerId } = req.params;
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
+
+    if (!userId || !userNickName) {
+        res.status(403).json({ message: 'Usuario no autenticado', ok: false });
+        return
+    }
+
+    try {
+        const plan = await Plan.findById(planId);
+        if (!plan) {
+            res.status(404).json({ message: 'Plan no encontrado', ok: false });
+            return
+        }
+
+        if (plan.creatorUser.toString() !== userId.toString()) {
+            res.status(403).json({ message: 'No autorizado para rechazar pasajeros', ok: false });
+            return
+        }
+
+        plan.pendingPassengers.pull({ id: passengerId });
+        await plan.save();
+
+        res.status(200).json({ message: 'Pasajero rechazado/eliminado', ok: true });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getPendingPassengers(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
+
+    if (!userId || !userNickName) {
+        res.status(403).json({ message: 'Usuario no autenticado', ok: false });
+        return;
+    }
+
+    try {
+        const plans = await Plan.find({ creatorUser: userId });
+
+        if (!plans || plans.length === 0) {
+            res.status(200).json({
+                message: 'No se encontraron planes creados por el usuario',
+                ok: true,
+                pendingPassengers: []
+            });
+            return;
+        }
+        const allPendingPassengers = plans.map(plan => ({
+            planId: plan._id,
+            planTitle: plan.title,
+            pendingPassengers: plan.pendingPassengers
+        }));
+
+        res.status(200).json({
+            message: 'Pasajeros pendientes obtenidos',
+            ok: true,
+            plans: allPendingPassengers
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function myPlans(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.user?.id;
+        const userNickName = req.user?.nickName;
+
+        if (!userId || !userNickName) {
+            res.status(403).json({
+                message: 'Usuario no autenticado o datos incompletos del token.',
+                ok: false
+            });
+            return
+        }
+
+        const plans = await Plan.find({
+            $or: [
+                { creatorUser: userId },
+                { 'passengers.id': userId }
+            ]
+        });
+
+        if (!plans.length) {
+            res.status(404).json({
+                message: 'No se encontraron planes creados ni en los que participes.',
+                data: [],
+                ok: false
+            });
+            return
+        }
+
+        const plansWithRoles = plans.map(plan => {
+            const isCreator = plan.creatorUser.toString() === userId;
+            const isPassenger = plan.passengers.some(passenger => passenger.id.toString() === userId);
+
+            return {
+                ...plan.toObject(),
+                isCreator,
+                isPassenger
+            };
+        });
+
+        res.status(200).json({
+            message: 'Planes encontrados',
+            plansList: plansWithRoles,
+            ok: true
+        });
+
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function leavePlan(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
+    const { planId } = req.params
+    try {
+
+        if (!userId || !userNickName) {
+            res.status(403).json({
+                message: 'Usuario no autenticado o datos incompletos del token.',
+                ok: false
+            });
+            return
+        }
+
+        const plan = await Plan.findById(planId);
+        if (!plan) {
+            res.status(404).json({
+                message: 'Plan no encontrado.',
+                ok: false
+            });
+            return
+        }
+
+
+        const wasPassenger = plan.passengers.some(p => p.id === userId);
+        if (!wasPassenger) {
+            res.status(400).json({
+                message: 'No estás inscrito en este plan.',
+                ok: false
+            });
+            return
+        }
+
+        plan.passengers.pull({ id: userId });
+        plan.placesAvailable += 1
+        await plan.save();
+
+        res.status(200).json({
+            message: 'Has salido del plan exitosamente.',
+            ok: true,
+            updatedPlan: plan
+        });
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+
+
+export default { createPlan, listPlans, getPlanById, updatePlan, listPlansByCategory, joinPlan, approvePassenger, rejectPassenger, getPendingPassengers, myPlans, leavePlan }

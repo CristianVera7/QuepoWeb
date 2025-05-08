@@ -1,30 +1,5 @@
 import mongoose from 'mongoose'
 
-// const plan = ref({
-//   title: '',
-//   category: '',
-//   description: '',
-//   route: {
-//       location: {
-//           origin: '',
-//           destination: ''
-//       },
-//       duration: '',
-//       distance: ''
-//   },
-//   // location: '',
-//   // duration: '',
-//   // distance: '',
-//   dateTime: '',
-//   placesAvailable: undefined,
-//   carInformation: {
-//       carIdentifier: '',
-//       brand: '',
-//       model: '',
-//       color: ''
-//   }
-// })
-
 export interface Plan {
   title: string
   category: string
@@ -44,6 +19,7 @@ export interface Plan {
   placesAvailable: number
   price: number
   passengers: string[]
+  pendingPassengers: string[]
   carInformation: {
     carIdentifier: string
     brand: string
@@ -78,7 +54,14 @@ const planSchema = new mongoose.Schema({
     id: { type: String },
     nickName: { type: String },
     dni: { type: String },
-  }], // array de strings, valorar meter foto de dni
+    isApproved: { type: Boolean, default: false }
+  }],
+  pendingPassengers: [{
+    id: { type: String },
+    nickName: { type: String },
+    dni: { type: String },
+    message: { type: String, default: '' }
+  }],
   carInformation: {
     carIdentifier: { type: String },
     brand: { type: String },

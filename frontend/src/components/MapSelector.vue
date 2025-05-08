@@ -1,44 +1,58 @@
-<template>
-    <div class="map-container">
-        <div class="route-info">
-            <input type="text" v-model="address.origin" placeholder="Dirección de salida"
-                @input="debouncedGeocodeAddress('origin')" />
-            <input type="text" v-model="address.destination" placeholder="Dirección de destino"
-                @input="debouncedGeocodeAddress('destination')" />
-            <div class="map" ref="mapRef"></div>
+<template lang="pug">
+    .map-container
+        .route-info
+            input(
+                type="text"
+                v-model="address.origin"
+                placeholder="Dirección de salida"
+                @input="debouncedGeocodeAddress('origin')"
+                )
+            input(
+                type="text"
+                v-model="address.destination"
+                placeholder="Dirección de destino"
+                @input="debouncedGeocodeAddress('destination')"
+                )
+            .map(ref="mapRef")
 
-            <!-- Sistema de notificaciones -->
-            <div class="notification" v-if="notification.visible" :class="notification.type">
-                <div class="notification-content">
-                    <span v-if="notification.type === 'error'" class="notification-icon">⚠️</span>
-                    <span v-else-if="notification.type === 'success'" class="notification-icon">✅</span>
-                    <span v-else class="notification-icon">ℹ️</span>
-                    <div class="notification-message" v-html="notification.message.replace(/\n/g, '<br>')"></div>
-                </div>
-                <button class="notification-close" @click="notification.visible = false">×</button>
-            </div>
+        .notification(v-if="notification.visible" :class="notification.type")
+            .notification-content
+                span.notification-icon(v-if="notification.type === 'error'") ⚠️
+                span.notification-icon(v-else-if="notification.type === 'success'") ✅
+                span.notification-icon(v-else) ℹ️
+                .notification-message(v-html="notification.message.replace(/\\n/g, '<br>')")
 
-            <div class="loading-indicator" v-if="loading">
-                <div class="loading-spinner"></div>
-                <span>Cargando...</span>
-            </div>
+            button.notification-close(@click="notification.visible = false") ×
 
-            <button type="button" :disabled="!isRouteReady" @click="calculateRoute" class="confirm-button">
-                Confirmar ruta
-            </button>
+        .loading-indicator(v-if="loading")
+            .loading-spinner
+            span Cargando...
 
-            <div class="route-details" v-if="hasRouteInfo">
-                <p><strong>Origen:</strong> {{ route.origin }}</p>
-                <p><strong>Destino:</strong> {{ route.destination }}</p>
-                <p><strong>Distancia:</strong> {{ route.distance }}</p>
-                <p><strong>Duración:</strong> {{ route.duration }}</p>
-            </div>
-        </div>
-    </div>
+        .containerBtn
+            button.confirm-button(
+                type="button"
+                :disabled="!isRouteReady"
+                @click="calculateRoute"
+            ) {{ existingRouteData ? 'Actualizar ruta' : 'Confirmar ruta' }}
+
+        .route-details(v-if="hasRouteInfo")
+            p
+                strong Origen:
+                |  {{ route.origin }}
+            p
+                strong Destino:
+                |  {{ route.destination }}
+            p
+                strong Distancia:
+                |  {{ route.distance }}
+            p
+                strong Duración:
+                |  {{ route.duration }}
+
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, toRefs } from 'vue'
 import axios from 'axios'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -67,6 +81,20 @@ interface NotificationState {
     visible: boolean;
 }
 
+interface RouteData {
+    location: {
+        origin: string;
+        destination: string;
+    };
+    distance: string;
+    duration: string;
+}
+
+// Define props for receiving existing route data
+const props = defineProps<{
+    initialRoute?: RouteData | null;
+}>()
+
 // Define interfaces for Nominatim API responses
 interface NominatimResponse {
     display_name: string;
@@ -91,6 +119,7 @@ const apiKey = '5b3ce3597851110001cf62483f8191c887b24389bc8fbfa5b3f59671'
 const loading = ref(false)
 const notification = ref<NotificationState>({ message: '', type: 'info', visible: false })
 
+// Initialize with empty values or existing values if in edit mode
 const address = ref<AddressState>({
     origin: '',
     destination: '',
@@ -106,6 +135,17 @@ const route = ref<RouteState>({
     destination: '',
     distance: '',
     duration: '',
+})
+
+// Extract initialRoute from props to use it inside a computed
+const { initialRoute } = toRefs(props)
+
+// Create a computed property to check if we have existing route data
+const existingRouteData = computed(() => {
+    return initialRoute.value &&
+        initialRoute.value.location &&
+        initialRoute.value.location.origin &&
+        initialRoute.value.location.destination;
 })
 
 const emit = defineEmits<{
@@ -146,6 +186,37 @@ const initializeMap = () => {
 
     // Verificar si ya hay coordenadas existentes y establecer marcadores
     updateMapWithExistingCoords()
+}
+
+// Cargar datos de la ruta existente (en modo edición)
+const loadExistingRouteData = async () => {
+    if (!existingRouteData.value) return
+
+    try {
+        loading.value = true
+
+        // Copiar datos iniciales a las variables del componente
+        address.value.origin = initialRoute.value!.location.origin
+        address.value.destination = initialRoute.value!.location.destination
+        route.value.origin = initialRoute.value!.location.origin
+        route.value.destination = initialRoute.value!.location.destination
+        route.value.distance = initialRoute.value!.distance
+        route.value.duration = initialRoute.value!.duration
+
+        // Geocodificar las direcciones para obtener coordenadas
+        await geocodeAddress('origin', true)
+        await geocodeAddress('destination', true)
+
+        // Recalcular la ruta para mostrarla en el mapa
+        if (coords.value.origin.lat && coords.value.destination.lat) {
+            await calculateRoute(true)
+        }
+    } catch (error) {
+        console.error('Error al cargar datos de ruta existente:', error)
+        showNotification('No se pudieron cargar los datos de la ruta existente', 'error')
+    } finally {
+        loading.value = false
+    }
 }
 
 // Actualizar el mapa con coordenadas existentes
@@ -231,7 +302,7 @@ const onMapClick = async (e: L.LeafletMouseEvent) => {
 }
 
 // Función para geocodificar las direcciones cuando se escribe en los inputs
-const geocodeAddress = async (type: 'origin' | 'destination') => {
+const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: boolean = false) => {
     const query = address.value[type]
     if (!query || query.length < 3) return // Evitar consultas muy cortas
 
@@ -244,12 +315,14 @@ const geocodeAddress = async (type: 'origin' | 'destination') => {
 
         if (response.data.length === 0) {
             // No se encontraron resultados
-            showNotification(`No se encontró la dirección "${query}". Intenta con una dirección más general o revisa si hay errores.`, 'error')
+            if (!skipNotification) {
+                showNotification(`No se encontró la dirección "${query}". Intenta con una dirección más general o revisa si hay errores.`, 'error')
+            }
             return
         }
 
         // Si hay resultados múltiples y son diferentes, mostrar alternativas
-        if (response.data.length > 1) {
+        if (response.data.length > 1 && !skipNotification) {
             const firstResult = response.data[0]
             const alternatives = response.data.slice(1, 3) // Tomar solo 2 alternativas como máximo
 
@@ -274,7 +347,9 @@ const geocodeAddress = async (type: 'origin' | 'destination') => {
         coords.value[type] = { lat: parsedLat, lng: parsedLng }
 
         // Actualizar dirección con el resultado completo para mayor precisión
-        address.value[type] = response.data[0].display_name.split(',').slice(0, 3).join(',')
+        if (!skipNotification) {
+            address.value[type] = response.data[0].display_name.split(',').slice(0, 3).join(',')
+        }
 
         // Actualizar marcador en el mapa
         if (type === 'origin') {
@@ -295,7 +370,9 @@ const geocodeAddress = async (type: 'origin' | 'destination') => {
         leafletMap?.setView([parsedLat, parsedLng], 13)
     } catch (error) {
         console.error('Error al geocodificar:', error)
-        showNotification('Error al buscar la dirección. Por favor, intenta de nuevo.', 'error')
+        if (!skipNotification) {
+            showNotification('Error al buscar la dirección. Por favor, intenta de nuevo.', 'error')
+        }
     } finally {
         loading.value = false
     }
@@ -324,7 +401,7 @@ const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
 }
 
 // Función para calcular la ruta entre origen y destino
-const calculateRoute = async () => {
+const calculateRoute = async (skipNotification: boolean = false) => {
     const { origin, destination } = coords.value
     if (!origin.lat || !destination.lat) return
 
@@ -347,7 +424,9 @@ const calculateRoute = async () => {
         )
 
         if (!response.data.features || response.data.features.length === 0) {
-            showNotification('No se pudo encontrar una ruta entre estos puntos. Intenta con ubicaciones más cercanas o accesibles por carretera.', 'error')
+            if (!skipNotification) {
+                showNotification('No se pudo encontrar una ruta entre estos puntos. Intenta con ubicaciones más cercanas o accesibles por carretera.', 'error')
+            }
             return
         }
 
@@ -359,10 +438,14 @@ const calculateRoute = async () => {
         routeLayer = L.polyline(coordsList, { color: 'blue', weight: 5 }).addTo(leafletMap!)
         leafletMap?.fitBounds(L.latLngBounds(coordsList), { padding: [50, 50] })
 
-        route.value.distance = `${(summary.distance / 1000).toFixed(2)} km`
-        const mins = Math.round(summary.duration / 60)
-        const hrs = Math.floor(mins / 60)
-        route.value.duration = hrs ? `${hrs} h ${mins % 60} min` : `${mins} min`
+        // Actualizar la información de la ruta solo si no se está cargando una existente o es explícitamente solicitado
+        if (!existingRouteData.value || !skipNotification) {
+            route.value.distance = `${(summary.distance / 1000).toFixed(2)} km`
+            const mins = Math.round(summary.duration / 60)
+            const hrs = Math.floor(mins / 60)
+            route.value.duration = hrs ? `${hrs} h ${mins % 60} min` : `${mins} min`
+        }
+
         route.value.origin = address.value.origin
         route.value.destination = address.value.destination
 
@@ -374,18 +457,22 @@ const calculateRoute = async () => {
             distance: route.value.distance
         })
 
-        showNotification('¡Ruta calculada correctamente!', 'success')
+        if (!skipNotification) {
+            showNotification(existingRouteData.value ? '¡Ruta actualizada correctamente!' : '¡Ruta calculada correctamente!', 'success')
+        }
 
     } catch (error: any) {
         console.error('Error al calcular la ruta:', error)
 
         // Detectar tipos específicos de errores
-        if (error.response && error.response.status === 403) {
-            showNotification('Error de autenticación con el servicio de rutas. Verifica la API key.', 'error')
-        } else if (error.response && error.response.status === 400) {
-            showNotification('Las ubicaciones seleccionadas no son válidas para calcular una ruta. Intenta con puntos accesibles por carretera.', 'error')
-        } else {
-            showNotification('Error al calcular la ruta. Por favor, intente con otras ubicaciones.', 'error')
+        if (!skipNotification) {
+            if (error.response && error.response.status === 403) {
+                showNotification('Error de autenticación con el servicio de rutas. Verifica la API key.', 'error')
+            } else if (error.response && error.response.status === 400) {
+                showNotification('Las ubicaciones seleccionadas no son válidas para calcular una ruta. Intenta con puntos accesibles por carretera.', 'error')
+            } else {
+                showNotification('Error al calcular la ruta. Por favor, intente con otras ubicaciones.', 'error')
+            }
         }
     } finally {
         loading.value = false
@@ -442,7 +529,7 @@ const debounce = (fn: Function, delay: number) => {
 }
 
 // Versión con debounce de la función geocodeAddress
-const debouncedGeocodeAddress = debounce(geocodeAddress, 800)
+const debouncedGeocodeAddress = debounce((type: 'origin' | 'destination') => geocodeAddress(type), 800)
 
 // Función para mostrar notificaciones
 const showNotification = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
@@ -469,11 +556,15 @@ const handleNominatimRateLimit = () => {
 onMounted(() => {
     setTimeout(() => {
         initializeMap()
+        // Si hay datos iniciales de ruta (modo edición), cargarlos
+        if (existingRouteData.value) {
+            loadExistingRouteData()
+        }
     }, 100) // Pequeño retraso para asegurar que el DOM esté listo
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .map-container {
     display: flex;
     flex-direction: column;
@@ -482,135 +573,145 @@ onMounted(() => {
     margin: 0 auto;
     padding: 20px;
     box-sizing: border-box;
-}
 
-.route-info {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-}
+    .route-info {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
 
-.map {
-    width: 100%;
-    height: 500px;
-    border-radius: 8px;
-    margin: 15px 0;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+        input {
+            background-color: #022c05;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+    }
 
-.route-info input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    box-sizing: border-box;
-}
+    .map {
+        width: 100%;
+        height: 500px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
-.confirm-button {
-    background-color: #4285f4;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
+    .containerBtn {
+        display: flex;
+        justify-content: center;
 
-.confirm-button:hover:not(:disabled) {
-    background-color: #3367d6;
-}
+        .confirm-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 179, 0, 0.3);
 
-.confirm-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
+            &:hover:not(:disabled) {
+                background-color: #43a047;
+                box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+            }
 
-.route-details {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 15px;
-    border-left: 4px solid #4285f4;
-}
+            &:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+        }
+    }
 
-.route-details p {
-    margin: 8px 0;
-    font-size: 16px;
-}
+    .route-details {
+        background-color: #022c05;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        border-left: 4px solid #ffffffbd;
 
-.loading-indicator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 10px 0;
-}
+        p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+    }
 
-.notification {
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 4px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    animation: fadeIn 0.3s ease-in;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+    .loading-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+        color: white;
 
-.notification-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    flex: 1;
-}
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(66, 133, 244, 0.3);
+            border-radius: 50%;
+            border-top-color: #4285f4;
+            animation: spin 1s ease-in-out infinite;
+        }
+    }
 
-.notification-icon {
-    font-size: 20px;
-}
+    .notification {
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 4px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        animation: fadeIn 0.3s ease-in;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
-.notification-message {
-    flex: 1;
-    line-height: 1.4;
-}
+        &-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            flex: 1;
+        }
 
-.notification-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0 5px;
-    color: #666;
-}
+        &-icon {
+            font-size: 20px;
+        }
 
-.notification.info {
-    background-color: #e3f2fd;
-    border-left: 4px solid #2196f3;
-    color: #0d47a1;
-}
+        &-message {
+            flex: 1;
+            line-height: 1.4;
+        }
 
-.notification.error {
-    background-color: #ffebee;
-    border-left: 4px solid #f44336;
-    color: #b71c1c;
-}
+        &-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+            color: #666;
+        }
 
-.notification.success {
-    background-color: #e8f5e9;
-    border-left: 4px solid #4caf50;
-    color: #1b5e20;
-}
+        &.info {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            color: #0d47a1;
+        }
 
-.loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid rgba(66, 133, 244, 0.3);
-    border-radius: 50%;
-    border-top-color: #4285f4;
-    animation: spin 1s ease-in-out infinite;
+        &.error {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #b71c1c;
+        }
+
+        &.success {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #1b5e20;
+        }
+    }
 }
 
 @keyframes spin {

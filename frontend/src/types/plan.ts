@@ -12,6 +12,8 @@ export interface IPlan {
         color: string
         carIdentifier: string
     }
-    passengers?: { _id: string; nickName: string }[]
+    passengers?: { _id: string; nickName: string; dni: string }[]
+    pendingPassengers: { _id: string; nickName: string; dni: string }[]
     placesAvailable: number
+    isCreator: boolean
 }

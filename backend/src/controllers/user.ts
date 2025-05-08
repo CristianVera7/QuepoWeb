@@ -135,8 +135,14 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
     }
 
     if (dni) {
+      const existingUserWithDni = await User.findOne({ dni });
+      if (existingUserWithDni && existingUserWithDni._id.toString() !== userId) {
+        res.status(400).json({ message: 'El DNI ya está en uso por otro usuario' });
+        return;
+      }
       user.dni = dni;
     }
+
     if (password && newPassword) {
 
       if (password === newPassword) {
@@ -191,14 +197,53 @@ async function hasDni(req: Request, res: Response, next: NextFunction) {
     }
 
     const hasDni = !!user.dni && user.dni.trim() !== ''
-      res.status(200).json({
-        message: hasDni?'El usuario tiene DNI':'El usuario no tiene DNI',
-        ok: true,
-        hasDni,
-      })
+    res.status(200).json({
+      message: hasDni ? 'El usuario tiene DNI' : 'El usuario no tiene DNI',
+      ok: true,
+      hasDni,
+    })
   } catch (err) {
     next(err)
   }
 }
 
-export default { register, login, findUserEmail, getUser, updateUser, hasDni }
+async function deleteUser(req: Request, res: Response, next: NextFunction) {
+  const userId = req.user?.id;
+  const { password } = req.body;
+
+  try {
+    if (!userId) {
+      res.status(401).json({ message: 'No autorizado: ID de usuario no presente' });
+      return;
+    }
+
+    if (!password || typeof password !== 'string') {
+      res.status(400).json({ message: 'La contraseña es obligatoria para eliminar la cuenta' });
+      return;
+    }
+
+    const user = await User.findById(userId).select('password');
+    if (!user) {
+      res.status(404).json({ message: 'Usuario no encontrado' });
+      return;
+    }
+
+    const passwordMatch = await argon2.verify(user.password, password);
+    if (!passwordMatch) {
+      res.status(401).json({ message: 'Contraseña incorrecta' });
+      return;
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      message: 'Cuenta eliminada correctamente',
+      ok: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+export default { register, login, findUserEmail, getUser, updateUser, hasDni, deleteUser }
