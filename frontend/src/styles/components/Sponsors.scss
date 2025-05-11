@@ -2,40 +2,92 @@
 @use '../mixins/breakpoint.scss' as mix;
 
 //Variables
-$base-color: #12ab9e;
+$base-color: #003809;
 $second-color: white;
 
-//
 .secondWrapper {
     display: none;
-    background-color: $second-color;
-    min-width: 50%;
-    justify-content: space-around;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-    .divLogoDesktop {
-        padding-top: 10em;
-        display: grid;
-        place-content: center;
-
-        img {
-            margin: 2em;
-            width: 13em;
-            height: 10em;
-        }
-    }
-
-    .sponsors {
-        margin: 2em;
-
-        .sponsor {
-            width: 15dvh;
-            height: 13dvh;
-        }
-    }
-
-    @include mix.respond(md) {
-        //secondWrapper
+    @include mix.respond(sm) {
         display: flex;
     }
+    
+    .sponsors {
+        background-color: rgb(255, 255, 255);
+        border-bottom-right-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        backdrop-filter: blur(6px);
+        
+        // @include mix.respond(sm) {
+        //     max-height: 800px; // Reducción de altura
+        //     width: auto;
+        // }
+
+        // @include mix.respond(md) {
+        //     width: 80%;
+        //     max-width: 750px;
+        //     min-height: 300px; // Altura significativamente reducida
+        // }
+
+        // @include mix.respond(lg) {
+        //     width: 75%;
+        //     max-width: 900px;
+        //     min-height: 280px; // Altura significativamente reducida
+        // }
+
+        // @include mix.respond(xl) {
+        //     width: 60%;
+        //     min-width: 300px;
+        //     max-width: 1200px;
+        //     min-height: 260px; // Altura significativamente reducida
+        // }
+
+        // @include mix.respond(xxl) {
+        //     width: 50%;
+        //     min-width: 500px;
+        //     max-width: 1400px;
+        //     min-height: 240px; // Altura significativamente reducida
+        // }
+    }
+
+    .sponsor {
+        flex: 1 1 clamp(6rem, 10vw, 10rem);
+        width: 6.5rem;
+        height: auto;
+        object-fit: contain;
+        filter: grayscale(30%);
+        transition: filter 0.3s ease, transform 0.3s ease;
+
+        @include mix.respond(xs) {
+            max-height: 200px; // Reducción de altura
+        }
+        @include mix.respond(sm) {
+            width: 8rem;
+        }
+        @include mix.respond(lg) {
+            width: 9.5rem;
+        }
+        @include mix.respond(xl) {
+            width:10.5rem;
+        }
+
+        &:hover {
+            filter: none;
+            transform: scale(1.05);
+        }
+    }
+
+   
+
+   
 }

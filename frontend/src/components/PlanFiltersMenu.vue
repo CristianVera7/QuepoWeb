@@ -9,29 +9,30 @@
             label(for="startDate") Desde:   
                 flat-pickr(
                     v-model="startDateModel" 
-                    :config="startDateConfig" 
+                    :config="flatpickrConfig" 
                     id="startDate" 
-                    @on-change="onStartDateChange"
+                    @on-change="applyFilters"
                 )
     
             label(for="endDate") Hasta:  
                 flat-pickr( 
                     v-model="endDateModel" 
-                    :config="endDateConfig" 
+                    :config="flatpickrConfig" 
                     id="endDate" 
-                    placeholder="Seleccione fecha " 
-                    @on-change="onEndDateChange"
+                    placeholder="Seleccione fecha" 
+                    @on-change="applyFilters"
                 )
     
         .containerBtns
-            router-link(v-if="hasDni && route.path !== '/dashboard'" to="/dashboard")
-                button Todos los planes
+            router-link(v-if="route.path !== '/dashboard'" to="/dashboard")
+                button Volver a inicio
 
             router-link(v-if="hasDni && route.path !== '/myPlans'" to="/myPlans")
                 button Mis planes
 
             router-link(v-if="(hasDni && route.path !== '/createPlan') || (!hasDni && route.path !== '/editProfile')" :to="hasDni ? '/createPlan' : '/editProfile'")
-                button {{ hasDni ? "+ Crear nuevo plan" : "Completa tu perfil" }}
+                button(v-if="hasDni") + Crear nuevo plan
+                button(v-else) Completa tu perfil
     .plan-header
         h2 {{headerTitle}}
         .nature-divider
@@ -40,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import type { IPlan } from '../types/plan';
 import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
@@ -50,20 +51,20 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const headerTitle = computed(() => {
-    if (route.name === 'dashboard') return '¿De qué plan te apetece disfrutar?'
-    if (route.name === 'createPlan') return 'Crea un nuevo plan'
-    if (route.name === 'myPlans') return 'Mis planes'
-    if (route.name === 'editProfile') return 'Aquí puedes editar tu perfil'
-    if (route.name === 'editPlan') return 'Modifica tu plan'
-    if (route.name === 'requestsPlans') return 'Solicitudes pendientes'
-
-    return ''
+    switch (route.name) {
+        case 'dashboard': return '¿De qué plan te apetece disfrutar?'
+        case 'createPlan': return 'Crea un nuevo plan'
+        case 'myPlans': return 'Mis planes'
+        case 'editProfile': return 'Aquí puedes editar tu perfil'
+        case 'editPlan': return 'Modifica tu plan'
+        case 'requestsPlans': return 'Solicitudes pendientes'
+        default: return ''
+    }
 })
 
-const showFilters = computed(() => {
-    return ['/dashboard', '/myPlans'].includes(route.path);
-});
-
+const showFilters = computed(() => 
+    ['/dashboard', '/myPlans'].includes(route.path)
+);
 
 // Props
 const props = defineProps<{
@@ -81,37 +82,28 @@ const categories = ['Pesca', 'Escalada', 'Senderismo'];
 const categoryModel = ref<string>('Ver todo');
 const startDateModel = ref<string>('');
 const endDateModel = ref<string>('');
-const today = ref<string>('');
 
-// Flatpickr configs
-const startDateConfig = {
+// Flatpickr config unificada
+const flatpickrConfig = {
     dateFormat: 'd-m-Y',
     locale: 'es',
     disableMobile: true,
     allowInput: true,
-    minDate: 'today' // Establece la fecha mínima como hoy
+    minDate: 'today',
+    disable: [
+        function(date:Date) {
+            // Deshabilita cualquier fecha anterior a hoy
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date < today;
+        }
+    ]
 };
 
-const endDateConfig = {
-    dateFormat: 'd-m-Y',
-    locale: 'es',
-    disableMobile: true,
-    allowInput: true,
-    minDate: 'today' // Establece la fecha mínima como hoy
-};
-
-// Methods
-function formatDateToDisplay(date: Date): string {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-}
-
+// Métodos
 function parseDisplayDate(dateStr: string): Date | null {
     if (!dateStr) return null;
 
-    // Formato: DD-MM-YYYY
     const parts = dateStr.split('-');
     if (parts.length !== 3) return null;
 
@@ -122,69 +114,16 @@ function parseDisplayDate(dateStr: string): Date | null {
     return new Date(year, month, day);
 }
 
-function onStartDateChange(selectedDates: Date[], dateStr: string) {
-    // Verificar que la fecha seleccionada no sea anterior a la fecha actual
-    const selectedDate = parseDisplayDate(dateStr);
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    if (selectedDate && selectedDate < currentDate) {
-        // Si es anterior, establecer la fecha de hoy
-        startDateModel.value = today.value;
-    } else {
-        startDateModel.value = dateStr;
-    }
-
-    // Si la fecha de fin es anterior a la fecha de inicio, actualizarla
-    if (endDateModel.value) {
-        const startDate = parseDisplayDate(startDateModel.value);
-        const endDate = parseDisplayDate(endDateModel.value);
-
-        if (startDate && endDate && endDate < startDate) {
-            endDateModel.value = startDateModel.value;
-        }
-    }
-
-    // Actualizar la configuración del segundo selector para establecer la nueva fecha mínima
-    endDateConfig.minDate = startDateModel.value;
-
-    applyFilters();
-}
-
-function onEndDateChange(selectedDates: Date[], dateStr: string) {
-    // Verificar que la fecha seleccionada no sea anterior a la fecha actual
-    const selectedDate = parseDisplayDate(dateStr);
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    if (selectedDate && selectedDate < currentDate) {
-        // Si es anterior, establecer la fecha de hoy
-        endDateModel.value = today.value;
-    } else if (selectedDate && startDateModel.value) {
-        // Verificar que no sea anterior a la fecha de inicio
-        const startDate = parseDisplayDate(startDateModel.value);
-
-        if (startDate && selectedDate < startDate) {
-            endDateModel.value = startDateModel.value;
-        } else {
-            endDateModel.value = dateStr;
-        }
-    } else {
-        endDateModel.value = dateStr;
-    }
-
-    applyFilters();
-}
-
 function applyFilters() {
     if (props.allPlans) {
         emit('update:filteredPlans', filteredPlans.value);
     }
 }
 
-// Computed
+// Computed para filtrar planes
 const filteredPlans = computed(() => {
     if (!props.allPlans) return [];
+    
     return props.allPlans.filter(plan => {
         if (!plan || !plan.dateTime || !plan.category) return false;
 
@@ -219,29 +158,15 @@ const filteredPlans = computed(() => {
     });
 });
 
-// Watchers
-watch(filteredPlans, (newFilteredPlans) => {
-    emit('update:filteredPlans', newFilteredPlans);
-});
-
-watch(() => props.allPlans, (newPlans) => {
-    if (newPlans) {
-        applyFilters();
-    }
-});
-
-
 // Lifecycle
 onMounted(() => {
+    // Establecemos la fecha de inicio como hoy
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    today.value = formatDateToDisplay(now);
-    startDateModel.value = today.value;
-
-    // Actualizar configuración de flatpickr
-    startDateConfig.minDate = 'today';
-    endDateConfig.minDate = startDateModel.value;
-
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    startDateModel.value = `${day}-${month}-${year}`;
+    
     // Aplicar filtros iniciales
     applyFilters();
 });
@@ -529,7 +454,7 @@ onMounted(() => {
 <style lang="scss">
 /* Estilos globales para flatpickr */
 .flatpickr-calendar {
-    background-color: rgba(1, 43, 0, 0.9) !important;
+    background-color: rgba(1, 43, 0, 0.938) !important;
     color: white !important;
     border: 1px solid white;
     font-family: inherit;
@@ -562,6 +487,7 @@ onMounted(() => {
         &.today {
             border-color: white;
             color: #4CAF50;
+            font-weight: bold;
         }
 
         &.prevMonthDay,
@@ -569,9 +495,17 @@ onMounted(() => {
             color: rgba(255, 255, 255, 0.4);
         }
 
-        &.disabled {
-            color: rgba(255, 255, 255, 0.2);
+        /* Estilos para días desactivados (días pasados) */
+        &.disabled,
+        &.flatpickr-disabled {
+            color: rgba(192, 192, 192, 0.582);
             text-decoration: line-through;
+            background-color: rgba(0, 0, 0, 0.1) !important; /* Fondo rojo transparente para días pasados */
+            cursor: not-allowed;
+            
+            &:hover {
+                background-color: rgba(255, 0, 0, 0.2) !important;
+            }
         }
     }
 

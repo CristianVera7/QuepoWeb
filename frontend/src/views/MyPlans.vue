@@ -1,7 +1,7 @@
 <template lang="pug">
     firstComponent
         PlanFiltersMenu(:allPlans="plansList" :hasDni="hasDni" @update:filteredPlans="onFilteredPlansUpdate")
-        PlanList(:filteredPlans="displayedPlans" :hasDni="hasDni" :message="message" @leavePlan="leavePlan")
+        PlanList(:filteredPlans="displayedPlans" :hasDni="hasDni" :pendingRequestPlans="pendingRequestPlans" :message="message" @leavePlan="leavePlan")
 </template>
 
 <script setup lang="ts">
@@ -20,7 +20,9 @@ const { hasDni } = storeToRefs(useRegisterStore());
 
 const plansList = ref<IPlan[]>([]);
 const displayedPlans = ref<IPlan[]>([]);
+const pendingRequestPlans = ref<string[]>([])
 const message = 'No tienes planes en los que seas participe.';
+
 
 const onFilteredPlansUpdate = (plans: IPlan[]) => {
     displayedPlans.value = plans;
@@ -67,8 +69,27 @@ const leavePlan = async (planId: string) => {
     }
 };
 
+const getPendingRequests = async () => {
+    try {
+        const response = await axios.get('http://localhost:8000/plan/pendingRequest', {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${tokenStore}`
+            }
+        });
+
+        if (response.data.ok && response.data.plans) {
+            pendingRequestPlans.value = response.data.plans.map((plan: any) => plan.planId);
+            // console.log('Solicitudes pendientes:', pendingRequestPlans.value);
+        }
+    } catch (error) {
+        console.log('Error al obtener solicitudes pendientes:', error);
+    }
+}
+
 onMounted(async () => {
     await checkUser();
     await listOfPlans();
+    await getPendingRequests()
 });
 </script>

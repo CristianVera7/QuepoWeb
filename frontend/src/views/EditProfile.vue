@@ -57,7 +57,7 @@
                     p.msgError(v-if="deleteError") {{ deleteError }}
 
                 .btns-group
-                    button.confirm-delete(@click.prevent="performDeleteAccount") Confirmar eliminación
+                    button.confirm-delete(@click.prevent="performDeleteAccount") Eliminar
                     button.cancel-delete(@click.prevent="cancelDeleteAccount") Cancelar
 </template>
 
@@ -74,7 +74,7 @@ import { validateSpanishId } from '../validations/validationDni';
 
 const { hasDni } = storeToRefs(useRegisterStore())
 const router = useRouter();
-const { tokenStore } = useRegisterStore()
+const { tokenStore, cleanStorage, cleanStore } = useRegisterStore()
 const showPasswordForm = ref(false);
 const showSuccessModal = ref(false);
 const showErrorModal = ref(false);
@@ -222,9 +222,8 @@ const performDeleteAccount = async () => {
     }
 
     try {
-        await axios.post('http://localhost:8000/user/delete', {
-            password: deletePassword.value
-        }, {
+        await axios.delete('http://localhost:8000/user/delete', {
+            data: { password: deletePassword.value },
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -233,13 +232,12 @@ const performDeleteAccount = async () => {
 
         // Cerrar sesión o redirigir
         successMessage.value = 'Tu cuenta ha sido eliminada con éxito.';
-        showSuccessModal.value = true;
         showDeleteModal.value = false;
 
-        // Redirigir después de un breve retraso
-        setTimeout(() => {
-            router.push('/'); // o login
-        }, 2000);
+        cleanStorage()
+        cleanStore()
+        router.push('/register');
+
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
             deleteError.value = error.response?.data?.message || 'Error al eliminar cuenta';
@@ -566,7 +564,7 @@ onMounted(async () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.459);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -639,21 +637,20 @@ onMounted(async () => {
             }
 
             .confirm-delete {
-                background-color: #2d89ef;
+                background-color: #F44336;
                 color: white;
 
                 &:hover {
-                    background-color: #2269be;
+                    background-color: #e53935;
                 }
             }
 
             .cancel-delete {
-                background-color: #e74c3c;
-                color: white;
+                background-color: #e9ecef;
+                color: #495057;
 
                 &:hover {
-                    background-color: #c0392b;
-
+                    background-color: #dee2e6;
                 }
             }
         }

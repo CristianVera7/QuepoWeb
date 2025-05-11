@@ -6,6 +6,7 @@
                 :key="plan._id"
                 :plan="plan"
                 :hasDni="hasDni"
+                :pendingRequestPlans="props.pendingRequestPlans"
                 @joinPlan="joinPlan"
                 @leavePlan="leavePlan"
             )
@@ -21,6 +22,7 @@ interface Props {
     filteredPlans: IPlan[];
     hasDni: boolean;
     message: string;
+    pendingRequestPlans?: string[];
 }
 
 const props = defineProps<Props>();
@@ -36,15 +38,13 @@ const leavePlan = (planId: string) => {
 </script>
 
 <style scoped lang="scss">
-
 .plan-list-container {
     padding: 2rem 4rem;
 
     .plan-list {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        align-items: start;
-        gap: 5rem;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 2rem;
     }
 
     .no-plans-message {
@@ -61,8 +61,29 @@ const leavePlan = (planId: string) => {
 }
 
 @media (max-width: 768px) {
+    .plan-list-container {
+        padding: 1rem;
+    }
+
     .plan-list {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 480px) {
+    .plan-list-container {
+        padding: 1rem;
+    }
+
+    .plan-list {
+        grid-template-columns: 1fr;  /* For smaller screens, cards take full width */
+        gap: 1.5rem;
+    }
+
+    .plan-card {
+        width: 100%;  /* Ensures cards take full width in small screens */
+        max-width: 100%;  /* Avoids limiting the size */
+    }
+}
+
 </style>

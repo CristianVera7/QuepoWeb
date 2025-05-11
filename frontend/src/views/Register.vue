@@ -2,26 +2,26 @@
     .register-view
         .firstWrapper
             .formContainer
-                NavMenuMobile
-                .view
-                    h2.h2 Sign up
-            .form-wrapper
-                form.form
-                    input(type="text" placeholder="Nickname" @focus='focusField="nickName"' :class='errors.nickName?"fieldError":"field"' v-model='user.nickName' v-if="isRegisterPath") 
-                    p.msgError(v-if='focusField==="nickName"&&errors.nickName') {{errors.nickName}}
-                    input( type="text" placeholder="Email"  @focus='focusField="email"' :class='errors.email?"fieldError":"field"' v-model='user.email' )
-                    p.msgError(v-if='focusField==="email"&&errors.email') {{errors.email}}
-                    input(type="password" placeholder="Password" @focus='focusField="password"'  :class='errors.password?"fieldError":"field"' v-model='user.password')
-                    p.msgError(v-if='focusField==="password"&&errors.password') {{errors.password}}
-                    input(type="password" placeholder="Repeat password" @focus='focusField="repeatPassword"' :class='errors.repeatPassword?"fieldError":"field"' v-model='user.repeatPassword' v-if="isRegisterPath")
-                    p.msgError(v-if='focusField==="repeatPassword"&&errors.repeatPassword') {{errors.repeatPassword}}
-                    button.btnForm(@click.prevent='registerUser' :disabled='isBtnDisabled') Sign up
-                    .divRouteLogin 
-                        label Already have an account?
-                        Router-link.routeLogin(:to="{name:'login'}") Log in
-            .divLogoMobile
-                img(src="../img/logo/logoQuepo.png")
-        Sponsors    
+                .firstBlock
+                    NavMenuMobile
+                    .view
+                        h2.h2 Sign up
+                    .form-wrapper
+                        form.form
+                            input(type="text" placeholder="Nickname" @focus='focusField="nickName"' :class='errors.nickName?"fieldError":"field"' v-model='user.nickName' v-if="isRegisterPath") 
+                            p.msgError(v-if='focusField==="nickName"&&errors.nickName') {{errors.nickName}}
+                            input( type="text" placeholder="Email"  @focus='focusField="email"' :class='errors.email?"fieldError":"field"' v-model='user.email' )
+                            p.msgError(v-if='focusField==="email"&&errors.email') {{errors.email}}
+                            input(type="password" placeholder="Password" @focus='focusField="password"'  :class='errors.password?"fieldError":"field"' v-model='user.password')
+                            p.msgError(v-if='focusField==="password"&&errors.password') {{errors.password}}
+                            input(type="password" placeholder="Repeat password" @focus='focusField="repeatPassword"' :class='errors.repeatPassword?"fieldError":"field"' v-model='user.repeatPassword' v-if="isRegisterPath")
+                            p.msgError(v-if='focusField==="repeatPassword"&&errors.repeatPassword') {{errors.repeatPassword}}
+                            button.btnForm(@click.prevent='registerUser' :disabled='isBtnDisabled') Sign up
+                            .divRouteLogin 
+                                label Already have an account?
+                                Router-link.routeLogin(:to="{name:'login'}") Log in
+                .secondBlock
+                    Sponsors    
 </template>
 
 <script setup lang="ts">

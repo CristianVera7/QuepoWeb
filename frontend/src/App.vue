@@ -32,13 +32,13 @@ import { RouterView, useRouter } from 'vue-router'
 // // const clearSetInterval = clearInterval(repeatFind)
 
 // onMounted(async () => {
-//     await checkUser()
-//     if (isRegistered.value && isLogged.value) router.push({ name: 'dashboard' })
-//     else if (isRegistered.value) router.push({ name: 'login' })
-//     else router.push({ name: 'register' })
+    // await checkUser()
+    // if (isRegistered.value && isLogged.value) router.push({ name: 'dashboard' })
+    // else if (isRegistered.value) router.push({ name: 'login' })
+    // else router.push({ name: 'register' })
 
-//     // refresh()
-//     // clearSetInterval
+    // refresh()
+    // clearSetInterval
 // })
 </script>
 

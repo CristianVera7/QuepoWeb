@@ -46,7 +46,7 @@ const handlePlanCreated = (planTitle: string) => {
 
 // Navegar al dashboard
 const navigateToDashboard = () => {
-    router.push('/dashboard')
+    router.push('/myPlans')
 }
 </script>
 

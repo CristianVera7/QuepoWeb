@@ -2,33 +2,33 @@
     .register-view
         .firstWrapper
             .formContainer
-                NavMenuMobile
-                .view
-                    h2.h2 Log in
-                .socialIcons
-                    button.icon
-                        .svg-icon.google
-                    button.icon
-                        .svg-icon.linkedin
-                    button.icon 
-                        .svg-icon.github
-                .divSeparator 
-                    hr.lineSeparator
-                    p.textSeparator OR
-                    hr.lineSeparator
-                .form-wrapper
-                    form.form
-                        input( type="text" placeholder="Email"  @focus='focusField="email"' :class='errors.email?"fieldError":"field"' v-model='user.email' )
-                        p.msgError(v-if='focusField==="email"&&errors.email') {{errors.email}}
-                        input(type="password" placeholder="Password" @focus='focusField="password"'  :class='errors.password?"fieldError":"field"' v-model='user.password')
-                        p.msgError(v-if='focusField==="password"&&errors.password') {{errors.password}}
-                        button.btnForm(@click.prevent='loginUser' :disabled='isBtnDisabled') Log in
-                        .divRouteLogin 
-                            label You don't have an account?
-                            Router-link.routeLogin(:to="{name:'register'}") Register
-                .divLogoMobile
-                    img(src="../img/logo/logoQuepo.png")
-        Sponsors
+                .firstBlock
+                    NavMenuMobile
+                    .view
+                        h2.h2 Log in
+                    .socialIcons
+                        button.icon
+                            .svg-icon.google
+                        button.icon
+                            .svg-icon.linkedin
+                        button.icon 
+                            .svg-icon.github
+                    .divSeparator 
+                        hr.lineSeparator
+                        p.textSeparator OR
+                        hr.lineSeparator
+                    .form-wrapper
+                        form.form
+                            input( type="text" placeholder="Email"  @focus='focusField="email"' :class='errors.email?"fieldError":"field"' v-model='user.email' )
+                            p.msgError(v-if='focusField==="email"&&errors.email') {{errors.email}}
+                            input(type="password" placeholder="Password" @focus='focusField="password"'  :class='errors.password?"fieldError":"field"' v-model='user.password')
+                            p.msgError(v-if='focusField==="password"&&errors.password') {{errors.password}}
+                            button.btnForm(@click.prevent='loginUser' :disabled='isBtnDisabled') Log in
+                            .divRouteLogin 
+                                label You don't have an account?
+                                Router-link.routeLogin(:to="{name:'register'}") Register
+                .secondBlock
+                    Sponsors
 </template>
 
 <script setup lang="ts">

@@ -1,18 +1,69 @@
-@use 'sass:map';
 
+// Definición de breakpoints para diseño responsive
 $breakpoints: (
-    xs: 430px,
-    sm: 540px,
-    md: 900px,
-    xl: 1220px
+  xxs: 400px,   // Móviles pequeños
+  xs: 480px,   // Móviles pequeños
+  sm: 560px,   // Móviles grandes
+  md: 768px,   // Tablets
+  lg: 992px,   // Desktops pequeños
+  xl: 1200px,  // Desktops grandes
+  xxl: 1400px  // Pantallas extra grandes
 );
 
+// Mixin para media queries
 @mixin respond($breakpoint) {
-    @if map.has-key($breakpoints, $breakpoint) {
-        @media screen and (min-width: map.get($breakpoints, $breakpoint)) {
-            @content;
-        }
-    } @else {
-        @warn "El valor '#{$breakpoint}' no ha sido declarado en el mapa";
+  // Si el breakpoint existe en el mapa
+  @if map-has-key($breakpoints, $breakpoint) {
+    // Obtiene el valor del breakpoint
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    
+    // Media query
+    @media (min-width: $breakpoint-value) {
+      @content;
     }
+  } 
+  // Si el breakpoint no existe en el mapa
+  @else {
+    // Logged para el desarrollador
+    @warn "Valor de breakpoint inválido: #{$breakpoint}.";
+  }
+}
+
+// Mixin para media queries máximas (hasta cierto breakpoint)
+@mixin respond-max($breakpoint) {
+  // Si el breakpoint existe en el mapa
+  @if map-has-key($breakpoints, $breakpoint) {
+    // Obtiene el valor del breakpoint
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    
+    // Media query
+    @media (max-width: ($breakpoint-value - 1)) {
+      @content;
+    }
+  } 
+  // Si el breakpoint no existe en el mapa
+  @else {
+    // Logged para el desarrollador
+    @warn "Valor de breakpoint inválido: #{$breakpoint}.";
+  }
+}
+
+// Mixin para rangos entre breakpoints
+@mixin respond-between($lower, $upper) {
+  // Si ambos breakpoints existen en el mapa
+  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
+    // Obtiene los valores de los breakpoints
+    $lower-value: map-get($breakpoints, $lower);
+    $upper-value: map-get($breakpoints, $upper);
+    
+    // Media query
+    @media (min-width: $lower-value) and (max-width: ($upper-value - 1)) {
+      @content;
+    }
+  } 
+  // Si algún breakpoint no existe en el mapa
+  @else {
+    // Logged para el desarrollador
+    @warn "Valores de breakpoint inválidos: #{$lower} o #{$upper}.";
+  }
 }

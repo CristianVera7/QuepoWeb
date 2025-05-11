@@ -383,6 +383,40 @@ async function getPendingPassengers(req: Request, res: Response, next: NextFunct
     }
 }
 
+async function getPendingRequests(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+
+    if (!userId) {
+        res.status(403).json({ message: 'Usuario no autenticado', ok: false });
+        return
+    }
+
+    try {
+        const plans = await Plan.find({ 'pendingPassengers.id': userId });
+
+        if (!plans.length) {
+            res.status(200).json({
+                message: 'No se encontraron planes a los que hayas solicitado unirte',
+                ok: true,
+                plans: []
+            });
+            return
+        }
+
+        const userPendingPlans = plans.map(plan => ({ planId: plan._id }));
+
+        res.status(200).json({
+            message: 'Planes encontrados donde estás como pasajero pendiente',
+            ok: true,
+            plans: userPendingPlans
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+
 async function myPlans(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = req.user?.id;
@@ -482,6 +516,49 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+//Eliminar plan:
+async function deletePlan(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.id;
+    const userNickName = req.user?.nickName;
+    const { planId } = req.params
+    if (!userId || !userNickName) {
+        res.status(403).json({
+            message: 'Usuario no autenticado o datos incompletos del token.',
+            ok: false
+        });
+        return
+    }
+
+    try {
+        const plan = await Plan.findById(planId);
+        if (!plan) {
+            res.status(404).json({
+                message: 'Plan no encontrado.',
+                ok: false
+            });
+            return
+        }
+        //comprobar si el usuario es el creador de este plan:
+        if (plan.creatorUser.toString() !== userId) {
+            res.status(403).json({
+                message: 'No tienes permisos para eliminar este plan.',
+                ok: false
+            });
+            return
+        }
+        //eliminar el plan:
+        await plan.deleteOne();
+        res.status(200).json({
+            message: 'Plan eliminado exitosamente.',
+            ok: true
+        });
+
+    } catch (error) {
+        next(error)
+    }
+}
 
 
-export default { createPlan, listPlans, getPlanById, updatePlan, listPlansByCategory, joinPlan, approvePassenger, rejectPassenger, getPendingPassengers, myPlans, leavePlan }
+
+
+export default { createPlan, listPlans, getPlanById, updatePlan, listPlansByCategory, joinPlan, approvePassenger, rejectPassenger, getPendingPassengers, getPendingRequests, myPlans, leavePlan, deletePlan }

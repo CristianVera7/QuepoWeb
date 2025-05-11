@@ -33,31 +33,18 @@
                 type="button"
                 :disabled="!isRouteReady"
                 @click="calculateRoute"
-            ) {{ existingRouteData ? 'Actualizar ruta' : 'Confirmar ruta' }}
-
-        .route-details(v-if="hasRouteInfo")
-            p
-                strong Origen:
-                |  {{ route.origin }}
-            p
-                strong Destino:
-                |  {{ route.destination }}
-            p
-                strong Distancia:
-                |  {{ route.distance }}
-            p
-                strong Duración:
-                |  {{ route.duration }}
-
+            )
+                i.fas.fa-map-marked-alt
+                span {{ existingRouteData ? 'Actualizar ruta' : 'Calcular ruta' }}
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, toRefs } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// Define interfaces for better TypeScript support
+// Define interfaces
 interface Coordinates {
     lat: number | null;
     lng: number | null;
@@ -68,85 +55,39 @@ interface AddressState {
     destination: string;
 }
 
-interface RouteState {
-    origin: string;
-    destination: string;
-    distance: string;
-    duration: string;
-}
-
 interface NotificationState {
     message: string;
     type: 'info' | 'error' | 'success';
     visible: boolean;
 }
 
-interface RouteData {
-    location: {
-        origin: string;
-        destination: string;
-    };
-    distance: string;
-    duration: string;
-}
-
-// Define props for receiving existing route data
-const props = defineProps<{
-    initialRoute?: RouteData | null;
-}>()
-
-// Define interfaces for Nominatim API responses
 interface NominatimResponse {
     display_name: string;
     lat: string;
     lon: string;
-    address?: NominatimAddress;
+    address?: {
+        road?: string;
+        street?: string;
+        path?: string;
+        city?: string;
+        town?: string;
+        village?: string;
+        country?: string;
+        [key: string]: string | undefined;
+    };
 }
 
-interface NominatimAddress {
-    road?: string;
-    street?: string;
-    path?: string;
-    city?: string;
-    town?: string;
-    village?: string;
-    country?: string;
-    [key: string]: string | undefined;
-}
-
-const mapRef = ref<HTMLElement | null>(null)
-const apiKey = '5b3ce3597851110001cf62483f8191c887b24389bc8fbfa5b3f59671'
-const loading = ref(false)
-const notification = ref<NotificationState>({ message: '', type: 'info', visible: false })
-
-// Initialize with empty values or existing values if in edit mode
-const address = ref<AddressState>({
-    origin: '',
-    destination: '',
-})
-
-const coords = ref({
-    origin: { lat: null as number | null, lng: null as number | null },
-    destination: { lat: null as number | null, lng: null as number | null },
-})
-
-const route = ref<RouteState>({
-    origin: '',
-    destination: '',
-    distance: '',
-    duration: '',
-})
-
-// Extract initialRoute from props to use it inside a computed
-const { initialRoute } = toRefs(props)
-
-// Create a computed property to check if we have existing route data
-const existingRouteData = computed(() => {
-    return initialRoute.value &&
-        initialRoute.value.location &&
-        initialRoute.value.location.origin &&
-        initialRoute.value.location.destination;
-})
+// Define props y emit
+const props = defineProps<{
+    initialRoute?: {
+        location: {
+            origin: string;
+            destination: string;
+        };
+        distance: string;
+        duration: string;
+    } | null;
+}>()
 
 const emit = defineEmits<{
     (e: 'route-confirmed', data: {
@@ -157,20 +98,39 @@ const emit = defineEmits<{
     }): void
 }>()
 
+// Estado del componente
+const mapRef = ref<HTMLElement | null>(null)
+const apiKey = '5b3ce3597851110001cf62483f8191c887b24389bc8fbfa5b3f59671'
+const loading = ref(false)
+const notification = ref<NotificationState>({ message: '', type: 'info', visible: false })
+const address = ref<AddressState>({ origin: '', destination: '' })
+const coords = ref({
+    origin: { lat: null as number | null, lng: null as number | null },
+    destination: { lat: null as number | null, lng: null as number | null },
+})
+const route = ref({
+    origin: '',
+    destination: '',
+    distance: '',
+    duration: '',
+})
 
+// Variables para Leaflet
 let leafletMap: L.Map | null = null
 let originMarker: L.Marker | null = null
 let destinationMarker: L.Marker | null = null
 let routeLayer: L.Polyline | null = null
 
-// Computed para habilitar el botón solo si ambas direcciones están definidas
-const isRouteReady = computed(() => {
-    return !!(coords.value.origin.lat && coords.value.destination.lat)
+// Computed properties
+const existingRouteData = computed(() => {
+    return props.initialRoute &&
+        props.initialRoute.location &&
+        props.initialRoute.location.origin &&
+        props.initialRoute.location.destination
 })
 
-// Computed para mostrar la información de la ruta solo cuando existe
-const hasRouteInfo = computed(() => {
-    return !!(route.value.distance && route.value.duration)
+const isRouteReady = computed(() => {
+    return !!(coords.value.origin.lat && coords.value.destination.lat)
 })
 
 // Inicialización del mapa
@@ -183,31 +143,29 @@ const initializeMap = () => {
     }).addTo(leafletMap)
 
     leafletMap.on('click', onMapClick)
-
-    // Verificar si ya hay coordenadas existentes y establecer marcadores
     updateMapWithExistingCoords()
 }
 
-// Cargar datos de la ruta existente (en modo edición)
+// Cargar datos de la ruta existente
 const loadExistingRouteData = async () => {
     if (!existingRouteData.value) return
 
     try {
         loading.value = true
 
-        // Copiar datos iniciales a las variables del componente
-        address.value.origin = initialRoute.value!.location.origin
-        address.value.destination = initialRoute.value!.location.destination
-        route.value.origin = initialRoute.value!.location.origin
-        route.value.destination = initialRoute.value!.location.destination
-        route.value.distance = initialRoute.value!.distance
-        route.value.duration = initialRoute.value!.duration
+        // Copiar datos iniciales
+        address.value.origin = props.initialRoute!.location.origin
+        address.value.destination = props.initialRoute!.location.destination
+        route.value.origin = props.initialRoute!.location.origin
+        route.value.destination = props.initialRoute!.location.destination
+        route.value.distance = props.initialRoute!.distance
+        route.value.duration = props.initialRoute!.duration
 
-        // Geocodificar las direcciones para obtener coordenadas
+        // Geocodificar direcciones
         await geocodeAddress('origin', true)
         await geocodeAddress('destination', true)
 
-        // Recalcular la ruta para mostrarla en el mapa
+        // Dibujar ruta en el mapa
         if (coords.value.origin.lat && coords.value.destination.lat) {
             await calculateRoute(true)
         }
@@ -223,7 +181,7 @@ const loadExistingRouteData = async () => {
 const updateMapWithExistingCoords = () => {
     if (!leafletMap) return
 
-    // Comprobar y mostrar el marcador de origen
+    // Marcador de origen
     if (coords.value.origin.lat && coords.value.origin.lng) {
         if (originMarker) originMarker.remove()
         originMarker = L.marker([coords.value.origin.lat, coords.value.origin.lng])
@@ -231,7 +189,7 @@ const updateMapWithExistingCoords = () => {
             .bindPopup('Origen')
     }
 
-    // Comprobar y mostrar el marcador de destino
+    // Marcador de destino
     if (coords.value.destination.lat && coords.value.destination.lng) {
         if (destinationMarker) destinationMarker.remove()
         destinationMarker = L.marker([coords.value.destination.lat, coords.value.destination.lng])
@@ -239,48 +197,36 @@ const updateMapWithExistingCoords = () => {
             .bindPopup('Destino')
     }
 
-    // Si ambas coordenadas existen, ajusta la vista para mostrar ambos puntos
+    // Ajustar vista
     if (coords.value.origin.lat && coords.value.destination.lat) {
         const bounds = L.latLngBounds(
             [coords.value.origin.lat, coords.value.origin.lng!],
             [coords.value.destination.lat, coords.value.destination.lng!]
         )
         leafletMap.fitBounds(bounds, { padding: [50, 50] })
-    }
-    // Si solo existe una coordenada, enfoca en ella
-    else if (coords.value.origin.lat) {
+    } else if (coords.value.origin.lat) {
         leafletMap.setView([coords.value.origin.lat, coords.value.origin.lng!], 13)
-    }
-    else if (coords.value.destination.lat) {
+    } else if (coords.value.destination.lat) {
         leafletMap.setView([coords.value.destination.lat, coords.value.destination.lng!], 13)
     }
 }
 
-// Manejador de clics en el mapa para establecer los marcadores de origen y destino
+// Manejar clics en el mapa
 const onMapClick = async (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng
 
-    // Determinar si configuramos origen o destino basado en lo que falta
-    let type: 'origin' | 'destination' = 'origin'
+    // Determinar si configuramos origen o destino
+    let type: 'origin' | 'destination' = !coords.value.origin.lat ? 'origin' :
+        !coords.value.destination.lat ? 'destination' : 'origin'
 
-    if (!coords.value.origin.lat) {
-        type = 'origin'
-    } else if (!coords.value.destination.lat) {
-        type = 'destination'
-    } else {
-        // Si ambos ya están configurados, actualiza el origen por defecto
-        type = 'origin'
-    }
-
-    // Actualizar coordenadas y marcador
+    // Actualizar coordenadas
     coords.value[type] = { lat, lng }
 
     try {
         loading.value = true
-        // Obtener dirección del punto y actualizar el campo de texto
         address.value[type] = await reverseGeocode(lat, lng)
 
-        // Actualizar marcador en el mapa
+        // Actualizar marcador
         if (type === 'origin') {
             if (originMarker) originMarker.remove()
             originMarker = L.marker([lat, lng])
@@ -301,34 +247,32 @@ const onMapClick = async (e: L.LeafletMouseEvent) => {
     }
 }
 
-// Función para geocodificar las direcciones cuando se escribe en los inputs
+// Geocodificar direcciones
 const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: boolean = false) => {
     const query = address.value[type]
-    if (!query || query.length < 3) return // Evitar consultas muy cortas
+    if (!query || query.length < 3) return
 
     try {
         loading.value = true
-        await handleNominatimRateLimit() // Añadir un retraso para evitar límites de API
+        await handleNominatimRateLimit()
 
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=es&limit=5`
         const response = await axios.get<NominatimResponse[]>(url)
 
         if (response.data.length === 0) {
-            // No se encontraron resultados
             if (!skipNotification) {
                 showNotification(`No se encontró la dirección "${query}". Intenta con una dirección más general o revisa si hay errores.`, 'error')
             }
             return
         }
 
-        // Si hay resultados múltiples y son diferentes, mostrar alternativas
+        // Mostrar alternativas si es relevante
         if (response.data.length > 1 && !skipNotification) {
             const firstResult = response.data[0]
-            const alternatives = response.data.slice(1, 3) // Tomar solo 2 alternativas como máximo
+            const alternatives = response.data.slice(1, 3)
 
-            // Verificar si las alternativas son significativamente diferentes
+            // Verificar si son significativamente diferentes
             const areAlternativesDifferent = alternatives.some((alt: NominatimResponse) => {
-                // Comprobar si el nombre del lugar o la ciudad es diferente
                 return alt.display_name.split(',')[0] !== firstResult.display_name.split(',')[0]
             })
 
@@ -339,19 +283,17 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
             }
         }
 
+        // Actualizar coordenadas y marcador
         const { lat, lon } = response.data[0]
         const parsedLat = parseFloat(lat)
         const parsedLng = parseFloat(lon)
 
-        // Actualizar coordenadas
         coords.value[type] = { lat: parsedLat, lng: parsedLng }
 
-        // Actualizar dirección con el resultado completo para mayor precisión
         if (!skipNotification) {
             address.value[type] = response.data[0].display_name.split(',').slice(0, 3).join(',')
         }
 
-        // Actualizar marcador en el mapa
         if (type === 'origin') {
             if (originMarker) originMarker.remove()
             originMarker = L.marker([parsedLat, parsedLng])
@@ -366,7 +308,6 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
                 .openPopup()
         }
 
-        // Centrar el mapa en la nueva ubicación
         leafletMap?.setView([parsedLat, parsedLng], 13)
     } catch (error) {
         console.error('Error al geocodificar:', error)
@@ -378,10 +319,10 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
     }
 }
 
-// Función para realizar la geocodificación inversa
+// Geocodificación inversa
 const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     try {
-        await handleNominatimRateLimit() // Añadir un retraso para evitar límites de API
+        await handleNominatimRateLimit()
 
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=es`
         const response = await axios.get<NominatimResponse>(url)
@@ -391,7 +332,7 @@ const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
             return 'Ubicación desconocida'
         }
 
-        const a: NominatimAddress = response.data.address
+        const a = response.data.address
         return [a.road || a.street || a.path || '', a.city || a.town || a.village || '', a.country || ''].filter(Boolean).join(', ')
     } catch (error) {
         console.error('Error en reverseGeocode:', error)
@@ -400,7 +341,7 @@ const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     }
 }
 
-// Función para calcular la ruta entre origen y destino
+// Calcular ruta
 const calculateRoute = async (skipNotification: boolean = false) => {
     const { origin, destination } = coords.value
     if (!origin.lat || !destination.lat) return
@@ -430,15 +371,17 @@ const calculateRoute = async (skipNotification: boolean = false) => {
             return
         }
 
+        // Procesar y mostrar la ruta
         const feature = response.data.features[0]
         const summary = feature.properties.summary
         const coordsList = feature.geometry.coordinates.map((c: number[]) => [c[1], c[0]])
 
+        // Dibujar ruta en mapa
         if (routeLayer) leafletMap?.removeLayer(routeLayer)
         routeLayer = L.polyline(coordsList, { color: 'blue', weight: 5 }).addTo(leafletMap!)
         leafletMap?.fitBounds(L.latLngBounds(coordsList), { padding: [50, 50] })
 
-        // Actualizar la información de la ruta solo si no se está cargando una existente o es explícitamente solicitado
+        // Actualizar información de ruta
         if (!existingRouteData.value || !skipNotification) {
             route.value.distance = `${(summary.distance / 1000).toFixed(2)} km`
             const mins = Math.round(summary.duration / 60)
@@ -449,7 +392,7 @@ const calculateRoute = async (skipNotification: boolean = false) => {
         route.value.origin = address.value.origin
         route.value.destination = address.value.destination
 
-        // Emitimos los datos al padre
+        // Emitir datos al componente padre
         emit('route-confirmed', {
             origin: route.value.origin,
             destination: route.value.destination,
@@ -463,12 +406,10 @@ const calculateRoute = async (skipNotification: boolean = false) => {
 
     } catch (error: any) {
         console.error('Error al calcular la ruta:', error)
-
-        // Detectar tipos específicos de errores
         if (!skipNotification) {
-            if (error.response && error.response.status === 403) {
+            if (error.response?.status === 403) {
                 showNotification('Error de autenticación con el servicio de rutas. Verifica la API key.', 'error')
-            } else if (error.response && error.response.status === 400) {
+            } else if (error.response?.status === 400) {
                 showNotification('Las ubicaciones seleccionadas no son válidas para calcular una ruta. Intenta con puntos accesibles por carretera.', 'error')
             } else {
                 showNotification('Error al calcular la ruta. Por favor, intente con otras ubicaciones.', 'error')
@@ -479,12 +420,9 @@ const calculateRoute = async (skipNotification: boolean = false) => {
     }
 }
 
-// Añadir observadores para actualizar el mapa cuando cambian las coordenadas
+// Watchers
 watch(
-    () => [
-        { ...coords.value.origin },
-        { ...coords.value.destination }
-    ],
+    [() => coords.value.origin, () => coords.value.destination],
     () => {
         if (leafletMap) {
             updateMapWithExistingCoords()
@@ -493,12 +431,11 @@ watch(
     { deep: true }
 )
 
-// Observador para las direcciones
+// Observador para detectar cuando se borran direcciones
 watch(
-    () => [address.value.origin, address.value.destination],
+    [() => address.value.origin, () => address.value.destination],
     ([newOrigin, newDestination], [oldOrigin, oldDestination]) => {
         if (newOrigin !== oldOrigin && newOrigin === '') {
-            // Si se borró la dirección de origen, limpiar el marcador
             coords.value.origin = { lat: null, lng: null }
             if (originMarker) {
                 originMarker.remove()
@@ -507,7 +444,6 @@ watch(
         }
 
         if (newDestination !== oldDestination && newDestination === '') {
-            // Si se borró la dirección de destino, limpiar el marcador
             coords.value.destination = { lat: null, lng: null }
             if (destinationMarker) {
                 destinationMarker.remove()
@@ -517,7 +453,7 @@ watch(
     }
 )
 
-// Debounce para evitar demasiadas peticiones
+// Funciones de utilidad
 const debounce = (fn: Function, delay: number) => {
     let timeout: number | null = null
     return (...args: any[]) => {
@@ -528,10 +464,8 @@ const debounce = (fn: Function, delay: number) => {
     }
 }
 
-// Versión con debounce de la función geocodeAddress
 const debouncedGeocodeAddress = debounce((type: 'origin' | 'destination') => geocodeAddress(type), 800)
 
-// Función para mostrar notificaciones
 const showNotification = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
     notification.value = {
         message,
@@ -539,28 +473,23 @@ const showNotification = (message: string, type: 'info' | 'error' | 'success' = 
         visible: true
     }
 
-    // Auto-ocultar después de un tiempo
     setTimeout(() => {
         notification.value.visible = false
-    }, type === 'error' ? 8000 : 5000) // Mostrar errores por más tiempo
+    }, type === 'error' ? 8000 : 5000)
 }
 
-// Función para manejar los límites de la API de Nominatim
 const handleNominatimRateLimit = () => {
-    // Añadir un retraso aleatorio para evitar bloqueos
-    const randomDelay = Math.floor(Math.random() * 500) + 500
-    return new Promise(resolve => setTimeout(resolve, randomDelay))
+    return new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 500) + 500))
 }
 
-// Cargar el mapa cuando se monta el componente
+// Inicializar
 onMounted(() => {
     setTimeout(() => {
         initializeMap()
-        // Si hay datos iniciales de ruta (modo edición), cargarlos
         if (existingRouteData.value) {
             loadExistingRouteData()
         }
-    }, 100) // Pequeño retraso para asegurar que el DOM esté listo
+    }, 100)
 })
 </script>
 
@@ -571,8 +500,8 @@ onMounted(() => {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
     box-sizing: border-box;
+    border: none;
 
     .route-info {
         display: flex;
@@ -626,19 +555,12 @@ onMounted(() => {
                 background-color: #cccccc;
                 cursor: not-allowed;
             }
-        }
-    }
 
-    .route-details {
-        background-color: #022c05;
-        border-radius: 8px;
-        padding: 15px;
-        margin-top: 15px;
-        border-left: 4px solid #ffffffbd;
+            i {
+                margin-right: 0.5rem;
 
-        p {
-            margin: 8px 0;
-            font-size: 16px;
+            }
+
         }
     }
 

@@ -10,20 +10,20 @@
         .user-menu
             .user-trigger(@click="toggleMenu")
                 img.avatar(src="../img/icons/mochilaSetting2.png", alt="Usuario")
-
+                span.notification-bell(v-if="hasNotifications")
             transition(name="dropdown")
                 .user-dropdown(v-show="menuVisible")
                     .user-trigger-dropdown
                         img.avatar(@click.self="toggleMenu")(src="../img/icons/mochilaSetting2.png", alt="Usuario" )
 
-                    .dropdown-item(@click="goToRequestsPlans")
+                    .dropdown-item(:class="{ 'highlighted': highlightRequests }" @click="goToRequestsPlans")
                         svg(xmlns="http://www.w3.org/2000/svg", fill="none", viewBox="0 0 24 24", stroke="currentColor", class="icon")
                             path(stroke-linecap="round", stroke-linejoin="round", stroke-width="1.8", d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9")
                         | Solicitudes
-
-                    .dropdown-item(@click="goToProfile")
+                    .dropdown-item(:class="{ 'highlighted': highlightProfile }" @click="goToProfile")
                         svg(xmlns="http://www.w3.org/2000/svg", fill="none", viewBox="0 0 24 24", stroke="currentColor", class="icon text-gray-600")
-                            path(stroke-linecap="round", stroke-linejoin="round", stroke-width="2", d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 12a3 3 0 10-6 0 3 3 0 006 0z")
+                            path(stroke-linecap="round", stroke-linejoin="round", stroke-width="1.8", d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z")
+                            path(stroke-linecap="round", stroke-linejoin="round", stroke-width="1.8", d="M6 21v-2c0-2.21 1.79-4 4-4h4c2.21 0 4 1.79 4 4v2")
                         | Editar perfil
 
                     .dropdown-item(@click="logout")
@@ -43,11 +43,55 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useRegisterStore } from '../stores/registerStore'
-import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { ref, onMounted } from 'vue'
+import type { IPlan } from '../types/plan'
+import axios from 'axios'
+
+const registerStore = useRegisterStore()
+const { hasDni } = storeToRefs(registerStore)
+const { tokenStore } = registerStore
 
 const router = useRouter()
 const menuVisible = ref(false)
 const showLogoutModal = ref(false)
+const hasNotifications = ref(false)
+const highlightProfile = ref(false)
+const highlightRequests = ref(false)
+
+const checkNotifications = async () => {
+    try {
+        const response = await axios.get('http://localhost:8000/plan/pending', {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${tokenStore}`
+            }
+        })
+
+        const hasPending = Array.isArray(response.data.plans) &&
+            response.data.plans.some(
+                (plan: IPlan) => plan.pendingPassengers && plan.pendingPassengers.length > 0
+            )
+
+
+        if (!hasDni.value) {
+            highlightProfile.value = true
+            highlightRequests.value = false
+        } else if (!!hasPending) {
+            highlightProfile.value = false
+            highlightRequests.value = true
+        } else {
+            highlightProfile.value = false
+            highlightRequests.value = false
+        }
+
+        hasNotifications.value = !hasDni.value || hasPending
+    } catch (error) {
+        console.error('Error verificando notificaciones:', error)
+        hasNotifications.value = !hasDni.value
+    }
+}
+
 
 const toggleMenu = () => {
     menuVisible.value = !menuVisible.value
@@ -73,10 +117,41 @@ const confirmLogout = () => {
     useRegisterStore().tokenStore = ''
     router.push({ name: 'login' })
 }
+
+onMounted(() => {
+    checkNotifications()
+    setInterval(checkNotifications, 60000)
+})
 </script>
 
 
 <style scoped lang="scss">
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(-15deg);
+    }
+
+    40% {
+        transform: rotate(15deg);
+    }
+
+    60% {
+        transform: rotate(-10deg);
+    }
+
+    80% {
+        transform: rotate(10deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
 .headerDashboard {
     font-size: larger;
     display: flex;
@@ -149,10 +224,25 @@ const confirmLogout = () => {
                 height: clamp(40px, 4vw, 60px);
             }
 
-            .arrow {
-                color: #ffffff;
-                font-size: 1rem;
+            .notification-bell {
+                position: absolute;
+                top: 0rem;
+                left: 0.5rem;
+                border-radius: 50%;
+                box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
                 font-weight: bold;
+                color: #000;
+                z-index: 20;
+                animation: shake 1s infinite;
+
+                &::before {
+                    content: "🔔";
+                    font-size: 1.2rem;
+                }
             }
         }
 
@@ -167,7 +257,7 @@ const confirmLogout = () => {
             width: max-content; // Se ajusta al contenido
             min-width: 185px; // Ancho mínimo
             overflow: hidden;
-            color: white;
+            color: rgba(255, 255, 255, 0.753);
             z-index: 100; // Asegura que aparezca sobre otros elementos
             margin-top: 0.5rem; // Espacio entre avatar y dropdown
 
@@ -193,6 +283,7 @@ const confirmLogout = () => {
                 &.text-danger {
                     stroke: #17d605;
                 }
+
             }
 
             .dropdown-item {
@@ -206,18 +297,36 @@ const confirmLogout = () => {
                 &:hover {
                     transform: translateY(-2px) scale(1.02);
                     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                    color: white;
                 }
 
                 &:last-child {
-                    color: #d81600;
+                    color: #ff1900b9;
                     font-weight: 600;
                 }
-
-
-
             }
         }
     }
+
+    .highlighted {
+        display: inline-block;
+        animation: pulseText 0.6s infinite;
+        color: rgb(255, 255, 255);
+    }
+
+    @keyframes pulseText {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+
 
     .dropdown-enter-active,
     .dropdown-leave-active {
@@ -247,56 +356,57 @@ const confirmLogout = () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.377);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 200;
-}
 
-.modal-content {
-    background-color: #001d06f5;
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    max-width: 90%;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    .modal-content {
+        background-color: #01300af5;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 90%;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.473);
 
-    h2 {
-        margin-bottom: 1.5rem;
-        font-size: 1.3rem;
-        color: #ffffff;
-    }
+        h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
 
-    .modal-actions {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
 
-        button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            background-color: #2d89ef;
-            color: white;
-            transition: background-color 0.2s;
-
-            &:hover {
-                background-color: #2269be;
-            }
-
-            &.cancel {
-                background-color: #d81600;
+            button {
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                cursor: pointer;
+                background-color: #2d89ef;
+                color: white;
+                transition: background-color 0.2s;
 
                 &:hover {
-                    background-color: #a80f00;
+                    background-color: #2269be;
+                }
+
+                &.cancel {
+                    background-color: #d81600;
+
+                    &:hover {
+                        background-color: #a80f00;
+                    }
                 }
             }
         }
     }
 }
+
 
 // Media queries mejoradas para diferentes tamaños de pantalla
 @media (max-width: 1024px) {
@@ -337,6 +447,23 @@ const confirmLogout = () => {
             padding: 1rem 0.5rem; // Reducir padding horizontal
             margin-left: 0; // Eliminar margen fijo
 
+            .user-trigger {
+
+                .notification-bell {
+                    position: absolute;
+                    top: 1.1rem;
+                    left: 0.3rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+
+                    &::before {
+                        content: "🔔";
+                        font-size: 1rem;
+                    }
+                }
+
+            }
+
             .user-dropdown {
                 top: 4px;
                 right: -5px; // Mantener alineado a la derecha
@@ -373,6 +500,19 @@ const confirmLogout = () => {
             .user-trigger {
                 padding: 0.2rem; // Borde más fino
                 border-width: 1px; // Borde más fino
+
+                .notification-bell {
+                    position: absolute;
+                    top: 0.5rem;
+                    left: 0.2rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+
+                    &::before {
+                        content: "🔔";
+                        font-size: 0.8rem;
+                    }
+                }
 
                 .avatar {
                     width: 35px; // Tamaño fijo para móviles pequeños

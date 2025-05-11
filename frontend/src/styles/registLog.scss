@@ -1,67 +1,197 @@
-//imports
+// Imports
 @use './mixins/breakpoint.scss' as mix;
 
-// Montserrat
+// Fuentes
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
-// Work Sans
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&display=swap');
 
-
-//Variables
-$base-color: #12ab9e;
+// Variables
+$base-color: #004206;
 $second-color: white;
+$background-image: url('../img/logo/forest4.jpg');
+$icon-size: 4.5em;
 
-//Style code
+// Estilos globales
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+// Vista de registro principal
 .register-view {
-    background-color: $base-color;
-    display: flex;
-    place-content: center;
-    text-align: center;
+    background-color: $second-color;
+    background-image: $background-image;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     .firstWrapper {
+        width: 100%;
+        padding: 20px;
         display: grid;
         justify-content: center;
         place-content: center;
+        align-items: center;
+        place-items: center; // Centra tanto vertical como horizontalmente
+        min-height: 100vh; // Asegura que ocupe toda la altura disponible
+
+        @include mix.respond(md) {
+            width: 80%;
+            // max-width: none;
+        }
+
+        @include mix.respond(lg) {
+            width: 80%;
+        }
 
         .formContainer {
-            display: grid;
-            margin: 1em 2em;
+            display: flex;
+            justify-content: center;
+            background-color: rgba(0, 37, 3, 0.76);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            // width: 100%;
+            min-height: 500px;
+            min-width: 325px;
+            margin: 0 auto; // Centrar el contenedor
+
+            @include mix.respond(xxs) {
+               width: 350px; // Aumentar sustancialmente en pantallas medianas
+                 // Aumentar sustancialmente en pantallas medianas
+            }
+            @include mix.respond(xs) {
+                min-width: 450px; // Aumentar sustancialmente en pantallas medianas
+                max-width: 450px; // Aumentar sustancialmente en pantallas medianas
+            }
+
+            @include mix.respond(sm) {
+                min-width: 550px; // Aumentar sustancialmente en pantallas medianas
+                max-width: 550px; // Aumentar sustancialmente en pantallas medianas
+            }
+
+            @include mix.respond(md) {
+                min-width: 650px; // Aumentar sustancialmente en pantallas medianas
+            }
+            @include mix.respond(lg) {
+                min-width: 750px; // Aumentar sustancialmente en pantallas medianas
+            }
+
+
+
+            // Título
+            .firstBlock {
+                padding: 2rem;
+                width: 100%;
+
+                @include mix.respond(md) {
+                    width: 80%;
+                }
+
+                @include mix.respond(lg) {
+                    width: 80%;
+                }
+
+                @include mix.respond(xl) {
+                    width: 80%;
+                }
+
+                @include mix.respond(xxl) {
+                    width: 80%;
+                }
+
+            }
 
             .view {
-            //    background-color: red;
-               .h2 {
-                    display: grid;
-                    place-content: center;
-                    font-family: 'montserrat', sans-serif;
-                    color: rgb(0, 0, 44);
-                    font-size: 3em;
-                    font-weight:normal;
-                    margin: 0.5em 0 1em;
+                text-align: center;
+                margin-bottom: 2rem;
 
-                    
+                .h2 {
+                    font-family: 'Montserrat', sans-serif;
+                    color: rgb(0, 0, 44);
+                    font-weight: 600;
+                    margin: 0 auto;
+
+                    // Escala de tamaño de fuente
+                    font-size: 1.8rem;
+
+                    @include mix.respond(sm) {
+                        font-size: 2rem;
+                    }
+
+                    @include mix.respond(md) {
+                        font-size: 2.3rem;
+                    }
+
+                    @include mix.respond(lg) {
+                        font-size: 2.6rem;
+                    }
+
+                    @include mix.respond(xl) {
+                        font-size: 3rem;
+                    }
                 }
             }
 
+            // Íconos sociales
             .socialIcons {
                 display: flex;
-                justify-content: space-between;
+                justify-content: center;
+                gap: 2rem;
+                margin: 2rem 0;
+
+                @include mix.respond(md) {
+                    gap: 3rem;
+                }
+
+                @include mix.respond(lg) {
+                    gap: 4rem;
+                }
 
                 .icon {
-                    display: grid;
-                    place-content: center;
-                    background-color: $second-color;
-                    border: none;
-                    width: 4.5em;
-                    height: 4.5em;
-                    border-radius: 3em;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 50%;
                     text-decoration: none;
+                    transition: all 0.3s ease;
 
-                    .svg-icon {
-                        width: 4em;
-                        height: 4em;
+                    // Escala de tamaño del ícono
+                    width: 3.5rem;
+                    height: 3.5rem;
+
+                    // @include mix.respond(sm) {
+                    //     width: 4rem;
+                    //     height: rem;
+                    // }
+
+                    @include mix.respond(md) {
+                        width: 3.5rem;
+                        height: 3.5rem;
                     }
 
+                    @include mix.respond(xl) {
+                        width: 4rem;
+                        height: 4rem;
+                    }
+
+                    &:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+                    }
+
+                    .svg-icon {
+                        width: 80%;
+                        height: 80%;
+                    }
+
+                    // Íconos personalizados
                     .linkedin {
                         background: url('../img/icons/facebook.png');
                         background-size: contain;
@@ -85,31 +215,44 @@ $second-color: white;
                 }
             }
 
+            // Separador con texto
             .divSeparator {
                 display: flex;
-                justify-content: space-between;
+                justify-content: center;
                 align-items: center;
-                min-height: 6em;
+                margin: 2rem 0;
 
                 .lineSeparator {
-                    width: 100%;
+                    flex: 1;
                     height: 2px;
-                    border-color: rgb(0, 0, 44);
-                    margin: 6px 0;
+                    background-color: rgb(0, 0, 44);
                 }
 
                 .textSeparator {
-                    color:rgb(0, 0, 44);
-                    margin: 0 1em;
-                    font-size: 1.3em;
+                    color: rgb(0, 0, 44);
+                    margin: 0 1rem;
+                    white-space: nowrap;
+
+                    // Escala de tamaño de fuente
+                    font-size: 1rem;
+
+                    @include mix.respond(sm) {
+                        font-size: 1.1rem;
+                        margin: 0 1.5rem;
+                    }
+
+                    @include mix.respond(md) {
+                        font-size: 1.2rem;
+                        margin: 0 2rem;
+                    }
+
+                    @include mix.respond(lg) {
+                        font-size: 1.3rem;
+                        margin: 0 2.5rem;
+                    }
                 }
             }
-        }
 
-        @include mix.respond(md) {
-            //firstWrapper
-            min-width: 50%;
-            place-content: center;
         }
     }
 }

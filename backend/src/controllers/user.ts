@@ -210,7 +210,6 @@ async function hasDni(req: Request, res: Response, next: NextFunction) {
 async function deleteUser(req: Request, res: Response, next: NextFunction) {
   const userId = req.user?.id;
   const { password } = req.body;
-
   try {
     if (!userId) {
       res.status(401).json({ message: 'No autorizado: ID de usuario no presente' });
@@ -222,7 +221,7 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
       return;
     }
 
-    const user = await User.findById(userId).select('password');
+    const user = await User.findById(userId).select(' password');
     if (!user) {
       res.status(404).json({ message: 'Usuario no encontrado' });
       return;
@@ -230,6 +229,7 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
 
     const passwordMatch = await argon2.verify(user.password, password);
     if (!passwordMatch) {
+
       res.status(401).json({ message: 'Contraseña incorrecta' });
       return;
     }
