@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { type IPlan } from '../types/plan';
 import CardPlan from './CardPlan.vue';
 
@@ -35,6 +36,8 @@ const joinPlan = (payload: { planId: string, message: string }) => {
 const leavePlan = (planId: string) => {
     emit('leavePlan', planId);
 }
+
+onMounted(()=>console.log('Pending for current user:', props.pendingRequestPlans))
 </script>
 
 <style scoped lang="scss">
@@ -60,30 +63,64 @@ const leavePlan = (planId: string) => {
     }
 }
 
+@media (max-width: 1024px) {
+    .plan-list-container {
+        padding: 1.5rem 3rem;
+        
+        .plan-list {
+            gap: 1.8rem;
+        }
+    }
+}
+
 @media (max-width: 768px) {
     .plan-list-container {
-        padding: 1rem;
-    }
-
-    .plan-list {
-        grid-template-columns: 1fr;
+        padding: 1.2rem;
+        
+        .plan-list {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 1.5rem;
+        }
     }
 }
 
 @media (max-width: 480px) {
     .plan-list-container {
         padding: 1rem;
-    }
-
-    .plan-list {
-        grid-template-columns: 1fr;  /* For smaller screens, cards take full width */
-        gap: 1.5rem;
-    }
-
-    .plan-card {
-        width: 100%;  /* Ensures cards take full width in small screens */
-        max-width: 100%;  /* Avoids limiting the size */
+        
+        .plan-list {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 100%;
+        }
+        
+        .no-plans-message {
+            padding: 1.5rem;
+            
+            p {
+                font-size: 1rem;
+            }
+        }
     }
 }
 
+@media (max-width: 360px) {
+    .plan-list-container {
+        padding: 0.8rem;
+        
+        .plan-list {
+            gap: 1.2rem;
+        }
+        
+        .no-plans-message {
+            padding: 1rem;
+            
+            p {
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
 </style>

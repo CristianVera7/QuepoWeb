@@ -5,7 +5,7 @@
         //-     button.icon
         //-         img.iconMenuMobile(src='../img/icons/iconUser.png')
         .title
-            h1 Quepo?
+            h1 ¿Quepo?
 </template>
 
 <script setup lang="ts">

@@ -5,7 +5,7 @@
                 .firstBlock
                     NavMenuMobile
                     .view
-                        h2.h2 Log in
+                        p.h2 Conéctate y continúa tu viaje hacia un mundo más verde con nosotros.
                     .socialIcons
                         button.icon
                             .svg-icon.google

@@ -5,7 +5,7 @@
                 .firstBlock
                     NavMenuMobile
                     .view
-                        h2.h2 Sign up
+                        p.h2 Únete a una comunidad comprometida con la sostenibilidad y el cambio positivo.
                     .form-wrapper
                         form.form
                             input(type="text" placeholder="Nickname" @focus='focusField="nickName"' :class='errors.nickName?"fieldError":"field"' v-model='user.nickName' v-if="isRegisterPath") 

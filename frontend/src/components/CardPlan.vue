@@ -120,8 +120,8 @@
                             i.fas.fa-sign-in-alt
                             | Unirse
                         
-                        button.pending-button(
-                            v-if="hasPendingRequest && !plan.isCreator && !plan.isPassenger"
+                        p.pending-button(
+                            v-if="hasPendingRequest"
                             disabled
                         )
                             i.fas.fa-clock
@@ -201,8 +201,7 @@ const showLeaveConfirmation = ref(false)
 
 // Verificamos si este plan está en la lista de solicitudes pendientes
 const hasPendingRequest = computed(() => {
-    if (!props.pendingRequestPlans) return false;
-    return props.pendingRequestPlans.includes(props.plan._id);
+    return props.pendingRequestPlans?.includes(props.plan._id) ?? false;
 });
 
 // Inicializamos todas las secciones como colapsadas
@@ -329,10 +328,11 @@ const editPlan = () => {
 
 .wrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 400px));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 400px));
     justify-content: center;
     gap: 1.5rem;
     align-items: flex-start;
+    padding: 1rem;
 
     .plan-card {
         background: rgba(255, 255, 255, 0.95);
@@ -343,8 +343,8 @@ const editPlan = () => {
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        width: 100%; // ⚠️ Esto asegura que la tarjeta se adapte al contenedor del grid
-        max-width: 100%; // ⚠️ No limites a 400px, deja que el grid lo gestione
+        width: 100%;
+        max-width: 100%;
 
         &:hover {
             transform: translateY(-5px);
@@ -352,7 +352,7 @@ const editPlan = () => {
         }
 
         .plan-image {
-            height: 200px; // Reducido un poco para tarjeta más compacta
+            height: 200px;
             position: relative;
 
             .background-img {
@@ -390,15 +390,11 @@ const editPlan = () => {
 
         // Estilo general para todas las secciones
         .section-box {
-            background-color: rgba(255, 255, 255, 0.795); // Color más suave
+            background-color: rgba(255, 255, 255, 0.795);
             border-radius: 10px;
-            padding: 1rem; // Reducido para tarjetas más compactas
+            padding: 1rem;
             margin-bottom: 1rem;
             transition: background-color 0.3s ease;
-
-            // &:hover {
-            //     background-color: rgb(229, 231, 229);
-            // }
         }
 
         // Estilo específico para la caja del encabezado del plan
@@ -460,7 +456,7 @@ const editPlan = () => {
             padding-top: 0;
 
             &.expanded {
-                max-height: 2000px; // Mayor altura para contener todas las secciones
+                max-height: 2000px;
                 opacity: 1;
                 padding-top: 0.5rem;
                 animation: sectionFadeIn 0.3s ease-out;
@@ -581,6 +577,7 @@ const editPlan = () => {
             .button-container {
                 display: flex;
                 flex-direction: column;
+                align-items: center;
                 gap: 1rem;
 
                 .dni-warning {
@@ -621,10 +618,13 @@ const editPlan = () => {
                 }
 
                 .pending-button {
-                    background-color: #f0ad4e;
-                    color: white;
+                    color: #f0ad4e;
                     cursor: not-allowed;
                     opacity: 0.8;
+
+                    i {
+                        margin-right: 0.4rem;
+                    }
 
                     &:hover {
                         opacity: 0.8;
@@ -751,7 +751,7 @@ const editPlan = () => {
     }
 
 
-    /* Estilos para el modal de confirmación - Ahora en el nivel raíz */
+    // Estilos para el modal de confirmación
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -872,51 +872,66 @@ const editPlan = () => {
     }
 }
 
+/* Responsive breakpoints */
 @media (max-width: 992px) {
-    .plan-card {
-        .plan-image {
-            height: 180px;
-        }
+    .wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 380px));
 
-        .plan-content {
-            padding: 1rem;
-        }
+        .plan-card {
+            .plan-image {
+                height: 180px;
+            }
 
-        .plan-header .plan-title {
-            font-size: 0.95rem;
-        }
+            .plan-content {
+                padding: 1rem;
+            }
 
-        .section-header h4 {
-            font-size: 1rem;
+            .plan-header .plan-title {
+                font-size: 0.95rem;
+            }
+
+            .section-header h4 {
+                font-size: 1rem;
+            }
+
+            .plan-actions button {
+                width: 80%;
+            }
         }
     }
 }
 
 @media (max-width: 768px) {
-    .plan-card {
-        .plan-image {
-            height: 160px;
-        }
+    .wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 360px));
+        gap: 1.2rem;
 
-        .plan-content {
-            padding: 0.9rem;
-        }
-
-        .car-details {
-            grid-template-columns: 1fr;
-        }
-
-        .plan-actions {
-            button {
-                width: 95%;
-                padding: 0.8rem 1.2rem;
-                font-size: 0.95rem;
+        .plan-card {
+            .plan-image {
+                height: 160px;
             }
-        }
 
-        .section-box {
-            padding: 0.8rem 0.7rem;
-            margin-bottom: 1rem;
+            .plan-content {
+                padding: 0.9rem;
+            }
+
+            .car-details {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .plan-actions {
+                button {
+                    width: 90%;
+                    padding: 0.8rem 1.2rem;
+                    font-size: 0.95rem;
+                }
+            }
+
+            .section-box {
+                padding: 0.8rem 0.7rem;
+                margin-bottom: 0.8rem;
+            }
         }
     }
 
@@ -926,111 +941,54 @@ const editPlan = () => {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
     .wrapper {
-        padding: 1rem;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0.8rem;
 
         .plan-card {
-            i {
-                display: none;
-            }
+            max-width: 100%;
 
             .plan-image {
-                height: 130px;
-            }
-
-            .plan-content {
-                padding: 0.6rem;
-            }
-
-            .plan-header .plan-title {
-                font-size: 0.85rem;
-                text-align: center;
-                font-weight: 100;
-
-            }
-
-            span {
-                font-size: 0.75rem;
-            }
-
-            .car-details {
-                grid-template-columns: 1fr;
-                gap: 0.4rem;
-
-                span {
-                    font-size: 0.85rem;
-                    padding: 0.4rem 0.6rem;
-                    font-weight: 100;
-
-                    strong {
-                        font-size: 0.9rem;
-                        font-weight: 100;
-                    }
-                }
-            }
-
-            .plan-details {
-                gap: 0.5rem;
-
-                .detail-item {
-                    flex-direction: column;
-                    align-items: flex-start;
-
-                    p {
-                        font-size: 0.85rem;
-                        font-weight: 100;
-                    }
-
-                    i {
-                        margin-right: 0;
-                        margin-bottom: 0.3rem;
-                    }
-                }
-            }
-
-            .plan-actions {
-
-                .places-available {
-                    font-size: 0.85rem;
-                }
-
-                .button-container {
-                    button {
-                        width: 100%;
-                        font-size: 0.9rem;
-                        padding: 0.75rem;
-                    }
-
-                    .message-box {
-                        textarea {
-                            min-height: 80px;
-                            font-size: 0.85rem;
-                        }
-                    }
-                }
-            }
-
-            .section-box {
-                padding: 0.6rem;
+                height: 150px;
             }
 
             .section-header h4 {
+                font-size: 0.95rem;
+            }
+
+            .plan-details .detail-item p {
                 font-size: 0.9rem;
             }
 
+            .car-details span {
+                font-size: 0.85rem;
+            }
+
             .passenger-list li {
-                font-size: 0.8rem;
-                padding: 0.3rem 0.6rem;
+                padding: 0.35rem 0.7rem;
+                font-size: 0.85rem;
+            }
+
+            .plan-actions {
+                .places-available {
+                    font-size: 1rem;
+                }
+
+                button {
+                    width: 100%;
+                    padding: 0.8rem 1rem;
+                }
             }
         }
 
-        .modal-content {
-            width: 98%;
-            max-width: 340px;
+        .modal-overlay .modal-content {
+            width: 95%;
+            max-width: 350px;
 
             .modal-header h3 {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
 
             .modal-body p {
@@ -1038,13 +996,239 @@ const editPlan = () => {
             }
 
             .modal-footer {
-                flex-direction: column;
+                padding: 0.8rem 1.2rem;
+
+                button {
+                    padding: 0.6rem 1rem;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+}
+
+/* Mobile optimization (including 380px) */
+@media (max-width: 480px) {
+    .wrapper {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0.5rem;
+
+        .plan-card {
+            .plan-image {
+                height: 140px;
+            }
+
+            .plan-content {
+                padding: 0.8rem;
+            }
+
+            .plan-header .plan-title {
+                font-size: 0.9rem;
+                text-align: center;
+            }
+
+            .section-box {
+                padding: 0.7rem;
+                margin-bottom: 0.7rem;
+            }
+
+            .section-header {
+                margin-bottom: 0.4rem;
+
+                h4 {
+                    font-size: 0.9rem;
+                }
+            }
+
+            .plan-details {
                 gap: 0.5rem;
+
+                .detail-item {
+                    i {
+                        width: 15px;
+                        font-size: 0.9rem;
+                    }
+
+                    p {
+                        font-size: 0.85rem;
+                    }
+                }
+            }
+
+            .car-details {
+                gap: 0.5rem;
+
+                span {
+                    padding: 0.4rem 0.6rem;
+                    font-size: 0.8rem;
+
+                    strong {
+                        font-size: 0.85rem;
+                    }
+                }
+            }
+
+            .passenger-list {
+                gap: 0.4rem;
+
+                li {
+                    padding: 0.35rem 0.6rem;
+                    font-size: 0.8rem;
+                }
+            }
+
+            .plan-actions {
+                margin-top: 0.6rem;
+                padding-top: 0.8rem;
+
+                .places-available {
+                    font-size: 0.9rem;
+                    margin-bottom: 0.8rem;
+                }
+
+                .button-container {
+                    gap: 0.8rem;
+
+                    button {
+                        font-size: 0.85rem;
+                        padding: 0.7rem 1rem;
+                    }
+
+                    .message-box {
+                        gap: 0.8rem;
+
+                        textarea {
+                            min-height: 80px;
+                            padding: 0.7rem;
+                            font-size: 0.85rem;
+                        }
+                    }
+
+                    .dni-warning {
+                        font-size: 0.8rem;
+
+                        i {
+                            padding: 0.8rem;
+                        }
+
+                        a {
+                            margin: 0.8rem;
+                        }
+                    }
+                }
+            }
+        }
+
+        .modal-overlay .modal-content {
+            width: 92%;
+            max-width: 330px;
+
+            .modal-header {
+                padding: 1rem;
+
+                h3 {
+                    font-size: 1rem;
+                }
+            }
+
+            .modal-body {
+                padding: 1.2rem;
+
+                p {
+                    font-size: 0.9rem;
+                    margin-bottom: 0.6rem;
+                }
+
+                .warning-text {
+                    font-size: 0.8rem;
+                }
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                gap: 0.6rem;
+                padding: 0.8rem 1rem;
 
                 button {
                     width: 100%;
                     justify-content: center;
+                    padding: 0.6rem;
+                    font-size: 0.85rem;
                 }
+            }
+        }
+    }
+}
+
+/* Ultra small screens (380px and below) */
+@media (max-width: 380px) {
+    .wrapper {
+        padding: 0.4rem;
+
+        .plan-card {
+            .plan-image {
+                height: 130px;
+            }
+
+            .plan-content {
+                padding: 0.7rem;
+            }
+
+            .plan-header .plan-title {
+                font-size: 0.85rem;
+            }
+
+            .section-box {
+                padding: 0.6rem;
+                margin-bottom: 0.6rem;
+            }
+
+            .section-header h4 {
+                font-size: 0.85rem;
+            }
+
+            .plan-details .detail-item p {
+                font-size: 0.8rem;
+            }
+
+            .car-details span {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            .passenger-list li {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            .plan-actions {
+                .places-available {
+                    font-size: 0.85rem;
+                }
+
+                .button-container button {
+                    font-size: 0.8rem;
+                    padding: 0.6rem 0.8rem;
+                }
+            }
+        }
+
+        .modal-overlay .modal-content {
+            width: 95%;
+            max-width: 300px;
+
+            .modal-header h3 {
+                font-size: 0.95rem;
+            }
+
+            .modal-body p {
+                font-size: 0.85rem;
+            }
+
+            .modal-footer button {
+                font-size: 0.8rem;
+                padding: 0.5rem;
             }
         }
     }

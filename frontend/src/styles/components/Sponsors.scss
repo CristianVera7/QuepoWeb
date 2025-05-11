@@ -39,25 +39,17 @@ $second-color: white;
         //     min-height: 300px; // Altura significativamente reducida
         // }
 
-        // @include mix.respond(lg) {
-        //     width: 75%;
-        //     max-width: 900px;
-        //     min-height: 280px; // Altura significativamente reducida
-        // }
+        @include mix.respond(lg) {
+            height: 900px; // Altura significativamente reducida
+        }
 
-        // @include mix.respond(xl) {
-        //     width: 60%;
-        //     min-width: 300px;
-        //     max-width: 1200px;
-        //     min-height: 260px; // Altura significativamente reducida
-        // }
+        @include mix.respond(xl) {
+            height: 900px; // Altura significativamente reducida
+        }
 
-        // @include mix.respond(xxl) {
-        //     width: 50%;
-        //     min-width: 500px;
-        //     max-width: 1400px;
-        //     min-height: 240px; // Altura significativamente reducida
-        // }
+        @include mix.respond(xxl) {
+            height: 900px; // Altura significativamente reducida
+        }
     }
 
     .sponsor {
@@ -78,7 +70,7 @@ $second-color: white;
             width: 9.5rem;
         }
         @include mix.respond(xl) {
-            width:10.5rem;
+            width:10rem;
         }
 
         &:hover {

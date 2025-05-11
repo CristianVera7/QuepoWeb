@@ -140,6 +140,7 @@ onMounted(async () => {
     }
 
     await getPendingRequests()
+    console.log('Solicitudes pendientes del usuario:', pendingRequestPlans.value.length);
     await listOfPlans()
 })
 </script>

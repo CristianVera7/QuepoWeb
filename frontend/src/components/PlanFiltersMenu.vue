@@ -62,7 +62,7 @@ const headerTitle = computed(() => {
     }
 })
 
-const showFilters = computed(() => 
+const showFilters = computed(() =>
     ['/dashboard', '/myPlans'].includes(route.path)
 );
 
@@ -91,7 +91,7 @@ const flatpickrConfig = {
     allowInput: true,
     minDate: 'today',
     disable: [
-        function(date:Date) {
+        function (date: Date) {
             // Deshabilita cualquier fecha anterior a hoy
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -123,7 +123,7 @@ function applyFilters() {
 // Computed para filtrar planes
 const filteredPlans = computed(() => {
     if (!props.allPlans) return [];
-    
+
     return props.allPlans.filter(plan => {
         if (!plan || !plan.dateTime || !plan.category) return false;
 
@@ -166,15 +166,28 @@ onMounted(() => {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
     startDateModel.value = `${day}-${month}-${year}`;
-    
+
     // Aplicar filtros iniciales
     applyFilters();
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
+// Variables comunes
+$color-bg-main: rgba(1, 43, 0, 0.7);
+$color-bg-dark: rgba(1, 43, 0, 0.938);
+$color-bg-darkest: #012b00fa;
+$color-white: #ffffff;
+$color-green: #026800f5;
+$color-gray: #d1d3d1;
+$border-radius-sm: 0.5rem;
+$border-radius-md: 1rem;
+$shadow-default: 0 2px 4px rgba(0, 0, 0, 0.3);
+$transition-default: all 0.3s ease;
+
+// Filtros
 .filters {
     display: flex;
     align-items: center;
@@ -183,55 +196,91 @@ onMounted(() => {
     flex-wrap: wrap;
     gap: 2.5rem;
 
-    .categories {
-        display: flex;
+    @media (max-width: 768px) {
+        justify-content: center;
+        place-content: center;
         align-items: center;
-        padding: 1rem;
-        border-radius: 1rem;
-
-        label {
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-right: 0.3rem;
-        }
-
-        select {
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid white;
-            background-color: rgba(1, 43, 0, 0.7);
-            color: white;
-            min-width: 140px;
-        }
-
-        option {
-            background-color: #012b00fa;
-            color: #ffffff;
-        }
+        gap: 0;
     }
 
+    @media (max-width: 576px) {
+        margin: 1.5em 0.5rem;
+        gap: 1rem;
+    }
+
+    // Estilos comunes para categorías y dateTime
+    .categories,
     .dateTime {
         display: flex;
         align-items: center;
         padding: 1rem;
-        border-radius: 1rem;
-        flex-wrap: wrap;
+        border-radius: $border-radius-md;
+
+        @media (max-width: 576px) {
+            padding: 0.75rem;
+        }
 
         label {
-            color: white;
+            color: $color-white;
             font-size: 1rem;
             font-weight: 600;
+            margin-right: 0.3rem;
+
+            @media (max-width: 576px) {
+                font-size: 0.9rem;
+            }
+        }
+    }
+
+    // Categorías
+    .categories {
+        select {
+            padding: 0.5rem;
+            border-radius: $border-radius-sm;
+            border: 1px solid $color-white;
+            background-color: $color-bg-main;
+            color: $color-white;
+            min-width: 140px;
+
+            @media (max-width: 576px) {
+                padding: 0.4rem;
+                font-size: 0.9rem;
+            }
+
+            option {
+                background-color: $color-bg-darkest;
+                color: $color-white;
+            }
+        }
+    }
+
+    // DateTime
+    .dateTime {
+        flex-wrap: wrap;
+
+        @media (max-width: 768px) {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+
+            label {
+                margin: 0.5rem 0;
+            }
         }
 
         input {
-            color: white;
-            background-color: rgba(1, 43, 0, 0.7);
+            color: $color-white;
+            background-color: $color-bg-main;
             padding: 0.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid white;
+            border-radius: $border-radius-sm;
+            border: 1px solid $color-white;
             margin-right: 1.5rem;
             width: 140px;
+
+            @media (max-width: 576px) {
+                padding: 0.4rem;
+                font-size: 0.9rem;
+            }
 
             &::placeholder {
                 color: rgba(255, 255, 255, 0.6);
@@ -243,44 +292,80 @@ onMounted(() => {
         }
     }
 
+    // Botones
     .containerBtns {
-        // margin-left: auto;
         display: flex;
         align-items: center;
         gap: 1rem;
         padding: 1rem;
-        border-radius: 1rem;
-        flex-wrap: wrap; // Mejor adaptación en móviles
+        border-radius: $border-radius-md;
+        flex-wrap: wrap;
+
+        @media (max-width: 576px) {
+            padding: 0.75rem;
+        }
 
         button {
-            background-color: #ffffff;
-            color: #026800f5;
+            background-color: $color-white;
+            color: $color-green;
             padding: 0.5rem 1rem;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: $border-radius-sm;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: $transition-default;
             white-space: nowrap;
 
+            @media (max-width: 576px) {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
             &:hover {
-                background-color: #d1d3d1;
+                background-color: $color-gray;
             }
         }
     }
 }
 
+// Header del plan
 .plan-header {
     text-align: center;
     margin-bottom: 2rem;
 
+    @media (max-width: 768px) {
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 576px) {
+        margin-bottom: 1rem;
+    }
+
     h2 {
         font-size: 2.5rem;
         font-weight: 700;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        text-shadow: $shadow-default;
         margin-bottom: 1rem;
-        color: #ffffff;
+        color: $color-white;
+
+        @media (max-width: 1200px) {
+            font-size: 2.2rem;
+        }
+
+        @media (max-width: 992px) {
+            font-size: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        @media (max-width: 576px) {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
     }
 
     .nature-divider {
@@ -289,6 +374,26 @@ onMounted(() => {
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
         width: 60%;
         margin: 1.5rem auto;
+
+        @media (max-width: 1200px) {
+            width: 70%;
+        }
+
+        @media (max-width: 992px) {
+            width: 80%;
+        }
+
+        @media (max-width: 768px) {
+            width: 90%;
+            height: 3px;
+            margin: 1rem auto;
+        }
+
+        @media (max-width: 576px) {
+            width: 95%;
+            height: 2px;
+            margin: 0.75rem auto;
+        }
 
         .leaf-icon {
             position: absolute;
@@ -304,180 +409,124 @@ onMounted(() => {
             justify-content: center;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 
-            i {
-                color: #ffffff;
-                font-size: 1.5rem;
-            }
-        }
-    }
-}
-
-/* Media queries para hacer responsive el header y los filtros */
-@media (max-width: 1200px) {
-    .plan-header {
-        h2 {
-            font-size: 2.2rem;
-        }
-
-        .nature-divider {
-            width: 70%;
-
-            .leaf-icon {
+            @media (max-width: 1200px) {
                 width: 45px;
                 height: 45px;
-
-                i {
-                    font-size: 1.3rem;
-                }
             }
-        }
-    }
-}
 
-@media (max-width: 992px) {
-    .plan-header {
-        h2 {
-            font-size: 2rem;
-        }
-
-        .nature-divider {
-            width: 80%;
-
-            .leaf-icon {
+            @media (max-width: 992px) {
                 width: 40px;
                 height: 40px;
-
-                i {
-                    font-size: 1.2rem;
-                }
             }
-        }
-    }
-}
 
-@media (max-width: 768px) {
-    .filters {
-        display: flex;
-        justify-content: center;
-        place-content: center;
-        align-items: center;
-        gap: 0rem;
-
-        .dateTime {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-
-            label {
-                margin: 0.5rem 0;
-            }
-        }
-    }
-
-    .plan-header {
-        margin-bottom: 1.5rem;
-
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .nature-divider {
-            width: 90%;
-            height: 3px;
-            margin: 1rem auto;
-
-            .leaf-icon {
+            @media (max-width: 768px) {
                 width: 35px;
                 height: 35px;
-
-                i {
-                    font-size: 1.1rem;
-                }
-            }
-        }
-    }
-}
-
-@media (max-width: 576px) {
-    .filters {
-        margin: 1.5em 0.5rem;
-        gap: 1rem;
-
-        .categories,
-        .dateTime {
-            padding: 0.75rem;
-
-            label {
-                font-size: 0.9rem;
             }
 
-            select,
-            input {
-                padding: 0.4rem;
-                font-size: 0.9rem;
-            }
-        }
-
-        .containerBtns button {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.9rem;
-        }
-    }
-
-    .plan-header {
-        margin-bottom: 1rem;
-
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .nature-divider {
-            width: 95%;
-            height: 2px;
-            margin: 0.75rem auto;
-
-            .leaf-icon {
+            @media (max-width: 576px) {
                 width: 30px;
                 height: 30px;
+            }
 
-                i {
+            i {
+                color: $color-white;
+                font-size: 1.5rem;
+
+                @media (max-width: 1200px) {
+                    font-size: 1.3rem;
+                }
+
+                @media (max-width: 992px) {
+                    font-size: 1.2rem;
+                }
+
+                @media (max-width: 768px) {
+                    font-size: 1.1rem;
+                }
+
+                @media (max-width: 576px) {
                     font-size: 1rem;
                 }
             }
         }
     }
 }
-</style>
 
-<style lang="scss">
-/* Estilos globales para flatpickr */
+// Estilos de Flatpickr
 .flatpickr-calendar {
-    background-color: rgba(1, 43, 0, 0.938) !important;
-    color: white !important;
-    border: 1px solid white;
+    background-color: $color-bg-dark !important;
+    color: $color-white !important;
+    border: 1px solid $color-white;
     font-family: inherit;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    width: 307px;
 
+    @media (max-width: 768px) {
+        width: 300px;
+    }
+
+    @media (max-width: 480px) {
+        width: 290px;
+    }
+
+    @media (max-width: 360px) {
+        width: 270px;
+    }
+
+    // Contenedores principales
     .flatpickr-months,
     .flatpickr-weekdays,
     .flatpickr-days {
         background-color: transparent;
-        color: white;
+        color: $color-white;
     }
 
+    .flatpickr-days {
+        @media (max-width: 360px) {
+            padding: 0;
+        }
+    }
+
+    // Días
     .flatpickr-day {
         background: transparent;
-        color: white;
+        color: $color-white;
         border-radius: 50%;
+        height: 38px;
+        line-height: 38px;
+        width: 38px;
+        margin: 1px;
+
+        @media (max-width: 768px) {
+            height: 36px;
+            line-height: 36px;
+            width: 36px;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 480px) {
+            height: 34px;
+            line-height: 34px;
+            width: 34px;
+            font-size: 0.9rem;
+            margin: 0.5px;
+        }
+
+        @media (max-width: 360px) {
+            height: 32px;
+            line-height: 32px;
+            width: 32px;
+            font-size: 0.85rem;
+            margin: 0.4px;
+        }
 
         &.selected,
         &.startRange,
         &.endRange {
-            background: white;
+            background: $color-white;
             color: #012b00;
-            border-color: white;
+            border-color: $color-white;
         }
 
         &:hover {
@@ -485,7 +534,7 @@ onMounted(() => {
         }
 
         &.today {
-            border-color: white;
+            border-color: $color-white;
             color: #4CAF50;
             font-weight: bold;
         }
@@ -495,57 +544,138 @@ onMounted(() => {
             color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Estilos para días desactivados (días pasados) */
         &.disabled,
         &.flatpickr-disabled {
             color: rgba(192, 192, 192, 0.582);
             text-decoration: line-through;
-            background-color: rgba(0, 0, 0, 0.1) !important; /* Fondo rojo transparente para días pasados */
+            background-color: rgba(0, 0, 0, 0.1) !important;
             cursor: not-allowed;
-            
+
             &:hover {
                 background-color: rgba(255, 0, 0, 0.2) !important;
             }
         }
     }
 
+    // Mes actual
     .flatpickr-current-month {
-        color: white;
+        color: $color-white;
+        font-size: 1rem;
+        padding: 5px 0;
+
+        @media (max-width: 768px) {
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 480px) {
+            font-size: 0.9rem;
+            padding: 4px 0;
+        }
+
+        @media (max-width: 360px) {
+            font-size: 0.85rem;
+            padding: 3px 0;
+        }
 
         .numInputWrapper {
-            color: white;
+            color: $color-white;
         }
 
         input.cur-year {
-            color: white;
+            color: $color-white;
+            font-size: 1rem;
+
+            @media (max-width: 768px) {
+                font-size: 0.95rem;
+            }
+
+            @media (max-width: 480px) {
+                font-size: 0.9rem;
+            }
+
+            @media (max-width: 360px) {
+                font-size: 0.85rem;
+            }
         }
     }
 
+    // Selector de meses
     .flatpickr-monthDropdown-months {
         appearance: none;
         background-color: transparent !important;
-        color: white !important;
+        color: $color-white !important;
         border: 1px solid rgba(255, 255, 255, 0.3);
         padding: 0.2rem 0.5rem;
         border-radius: 0.25rem;
+        font-size: 1rem;
+
+        @media (max-width: 768px) {
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 480px) {
+            font-size: 0.9rem;
+            padding: 0.15rem 0.4rem;
+        }
+
+        @media (max-width: 360px) {
+            font-size: 0.85rem;
+            padding: 0.1rem 0.3rem;
+        }
+
+        option {
+            background-color: #012b00;
+            color: $color-white;
+        }
     }
 
-    .flatpickr-monthDropdown-months option {
-        background-color: #012b00;
-        color: white;
-    }
-
+    // Día de la semana
     .flatpickr-weekday {
         color: rgba(255, 255, 255, 0.8);
         font-weight: bold;
+        font-size: 0.9rem;
+
+        @media (max-width: 768px) {
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 480px) {
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 360px) {
+            font-size: 0.75rem;
+        }
     }
 
+    // Botones de navegación
     .flatpickr-prev-month,
     .flatpickr-next-month {
-        color: white !important;
+        color: $color-white !important;
+        padding: 10px;
+
+        @media (max-width: 480px) {
+            padding: 8px;
+        }
+
+        @media (max-width: 360px) {
+            padding: 6px;
+        }
 
         svg {
-            fill: white !important;
+            fill: $color-white !important;
+            width: 16px;
+            height: 16px;
+
+            @media (max-width: 480px) {
+                width: 14px;
+                height: 14px;
+            }
+
+            @media (max-width: 360px) {
+                width: 12px;
+                height: 12px;
+            }
         }
 
         &:hover svg {
@@ -553,6 +683,7 @@ onMounted(() => {
         }
     }
 
+    // Entrada numérica
     .numInputWrapper {
         span {
             border-color: rgba(255, 255, 255, 0.3);
@@ -562,11 +693,11 @@ onMounted(() => {
             }
 
             &:after {
-                border-top-color: white;
+                border-top-color: $color-white;
             }
 
             &.arrowUp:after {
-                border-bottom-color: white;
+                border-bottom-color: $color-white;
             }
         }
     }
