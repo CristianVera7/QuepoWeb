@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { defineStore } from 'pinia'
 interface IStore {
     emailStore: string
@@ -113,6 +113,9 @@ export const useRegisterStore = defineStore('registerUser', {
             }
         },
         async checkHasDni() {
+            if (!this.tokenStore) {
+                return
+            }
             try {
                 const response = await axios.get(`http://localhost:8000/user/hasDni`, {
                     headers: {

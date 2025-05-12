@@ -68,22 +68,16 @@ router.beforeEach(async (to, from, next) => {
     const { isRegistered, isLogged } = storeToRefs(store)
 
     await checkUser()
-
-    const publicPages = ['login', 'register']
-    const authRequired = !publicPages.includes(to.name as string)
-
-    // ✅ Permite login o register si no estás registrado
-    if (!isRegistered.value && !['login', 'register'].includes(to.name as string)) {
+   
+    if (!isRegistered.value && to.name === 'dashboard' ) {
         return next({ name: 'register' })
     }
 
-    // ✅ Si estás registrado pero no logueado, redirige a login si accede a ruta protegida
-    if (!isLogged.value && authRequired) {
+    if (isRegistered.value && (!isLogged.value && to.name === 'dashboard')) {
         return next({ name: 'login' })
     }
 
-    // ✅ Si ya estás logueado y vas a login o register, redirige a dashboard
-    if (isLogged.value && publicPages.includes(to.name as string)) {
+    if (isLogged.value && (to.name === 'login' || to.name === 'register')) {
         return next({ name: 'dashboard' })
     }
 
