@@ -144,25 +144,25 @@
                         button.leave-button(v-if="plan.isPassenger" @click="openLeaveModal")
                             i.fas.fa-sign-out-alt
                             | Salir del plan
-            Teleport(to="body")
-                .modal-overlay(v-if="showLeaveConfirmation" @click.self="closeLeaveModal")
-                    .modal-content
-                        .modal-header
-                            h3 
-                                i.fas.fa-exclamation-triangle
-                                | Confirmar salida
-                            button.close-button(@click="closeLeaveModal")
-                                i.fas.fa-times
-                        .modal-body
-                            p ¿Estás seguro de que deseas abandonar este plan?
-                            p.warning-text Tu plaza quedará disponible para otros usuarios.
-                        .modal-footer
-                            button.confirm-button(@click="confirmLeavePlan")
-                                i.fas.fa-check
-                                | Confirmar
-                            button.cancel-button(@click="closeLeaveModal")
-                                i.fas.fa-times
-                                | Cancelar
+    Teleport(to="body")
+        .modal-overlay(v-if="showLeaveConfirmation" @click.self="closeLeaveModal")
+            .modal-content
+                .modal-header
+                    h3 
+                        i.fas.fa-exclamation-triangle
+                        | Confirmar salida
+                    button.close-button(@click="closeLeaveModal")
+                        i.fas.fa-times
+                .modal-body
+                    p ¿Estás seguro de que deseas abandonar este plan?
+                    p.warning-text Tu plaza quedará disponible para otros usuarios.
+                .modal-footer
+                    button.confirm-button(@click="confirmLeavePlan")
+                        i.fas.fa-check
+                        | Confirmar
+                    button.cancel-button(@click="closeLeaveModal")
+                        i.fas.fa-times
+                        | Cancelar
 </template>
 
 <script setup lang="ts">
@@ -746,126 +746,126 @@ const editPlan = () => {
                         }
                     }
                 }
+
             }
         }
     }
+}
 
+// Estilos para el modal de confirmación
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.596);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
 
-    // Estilos para el modal de confirmación
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.596);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        backdrop-filter: blur(3px);
+    .modal-content {
+        background-color: #01300af5;
+        width: 90%;
+        max-width: 450px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        animation: modalFadeIn 0.3s ease;
 
-        .modal-content {
-            background-color: #01300af5;
-            width: 90%;
-            max-width: 450px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-            animation: modalFadeIn 0.3s ease;
+        .modal-header {
+            background-color: #0157089f;
+            padding: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
-            .modal-header {
-                background-color: #0157089f;
-                padding: 1.2rem;
+            h3 {
+                color: #F44336;
+                margin: 0;
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                font-size: 1.2rem;
 
-                h3 {
-                    color: #F44336;
-                    margin: 0;
-                    display: flex;
-                    align-items: center;
-                    font-size: 1.2rem;
-
-                    i {
-                        margin-right: 0.5rem;
-                    }
-                }
-
-                .close-button {
-                    background: none;
-                    border: none;
-                    font-size: 1.2rem;
-                    color: #6c757d;
-                    cursor: pointer;
-
-                    &:hover {
-                        color: #F44336;
-                    }
+                i {
+                    margin-right: 0.5rem;
                 }
             }
 
-            .modal-body {
-                padding: 1.5rem;
-                text-align: center;
+            .close-button {
+                background: none;
+                border: none;
+                font-size: 1.2rem;
+                color: #6c757d;
+                cursor: pointer;
 
-                p {
-                    margin: 0 0 0.8rem;
-                    color: #ffffff;
-                    font-size: 1rem;
-                }
-
-                .warning-text {
+                &:hover {
                     color: #F44336;
-                    font-weight: 700;
-                    font-size: 0.9rem;
                 }
             }
+        }
 
-            .modal-footer {
+        .modal-body {
+            padding: 1.5rem;
+            text-align: center;
+
+            p {
+                margin: 0 0 0.8rem;
+                color: #ffffff;
+                font-size: 1rem;
+            }
+
+            .warning-text {
+                color: #F44336;
+                font-weight: 700;
+                font-size: 0.9rem;
+            }
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background-color: #0157089f;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+
+            button {
+                padding: 0.6rem 1.2rem;
+                border-radius: 6px;
+                font-size: 0.95rem;
+                font-weight: 500;
                 display: flex;
-                justify-content: flex-end;
-                gap: 1rem;
-                padding: 1rem 1.5rem;
-                background-color: #0157089f;
-                border-top: 1px solid rgba(0, 0, 0, 0.1);
+                align-items: center;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
 
-                button {
-                    padding: 0.6rem 1.2rem;
-                    border-radius: 6px;
-                    font-size: 0.95rem;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
-                    border: none;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-
-                    i {
-                        margin-right: 0.5rem;
-                    }
+                i {
+                    margin-right: 0.5rem;
                 }
+            }
 
-                .cancel-button {
-                    background-color: #e9ecef;
-                    color: #495057;
+            .cancel-button {
+                background-color: #e9ecef;
+                color: #495057;
 
-                    &:hover {
-                        background-color: #dee2e6;
-                        transform: translateY(-2px);
-                    }
+                &:hover {
+                    background-color: #dee2e6;
+                    transform: translateY(-2px);
                 }
+            }
 
-                .confirm-button {
-                    background-color: #F44336;
-                    color: white;
+            .confirm-button {
+                background-color: #F44336;
+                color: white;
 
-                    &:hover {
-                        background-color: #e53935;
-                        transform: translateY(-2px);
-                    }
+                &:hover {
+                    background-color: #e53935;
+                    transform: translateY(-2px);
                 }
             }
         }
