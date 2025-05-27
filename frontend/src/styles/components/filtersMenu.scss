@@ -1,0 +1,614 @@
+@use '../mixins/breakpoint.scss' as mix;
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+// Variables comunes
+$color-bg-main: rgba(1, 43, 0, 0.7);
+$color-bg-dark: rgba(1, 43, 0, 0.938);
+$color-bg-darkest: #012b00fa;
+$color-white: #ffffff;
+$color-green: #026800f5;
+$color-gray: #d1d3d1;
+$border-radius-sm: 0.5rem;
+$border-radius-md: 1rem;
+$shadow-default: 0 2px 4px rgba(0, 0, 0, 0.3);
+$transition-default: all 0.3s ease;
+
+// Filtros
+.filters {
+    display: flex;
+    align-items: center;
+    place-content: center;
+    margin: 3em 2rem;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+
+    // Estilos comunes para categorías y dateTime
+    .categories,
+    .dateTime {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: $border-radius-md;
+
+        label {
+            color: $color-white;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+    }
+
+    // Categorías
+    .categories {
+        select {
+            padding: 0.5rem;
+            border-radius: $border-radius-sm;
+            border: 1px solid $color-white;
+            background-color: $color-bg-main;
+            color: $color-white;
+            min-width: 140px;
+
+            option {
+                background-color: $color-bg-darkest;
+                color: $color-white;
+            }
+        }
+    }
+
+    // DateTime
+    .dateTime {
+        flex-wrap: wrap;
+
+        input {
+            color: $color-white;
+            background-color: $color-bg-main;
+            padding: 0.5rem;
+            border-radius: $border-radius-sm;
+            border: 1px solid $color-white;
+            margin-right: 1.5rem;
+            width: 140px;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            &::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+            }
+        }
+    }
+
+    // Botones
+    .containerBtns {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: $border-radius-md;
+        flex-wrap: wrap;
+
+        button {
+            background-color: $color-white;
+            color: $color-green;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: $border-radius-sm;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: $transition-default;
+            white-space: nowrap;
+
+            &:hover {
+                background-color: $color-gray;
+            }
+        }
+    }
+}
+
+// Header del plan
+.plan-header {
+    display: grid;
+    flex-direction: column;
+    text-align: center;
+
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: $shadow-default;
+        margin-bottom: 0.5rem;
+        color: $color-white;
+
+        @media (max-width: 1200px) {
+            font-size: 2.2rem;
+        }
+
+        @media (max-width: 992px) {
+            font-size: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        @media (max-width: 576px) {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    .nature-divider {
+        position: relative;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+        width: 60%;
+        margin: 0.5rem auto;
+
+        .leaf-icon {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(1, 43, 0, 0.961);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+
+            i {
+                color: $color-white;
+                font-size: 1.5rem;
+
+                @media (max-width: 1200px) {
+                    font-size: 1.3rem;
+                }
+
+                @media (max-width: 992px) {
+                    font-size: 1.2rem;
+                }
+
+                @media (max-width: 768px) {
+                    font-size: 1.1rem;
+                }
+
+                @media (max-width: 576px) {
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
+}
+
+// Estilos de Flatpickr
+.flatpickr-calendar {
+    background-color: $color-bg-dark !important;
+    color: $color-white !important;
+    border: 1px solid $color-white;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    width: 307px;
+
+    // Contenedores principales
+    .flatpickr-months,
+    .flatpickr-weekdays,
+    .flatpickr-days {
+        background-color: transparent;
+        color: $color-white;
+    }
+
+    .flatpickr-days {
+    }
+
+    // Días
+    .flatpickr-day {
+        background: transparent;
+        color: $color-white;
+        border-radius: 50%;
+        height: 38px;
+        line-height: 38px;
+        width: 38px;
+        margin: 1px;
+
+        &.selected,
+        &.startRange,
+        &.endRange {
+            background: $color-white;
+            color: #012b00;
+            border-color: $color-white;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        &.today {
+            border-color: $color-white;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        &.prevMonthDay,
+        &.nextMonthDay {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        &.disabled,
+        &.flatpickr-disabled {
+            color: rgba(192, 192, 192, 0.582);
+            text-decoration: line-through;
+            background-color: rgba(0, 0, 0, 0.1) !important;
+            cursor: not-allowed;
+
+            &:hover {
+                background-color: rgba(255, 0, 0, 0.2) !important;
+            }
+        }
+    }
+
+    // Mes actual
+    .flatpickr-current-month {
+        color: $color-white;
+        font-size: 1rem;
+        padding: 5px 0;
+
+        .numInputWrapper {
+            color: $color-white;
+        }
+
+        input.cur-year {
+            color: $color-white;
+            font-size: 1rem;
+        }
+    }
+
+    // Selector de meses
+    .flatpickr-monthDropdown-months {
+        appearance: none;
+        background-color: transparent !important;
+        color: $color-white !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+
+        option {
+            background-color: #012b00;
+            color: $color-white;
+        }
+    }
+
+    // Día de la semana
+    .flatpickr-weekday {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    // Botones de navegación
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        color: $color-white !important;
+        padding: 10px;
+
+        svg {
+            fill: $color-white !important;
+            width: 16px;
+            height: 16px;
+        }
+
+        &:hover svg {
+            fill: #4CAF50 !important;
+        }
+    }
+
+    // Entrada numérica
+    .numInputWrapper {
+        span {
+            border-color: rgba(255, 255, 255, 0.3);
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            &:after {
+                border-top-color: $color-white;
+            }
+
+            &.arrowUp:after {
+                border-bottom-color: $color-white;
+            }
+        }
+    }
+}
+
+// Agrupación de media queries al final
+
+@include mix.respond-max(+lg)  {
+    .headerDashboard {
+        flex-wrap: wrap;
+
+        .purpose {
+            position: static;
+            transform: none;
+            order: 3;
+            max-width: 100%;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .user-menu {
+            .user-dropdown {
+                top: -13px;
+                right: -3px;
+            }
+        }
+    }
+}
+
+@include mix.respond-max(md) {
+    .filters {
+        justify-content: center;
+        place-content: center;
+        align-items: center;
+        gap: 0;
+    }
+
+    .filters .dateTime {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+
+        label {
+            margin: 0.5rem 0;
+        }
+    }
+
+    .plan-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .plan-header h2 {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .plan-header .nature-divider {
+        width: 90%;
+        height: 3px;
+        margin: 1rem auto;
+    }
+
+    .plan-header .nature-divider .leaf-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .flatpickr-calendar {
+        width: 300px;
+    }
+
+    .flatpickr-day {
+        height: 36px;
+        line-height: 36px;
+        width: 36px;
+        font-size: 0.95rem;
+    }
+
+    .flatpickr-current-month {
+        font-size: 0.95rem;
+    }
+
+    .flatpickr-current-month input.cur-year {
+        font-size: 0.95rem;
+    }
+
+    .flatpickr-monthDropdown-months {
+        font-size: 0.95rem;
+    }
+
+    .flatpickr-weekday {
+        font-size: 0.85rem;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        padding: 10px;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@include mix.respond-max(sm)  {
+    .filters {
+        margin: 1.5em 0.5rem;
+        gap: 1rem;
+    }
+
+    .filters .categories,
+    .filters .dateTime {
+        padding: 0.75rem;
+    }
+
+    .filters .categories label {
+        font-size: 0.9rem;
+    }
+
+    .filters .categories select {
+        padding: 0.4rem;
+        font-size: 0.9rem;
+    }
+
+    .filters .dateTime input {
+        padding: 0.4rem;
+        font-size: 0.9rem;
+    }
+
+    .filters .containerBtns {
+        padding: 0.75rem;
+    }
+
+    .filters .containerBtns button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .plan-header {
+        margin-bottom: 1rem;
+    }
+
+    .plan-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .plan-header .nature-divider {
+        width: 95%;
+        height: 2px;
+        margin: 0.75rem auto;
+    }
+
+    .plan-header .nature-divider .leaf-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .flatpickr-calendar {
+        width: 290px;
+    }
+
+    .flatpickr-day {
+        height: 34px;
+        line-height: 34px;
+        width: 34px;
+        font-size: 0.9rem;
+        margin: 0.5px;
+    }
+
+    .flatpickr-current-month {
+        font-size: 0.9rem;
+        padding: 4px 0;
+    }
+
+    .flatpickr-current-month input.cur-year {
+        font-size: 0.9rem;
+    }
+
+    .flatpickr-monthDropdown-months {
+        font-size: 0.9rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    .flatpickr-weekday {
+        font-size: 0.8rem;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        padding: 8px;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@include mix.respond-max(xs)  {
+    .flatpickr-calendar {
+        width: 290px;
+    }
+
+    .flatpickr-day {
+        height: 34px;
+        line-height: 34px;
+        width: 34px;
+        font-size: 0.9rem;
+        margin: 0.5px;
+    }
+
+    .flatpickr-current-month {
+        font-size: 0.9rem;
+        padding: 4px 0;
+    }
+
+    .flatpickr-current-month input.cur-year {
+        font-size: 0.9rem;
+    }
+
+    .flatpickr-monthDropdown-months {
+        font-size: 0.9rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    .flatpickr-weekday {
+        font-size: 0.8rem;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        padding: 8px;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@include mix.respond-max(xxs) {
+    .flatpickr-calendar {
+        width: 270px;
+    }
+
+    .flatpickr-days {
+        padding: 0;
+    }
+
+    .flatpickr-day {
+        height: 32px;
+        line-height: 32px;
+        width: 32px;
+        font-size: 0.85rem;
+        margin: 0.4px;
+    }
+
+    .flatpickr-current-month {
+        font-size: 0.85rem;
+        padding: 3px 0;
+    }
+
+    .flatpickr-current-month input.cur-year {
+        font-size: 0.85rem;
+    }
+
+    .flatpickr-monthDropdown-months {
+        font-size: 0.85rem;
+        padding: 0.1rem 0.3rem;
+    }
+
+    .flatpickr-weekday {
+        font-size: 0.75rem;
+    }
+
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        padding: 6px;
+    }
+
+    .flatpickr-prev-month svg,
+    .flatpickr-next-month svg {
+        width: 12px;
+        height: 12px;
+    }
+}

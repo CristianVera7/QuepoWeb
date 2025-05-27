@@ -5,7 +5,8 @@ $breakpoints: (
   xs: 480px,   // Móviles pequeños
   sm: 560px,   // Móviles grandes
   md: 768px,   // Tablets
-  lg: 992px,   // Desktops pequeños
+  lg: 992px, 
+  +lg:1024px, 
   xl: 1200px,  // Desktops grandes
   xxl: 1400px  // Pantallas extra grandes
 );

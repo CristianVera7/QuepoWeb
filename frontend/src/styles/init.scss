@@ -1,6 +1,19 @@
 @use './reset.scss';
 
-@use './registLog.scss';
+@use './views/registLog.scss';
+@use './views/createPlan.scss';
+@use './views/dashboard.scss';
+@use './views/editPlan.scss';
+@use './views/editProfile.scss';
+@use './views/requestsPlans.scss';
+
+
 @use './components/NavMenuMobile.scss';
 @use './components/FormAddLogin.scss';
 @use './components/Sponsors.scss';
+@use './components/cardPlan.scss';
+@use './components/header.scss';
+@use './components/mapSelector.scss';
+@use './components/filtersMenu.scss';
+@use './components/planForm.scss';
+@use './components/planList.scss';

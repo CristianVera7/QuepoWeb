@@ -1,5 +1,5 @@
 // Imports
-@use './mixins/breakpoint.scss' as mix;
+@use '../mixins/breakpoint.scss' as mix;
 
 // Fuentes
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
@@ -19,7 +19,7 @@ $icon-size: 4.5em;
 }
 
 // Vista de registro principal
-.register-view {
+.registerLog-view {
     background-color: $second-color;
     background-image: $background-image;
     background-size: cover;

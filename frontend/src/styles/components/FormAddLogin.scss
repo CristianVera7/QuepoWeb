@@ -126,12 +126,13 @@ $link-hover: rgba(0, 68, 255, 0.815);
         }
 
         .msgError {
-            color: #d32f2f; // Rojo más oscuro para mejor legibilidad
+            color: #ff3333; // Rojo más oscuro para mejor legibilidad
             padding-left: 0.5rem;
             animation: moveElement 0.2s ease-in-out 1;
             font-weight: 500; // Ligeramente más grueso
             display: flex; // Para alinear icono si decides agregar uno
             align-items: center;
+            background-color: rgba(255, 0, 0, 0);
 
             // Altura fija para evitar saltos
             height: 1.5rem;

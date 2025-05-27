@@ -1,5 +1,5 @@
 <template lang="pug">
-    .register-view
+    .registerLog-view
         .firstWrapper
             .formContainer
                 .firstBlock

@@ -1,0 +1,84 @@
+@use '../mixins/breakpoint.scss' as mix;
+
+.plan-list-container {
+    padding: 2rem 4rem;
+
+    .plan-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 2rem;
+    }
+
+    .no-plans-message {
+        padding: 2rem;
+        text-align: center;
+        background-color: #f9f9f962;
+        border-radius: 0.5rem;
+
+        p {
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+    }
+}
+
+@include mix.respond-max(+lg)  {
+    .plan-list-container {
+        padding: 1.5rem 3rem;
+        
+        .plan-list {
+            gap: 1.8rem;
+        }
+    }
+}
+
+@include mix.respond-max(md)  {
+    .plan-list-container {
+        padding: 1.2rem;
+        
+        .plan-list {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 1.5rem;
+        }
+    }
+}
+
+@include mix.respond-max(xs) {
+    .plan-list-container {
+        padding: 1rem;
+        
+        .plan-list {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 100%;
+        }
+        
+        .no-plans-message {
+            padding: 1.5rem;
+            
+            p {
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+@include mix.respond-max(xxs) {
+    .plan-list-container {
+        padding: 0.8rem;
+        
+        .plan-list {
+            gap: 1.2rem;
+        }
+        
+        .no-plans-message {
+            padding: 1rem;
+            
+            p {
+                font-size: 0.9rem;
+            }
+        }
+    }
+}

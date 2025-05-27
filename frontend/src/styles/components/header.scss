@@ -1,0 +1,421 @@
+@use '../mixins/breakpoint.scss' as mix;
+
+@keyframes shake {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(-15deg);
+    }
+
+    40% {
+        transform: rotate(15deg);
+    }
+
+    60% {
+        transform: rotate(-10deg);
+    }
+
+    80% {
+        transform: rotate(10deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.headerDashboard {
+    font-size: larger;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #d7eee400;
+    margin: 2vw 4vw;
+    width: auto;
+    height: 12.8rem;
+    position: relative;
+
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .titleDashboard {
+        .routeStyles {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        display: flex;
+        justify-content: center;
+        place-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: clamp(1rem, 1.5vw, 1.5rem); // Tamaño de fuente responsive
+        color: #ffffff;
+        margin: 1rem;
+        cursor: pointer;
+        max-width: 8rem;
+    }
+
+    .purpose {
+        color: #ffffff;
+        font-size: clamp(1.5rem, 3vw, 2.3rem); // Tamaño de fuente responsive
+        margin: 0 auto; // Centrado automático
+        max-width: 50%; // Limitar ancho máximo
+        display: flex;
+        align-items: center;
+        justify-content: center; // Centrar contenido
+        text-align: center;
+        position: absolute; // Posicionamiento absoluto
+        left: 50%; // Centrar horizontalmente
+        transform: translateX(-50%); // Ajustar la posición para centrar
+    }
+
+    .user-menu {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 1rem;
+        height: 4rem;
+        padding: 2rem 1rem;
+        border-radius: 2rem;
+        z-index: 10; // Añadido para asegurar que esté por encima de otros elementos
+
+        .user-trigger {
+            display: flex;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            object-fit: cover;
+            padding: 0.3rem;
+
+            .avatar {
+                width: clamp(40px, 4vw, 60px); // Tamaño responsive para la imagen
+                height: clamp(40px, 4vw, 60px);
+            }
+
+            .notification-bell {
+                position: absolute;
+                top: 0rem;
+                left: 0.5rem;
+                border-radius: 50%;
+                box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: bold;
+                color: #000;
+                z-index: 20;
+                animation: shake 1s infinite;
+
+                &::before {
+                    content: "🔔";
+                    font-size: 1.2rem;
+                }
+            }
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: -20px; // Cambiado para posicionarlo debajo del avatar
+            right: 0px;
+            background: #012b00c5;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+            width: max-content; // Se ajusta al contenido
+            min-width: 185px; // Ancho mínimo
+            overflow: hidden;
+            color: rgba(255, 255, 255, 0.753);
+            z-index: 100; // Asegura que aparezca sobre otros elementos
+            margin-top: 0.5rem; // Espacio entre avatar y dropdown
+
+            .user-trigger-dropdown {
+                display: flex;
+                justify-content: end;
+                cursor: pointer;
+                margin-right: 1.25rem;
+
+                .avatar {
+                    width: clamp(40px, 5vw, 60px); // Tamaño responsive para la imagen
+                    height: clamp(40px, 5vw, 60px);
+                }
+            }
+
+            .icon {
+                width: 1.2rem;
+                height: 1.2rem;
+                margin-right: 0.6rem;
+                stroke: #00ad09;
+                flex-shrink: 0;
+
+                &.text-danger {
+                    stroke: #17d605;
+                }
+
+            }
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                font-size: clamp(0.9rem, 1.2vw, 1.2rem); // Texto responsive
+                padding: 0.65rem 1.2rem;
+                white-space: nowrap;
+                cursor: pointer;
+
+                &:hover {
+                    transform: translateY(-2px) scale(1.02);
+                    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                    color: white;
+                }
+
+                &:last-child {
+                    color: #ff1900b9;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+    .highlighted {
+        display: inline-block;
+        animation: pulseText 0.6s infinite;
+        color: rgb(255, 255, 255);
+    }
+
+    @keyframes pulseText {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+
+
+    .dropdown-enter-active,
+    .dropdown-leave-active {
+        transition: all 0.2s ease-out;
+        transform-origin: top right;
+    }
+
+    .dropdown-enter-from {
+        opacity: 0;
+        transform: translateY(0) scaleY(0.5);
+    }
+
+    .dropdown-leave-from {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+
+    .dropdown-leave-to {
+        opacity: 0;
+        transform: translateY(1%) scaleY(0.5);
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.377);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+
+    .modal-content {
+        background-color: #01300af5;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 90%;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.473);
+
+        h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+
+            button {
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                cursor: pointer;
+                background-color: #2d89ef;
+                color: white;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background-color: #2269be;
+                }
+
+                &.cancel {
+                    background-color: #d81600;
+
+                    &:hover {
+                        background-color: #a80f00;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// Media queries mejoradas para diferentes tamaños de pantalla
+@include mix.respond-max(+lg) {
+    .headerDashboard {
+        flex-wrap: wrap;
+
+        .purpose {
+            position: static;
+            transform: none;
+            order: 3;
+            max-width: 100%;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .user-menu {
+            .user-dropdown {
+                top: -13px;
+                right: -3px; // Asegurar que permanezca alineado a la derecha
+            }
+        }
+    }
+}
+
+@include mix.respond-max(md) {
+    .headerDashboard {
+        margin: 1rem; // Reducir márgenes en móviles
+        justify-content: space-between;
+        gap: 1rem; // Espacio entre elementos
+
+        .titleDashboard {
+            margin-right: 0; // Eliminamos el margen fijo
+            flex: 1; // Permitir que crezca para llenar el espacio
+        }
+
+        .user-menu {
+            height: auto; // Altura automática
+            padding: 1rem 0.5rem; // Reducir padding horizontal
+            margin-left: 0; // Eliminar margen fijo
+
+            .user-trigger {
+
+                .notification-bell {
+                    position: absolute;
+                    top: 1.1rem;
+                    left: 0.3rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+
+                    &::before {
+                        content: "🔔";
+                        font-size: 1rem;
+                    }
+                }
+
+            }
+
+            .user-dropdown {
+                top: 4px;
+                right: -5px; // Mantener alineado a la derecha
+                width: auto; // Ancho automático
+                min-width: 160px; // Reducir ancho mínimo
+
+                .dropdown-item {
+                    padding: 0.6rem 1rem; // Reducir padding
+                    font-size: 1rem; // Tamaño fijo para móviles
+                }
+            }
+        }
+
+        .purpose {
+            font-size: 1.3rem; // Tamaño de fuente más pequeño
+            margin-top: 0.5rem; // Reducir espacio superior
+            width: 100%; // Ocupar todo el ancho
+        }
+    }
+}
+
+@include mix.respond-max(xs) {
+    .headerDashboard {
+        margin: 0.5rem; // Márgenes más pequeños
+        padding: 0.5rem;
+
+        .titleDashboard {
+            font-size: 0.9rem; // Reducir tamaño de fuente
+        }
+
+        .user-menu {
+            padding: 0.5rem;
+
+            .user-trigger {
+                padding: 0.2rem; // Borde más fino
+                border-width: 1px; // Borde más fino
+
+                .notification-bell {
+                    position: absolute;
+                    top: 0.5rem;
+                    left: 0.2rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+
+                    &::before {
+                        content: "🔔";
+                        font-size: 0.8rem;
+                    }
+                }
+
+                .avatar {
+                    width: 35px; // Tamaño fijo para móviles pequeños
+                    height: 35px;
+                }
+            }
+
+            .user-dropdown {
+                top: -10px;
+                left: auto; // Anular cualquier posicionamiento izquierdo
+                right: -11.5px; // Ajustar para que no se salga de la pantalla
+                transform-origin: top right; // Origen de transformación
+                width: 150px; // Ancho fijo para móviles pequeños
+
+                .dropdown-item {
+                    padding: 0.5rem 0.8rem; // Padding más compacto
+                    font-size: 0.9rem; // Texto más pequeño
+
+                    .icon {
+                        width: 1rem;
+                        height: 1rem;
+                        margin-right: 0.4rem;
+                    }
+                }
+            }
+        }
+
+        .purpose {
+            font-size: 1.1rem; // Aún más pequeño en móviles pequeños
+        }
+    }
+}
