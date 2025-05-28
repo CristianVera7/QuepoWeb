@@ -1,12 +1,14 @@
 <template lang="pug">
     .wrapper
         .plan-card
+            // Imagen de fondo con categoría del plan
             .plan-image
                 img.background-img(:src="defaultImage(plan.category)" :alt="plan.category")
                 .plan-image-overlay
                     .plan-category {{ plan.category }}
             
             .plan-content
+                // Header principal del plan - siempre visible, controla la expansión general
                 .section-box.plan-header-box
                     .section-header(@click="toggleSection('planHeader')")
                         h4 
@@ -17,10 +19,11 @@
                     .nature-divider
                     .plan-header
                         .plan-title {{ plan.description }}
-                    // Contenido principal y todos los demás desplegables
+                    
+                    // Todo el contenido desplegable se muestra solo cuando planHeader está expandido
                     .section-content(v-show="expandedSections.planHeader" :class="{ expanded: expandedSections.planHeader }")
                         
-                        // Sección Información del viaje
+                        // Sección 1: Información básica del viaje (organiza, fecha, rutas, precio)
                         .section-box.expandable-section
                             .section-header(@click="toggleSection('journeyInfo')")
                                 h4 
@@ -66,7 +69,7 @@
                                             strong Precio: 
                                             | {{ plan.price }}€
                         
-                        // Sección Vehículo
+                        // Sección 2: Información del vehículo (marca, modelo, color, matrícula)
                         .section-box.expandable-section
                             .section-header(@click="toggleSection('carInfo')")
                                 h4 
@@ -89,7 +92,7 @@
                                         strong Matrícula: 
                                         | {{ plan.carInformation.carIdentifier }}
                         
-                        // Sección Pasajeros
+                        // Sección 3: Lista de pasajeros actuales
                         .section-box.expandable-section
                             .section-header(@click="toggleSection('passengersInfo')")
                                 h4 
@@ -102,17 +105,23 @@
                                     li(v-for="p in plan.passengers" :key="p._id") {{ p.nickName }}
                 
                 .nature-divider
+                
+                // Sección de acciones - siempre visible al final
                 .plan-actions
+                    // Contador de plazas disponibles
                     p.places-available
                         i.fas.fa-chair
                         | Plazas disponibles: 
                         strong {{ plan.placesAvailable }}
+                    
                     .button-container
+                        // Advertencia si el usuario no tiene DNI registrado
                         .dni-warning(v-if="!hasDni")
                             i.fas.fa-exclamation-triangle  
                             router-link(to="editProfile") Debes tener un DNI registrado en tu cuenta para unirte.
                                 p Haga click para completar su perfil
                         
+                        // Botón "Unirse" - solo si hay plazas, no es creador, no es pasajero, no tiene solicitud pendiente y tiene DNI
                         button.join-button(
                             v-if="plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && !showMessageBox && hasDni"
                             @click="toggleMessageBox"
@@ -120,6 +129,7 @@
                             i.fas.fa-sign-in-alt
                             | Unirse
                         
+                        // Estado "Solicitud pendiente" - cuando el usuario ya envió una solicitud
                         p.pending-button(
                             v-if="hasPendingRequest"
                             disabled
@@ -127,23 +137,29 @@
                             i.fas.fa-clock
                             | Solicitud pendiente
         
+                        // Caja de mensaje para enviar solicitud de unión
                         .message-box(v-if="showMessageBox")
                             textarea(v-model="message" placeholder="Escribe un mensaje para el creador..." rows="3")
                             button.send-button(@click="joinPlanEmit" :disabled="!message.trim()") 
                                 i.fas.fa-paper-plane
                                 | Enviar solicitud
         
+                        // Botón deshabilitado cuando no hay plazas disponibles
                         button.no-places-button(v-if="!plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && hasDni" disabled)
                             i.fas.fa-ban
                             | No hay plazas
                             
+                        // Botón "Editar" - solo visible para el creador del plan
                         button.edit-button(v-if="plan.isCreator" @click="editPlan")
                             i.fas.fa-edit
                             | Editar
                             
+                        // Botón "Salir del plan" - solo visible para pasajeros actuales
                         button.leave-button(v-if="plan.isPassenger" @click="openLeaveModal")
                             i.fas.fa-sign-out-alt
                             | Salir del plan
+    
+    // Modal de confirmación para salir del plan (se renderiza en el body)
     Teleport(to="body")
         .modal-overlay(v-if="showLeaveConfirmation" @click.self="closeLeaveModal")
             .modal-content
@@ -176,13 +192,14 @@ import defaultImg from '../img/plans/defaultImg.jpg'
 import { storeToRefs } from 'pinia';
 import router from '../router';
 
+// Props del componente
 interface Props {
     plan: IPlan,
     hasDni: boolean,
     pendingRequestPlans?: string[]
 }
 
-// Definimos el tipo para las secciones expandibles
+// Definición de tipos para el sistema de secciones expandibles
 type ExpandableSectionKey = 'planHeader' | 'journeyInfo' | 'carInfo' | 'passengersInfo';
 interface ExpandedSections {
     planHeader: boolean;
@@ -192,18 +209,24 @@ interface ExpandedSections {
     [key: string]: boolean; // Índice de firma para permitir acceso por string
 }
 
+// Acceso al store de registro para verificar DNI
 const { hasDni } = storeToRefs(useRegisterStore())
 const props = defineProps<Props>()
 const emit = defineEmits(['joinPlan', 'leavePlan'])
-const showMessageBox = ref(false)
-const message = ref('')
-const showLeaveConfirmation = ref(false)
 
-// Verificamos si este plan está en la lista de solicitudes pendientes
+// Estados reactivos para el flujo de unirse al plan
+const showMessageBox = ref(false)  // Controla la visibilidad del textarea para mensaje
+const message = ref('')           // Contenido del mensaje del usuario
+
+// Estados reactivos para el flujo de salir del plan
+const showLeaveConfirmation = ref(false)  // Controla la visibilidad del modal de confirmación
+
+// Verifica si el usuario tiene una solicitud pendiente para este plan
 const hasPendingRequest = computed(() => {
     return props.pendingRequestPlans?.includes(props.plan._id) ?? false;
 });
 
+// Estado reactivo para controlar qué secciones están expandidas
 // Inicializamos todas las secciones como colapsadas
 const expandedSections = reactive<ExpandedSections>({
     planHeader: false,
@@ -212,28 +235,32 @@ const expandedSections = reactive<ExpandedSections>({
     passengersInfo: false
 })
 
+/**
+ * FLUJO PRINCIPAL DE EXPANSIÓN DE SECCIONES:
+ */
 const toggleSection = (section: ExpandableSectionKey) => {
     const isOpening = !expandedSections[section];
 
-    // Cierra todas las secciones primero
+    // Paso 1: Cierra todas las secciones primero (excepto planHeader)
     Object.keys(expandedSections).forEach(key => {
         if (key !== 'planHeader') {
             expandedSections[key] = false;
         }
     });
 
-    // Si estamos abriendo una sección específica, ábrela
+    // Paso 2: Si estamos abriendo una sección específica, ábrela
     if (section !== 'planHeader') {
         expandedSections[section] = isOpening;
     }
 
-    // Manejo especial para el planHeader (mantener como está si es necesario)
+    // Paso 3: Manejo especial para el planHeader (sección padre)
     if (section === 'planHeader') {
         expandedSections.planHeader = !expandedSections.planHeader;
         if (expandedSections.planHeader) {
-            expandedSections.journeyInfo = true; // Mostrar por defecto si se abre el header
+            // Al abrir el header, mostrar por defecto la información del viaje
+            expandedSections.journeyInfo = true;
         } else {
-            // Cierra también las secciones hijas si se colapsa el header
+            // Al cerrar el header, cierra también todas las secciones hijas
             expandedSections.journeyInfo = false;
             expandedSections.carInfo = false;
             expandedSections.passengersInfo = false;
@@ -241,19 +268,15 @@ const toggleSection = (section: ExpandableSectionKey) => {
     }
 };
 
-
+/**
+ * FLUJO DE UNIRSE AL PLAN:
+ * 1. Usuario hace click en "Unirse" -> se muestra el textarea
+ * 2. Usuario escribe mensaje y hace click en "Enviar solicitud"
+ * 3. Se emite el evento al componente padre con planId y mensaje
+ * 4. Se resetea el estado local
+ */
 const toggleMessageBox = () => {
     showMessageBox.value = !showMessageBox.value
-}
-
-const formatDate = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString(undefined, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    })
 }
 
 const joinPlanEmit = () => {
@@ -262,11 +285,12 @@ const joinPlanEmit = () => {
     showMessageBox.value = false
 }
 
-const leavePlanEmit = (planId: string) => {
-    emit('leavePlan', planId)
-}
-
-// Funciones separadas para mejor control del modal
+/**
+ * FLUJO DE SALIR DEL PLAN:
+ * 1. Usuario hace click en "Salir del plan" -> se abre modal de confirmación
+ * 2. Usuario confirma -> se emite evento al padre y se cierra modal
+ * 3. Usuario cancela -> solo se cierra modal
+ */
 const openLeaveModal = () => {
     showLeaveConfirmation.value = true
     // Prevenimos el scroll del body cuando el modal está activo
@@ -284,6 +308,22 @@ const confirmLeavePlan = () => {
     closeLeaveModal()
 }
 
+const leavePlanEmit = (planId: string) => {
+    emit('leavePlan', planId)
+}
+
+//  Formatea fecha para mostrar solo día/mes/año
+const formatDate = (dateTime: string) => {
+    return new Date(dateTime).toLocaleString(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+}
+
+//  Retorna la imagen de fondo según la categoría del plan
 const defaultImage = (category: string) => {
     const categoryLower = category.toLowerCase();
     switch (categoryLower) {
@@ -294,6 +334,7 @@ const defaultImage = (category: string) => {
     }
 }
 
+//  Redirige a la página de edición del plan
 const editPlan = () => {
     if (props.plan && props.plan._id) {
         router.push({ name: 'editPlan', params: { id: props.plan._id } });

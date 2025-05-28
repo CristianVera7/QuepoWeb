@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+// Importación de componentes y librerías necesarias
 import firstComponent from '../components/FirstComponent.vue';
 import PlanFiltersMenu from '../components/PlanFiltersMenu.vue';
 import PlanList from '../components/PlanList.vue';
@@ -14,20 +15,29 @@ import { useRegisterStore } from '../stores/registerStore';
 import type { IPlan } from '../types/plan';
 import { storeToRefs } from 'pinia';
 
+// Uso del store de registro
 const store = useRegisterStore();
 const { checkUser, tokenStore } = store;
 const { hasDni } = storeToRefs(useRegisterStore());
 
+// Listado de todos los planes obtenidos del backend
 const plansList = ref<IPlan[]>([]);
+
+// Planes actualmente visibles (pueden estar filtrados)
 const displayedPlans = ref<IPlan[]>([]);
-const pendingRequestPlans = ref<string[]>([])
+
+// Lista de IDs de planes en los que hay solicitudes pendientes del usuario
+const pendingRequestPlans = ref<string[]>([]);
+
+// Mensaje por defecto cuando el usuario no tiene planes
 const message = 'No tienes planes en los que seas participe.';
 
-
+// Función que actualiza los planes visibles según filtros aplicados
 const onFilteredPlansUpdate = (plans: IPlan[]) => {
     displayedPlans.value = plans;
 };
 
+// Función que obtiene los planes del usuario desde el backend
 const listOfPlans = async () => {
     try {
         const response = await axios.get('http://localhost:8000/plan/myPlans', {
@@ -40,8 +50,7 @@ const listOfPlans = async () => {
         if (response.data.ok) {
             console.log('Planes obtenidos:', response.data.plansList);
             plansList.value = response.data.plansList;
-            // Al cargar los planes, inicializamos también los planes filtrados
-            displayedPlans.value = response.data.plansList;
+            displayedPlans.value = response.data.plansList; // se inicializan los planes visibles
         } else {
             console.log('ERROR AL OBTENER LOS PLANES');
         }
@@ -50,6 +59,7 @@ const listOfPlans = async () => {
     }
 };
 
+// Función para que el usuario abandone un plan
 const leavePlan = async (planId: string) => {
     try {
         const response = await axios.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
@@ -60,7 +70,7 @@ const leavePlan = async (planId: string) => {
 
         if (response.data.ok) {
             console.log('Te has salido del plan');
-            await listOfPlans();
+            await listOfPlans(); // se actualiza la lista luego de salir del plan
         } else {
             console.log('ERROR AL SALIR DEL PLAN');
         }
@@ -69,6 +79,7 @@ const leavePlan = async (planId: string) => {
     }
 };
 
+// Función que obtiene los planes con solicitudes pendientes del usuario
 const getPendingRequests = async () => {
     try {
         const response = await axios.get('http://localhost:8000/plan/pendingRequest', {
@@ -79,17 +90,18 @@ const getPendingRequests = async () => {
         });
 
         if (response.data.ok && response.data.plans) {
+            // Extrae solo los IDs de los planes con solicitudes pendientes
             pendingRequestPlans.value = response.data.plans.map((plan: any) => plan.planId);
-            // console.log('Solicitudes pendientes:', pendingRequestPlans.value);
         }
     } catch (error) {
         console.log('Error al obtener solicitudes pendientes:', error);
     }
 }
 
+// Cuando se monta la vista, se valida al usuario y se cargan sus planes y solicitudes pendientes
 onMounted(async () => {
-    await checkUser();
-    await listOfPlans();
-    await getPendingRequests()
+    await checkUser(); // verifica al usuario logueado
+    await listOfPlans(); // obtiene sus planes actuales
+    await getPendingRequests(); // obtiene sus solicitudes pendientes
 });
 </script>

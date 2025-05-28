@@ -1,12 +1,16 @@
 <template lang="pug">
     .plan-form-container
+        //- Menú de filtros que se muestra solo si showFilters está habilitado
         PlanFiltersMenu(:hasDni="hasDni")
         .plan-creation-container
+            //- Formulario principal para crear/editar planes
             form.formPlan(@submit.prevent="submitForm")
+                //- Campo de título del plan
                 .form-group
                     label(for="plan-title") Título
                     input#plan-title(type="text" placeholder="Título de tu aventura" v-model="planData.title" required)
                 
+                //- Selector de categoría del plan
                 .form-group
                     label(for="plan-category") Categoría
                     select#plan-category(v-model="planData.category" required)
@@ -15,18 +19,22 @@
                         option(value="Senderismo") Senderismo
                         option(value="Escalada") Escalada
 
+                //- Área de texto para la descripción
                 .form-group
                     label(for="plan-description") Descripción
                     textarea#plan-description(placeholder="Describe tu plan de aventura" v-model="planData.description" required)
                 
+                //- Sección del mapa interactivo para seleccionar la ruta
                 .form-group.map-section
                     label.map-label Selecciona la ruta
                     .map-wrapper
+                        //- Componente de mapa que emite evento cuando se confirma una ruta
                         MapSelector(
                             @route-confirmed="handleRoute" 
                             :initialOrigin="planData.route.location.origin"
                             :initialDestination="planData.route.location.destination"
                         )
+                    //- Información de la ruta seleccionada (solo se muestra si hay origen y destino)
                     .route-info(v-if="planData.route.location.origin && planData.route.location.destination")
                         .route-detail
                             i.fas.fa-map-marker-alt
@@ -42,10 +50,11 @@
                                 i.fas.fa-clock
                                 span Duración: {{ planData.route.duration }}
                 
+                //- Fila con campos de fecha, plazas y precio
                 .form-row
+                    //- Selector de fecha y hora usando FlatPickr
                     .form-group.half
                         label(for="plan-date") Fecha y hora
-                        //- Reemplazo del input datetime-local por flatpickr
                         flat-pickr#plan-date(
                             v-model="planData.dateTime"
                             :config="dateTimeConfig"
@@ -53,16 +62,19 @@
                             required
                         )
                     
+                    //- Campo numérico para plazas disponibles
                     .form-group.half
                         label(for="plan-places") Plazas disponibles
-                        input#plan-places(type="number" min="1" placeholder="Número de plazas" v-model="planData.placesAvailable" required)
+                        input#plan-places(type="number" placeholder="Número de plazas" v-model="planData.placesAvailable" required)
                     
+                    //- Campo de precio con símbolo de euro
                     .form-group.half
                         label(for="plan-price") Precio por plaza
                         .price-input-container
                             input#plan-price(type="number" min="1" placeholder="Precio" v-model="planData.price" required)
                             span.price-currency €
 
+                //- Sección de información del vehículo
                 .form-group.car-section
                     h3 
                         i.fas.fa-car
@@ -84,6 +96,7 @@
                             label(for="car-color") Color
                             input#car-color(type="text" placeholder="Azul" v-model="planData.carInformation.color")
 
+                //- Sección de pasajeros (solo visible en modo edición y si hay pasajeros)
                 .section-box.passengers-info(v-if="isEditMode && planData.passengers && planData.passengers.length > 0")
                     h3
                         i.fas.fa-users
@@ -93,25 +106,33 @@
                             i.fas.fa-user
                             span {{ passenger.nickName }}
 
+                //- Sección de acciones del formulario
                 .form-actions
+                    //- Contenedor de mensajes (éxito/error) con iconos dinámicos
                     .message-container(v-if="message" :class="{ 'success': message.includes('éxito'), 'error': message.includes('Error') || message.includes('campos') }")
                         i.fas(:class="message.includes('éxito') ? 'fa-check-circle' : 'fa-exclamation-circle'")
                         p {{ message }}
                     
+                    //- Grupo de botones de acción
                     .button-group
+                        //- Botón de cancelar (solo en modo edición)
                         button.cancel-button(type="button" @click="cancelForm" v-if="isEditMode")
                             i.fas.fa-times
                             span Cancelar
                         
+                        //- Botón principal de envío (crear/actualizar)
                         button.submit-button(type="submit" :disabled="loading")
                             i.fas(:class="isEditMode ? 'fa-save' : 'fa-paper-plane'")
                             span {{ isEditMode ? 'Guardar cambios' : 'Crear plan' }}
                             span.loading-indicator(v-if="loading") ...
                         
+                        //- Botón de eliminar (solo en modo edición)
                         button.delete-button(type="button" @click="showDeleteModal = true" :disabled="deleteLoading" v-if="isEditMode")
                             i.fas.fa-trash
                             span Eliminar plan
                             span.loading-indicator(v-if="deleteLoading") ...
+                        
+                        //- Modal de confirmación para eliminación (teleportado al body)
                         Teleport(to="body")
                             .modal-mask(v-if="showDeleteModal")
                                 .modal-wrapper
@@ -135,47 +156,50 @@ import FlatPickr from 'vue-flatpickr-component'
 import 'flatpickr/dist/flatpickr.css'
 import 'flatpickr/dist/l10n/es.js'
 
-// Definir props para el componente
+// CONFIGURACIÓN DE PROPS Y EVENTOS
+// Props que definen el comportamiento del componente
 const props = defineProps({
-    isEditMode: {
+    isEditMode: {           // Determina si estamos editando o creando
         type: Boolean,
         default: false
     },
-    showHeader: {
+    showHeader: {           // Controla la visibilidad del header
         type: Boolean,
         default: true
     },
-    showFilters: {
+    showFilters: {          // Controla la visibilidad de los filtros
         type: Boolean,
         default: true
     },
-    planId: {
+    planId: {               // ID del plan para modo edición
         type: String,
         default: ''
     }
 })
 
-// Definir eventos
+// Eventos que emite el componente para comunicarse con el padre
 const emit = defineEmits(['plan-created', 'plan-updated', 'plan-deleted', 'cancel'])
 
+// INICIALIZACIÓN DE DEPENDENCIAS
 const route = useRoute()
 const router = useRouter()
 const { checkUser, tokenStore } = useRegisterStore()
 const { hasDni } = storeToRefs(useRegisterStore())
 
-// Configuración de FlatPickr para fecha y hora
+// CONFIGURACIÓN DEL SELECTOR DE FECHA
+// Configuración completa para FlatPickr con validaciones y formato español
 const dateTimeConfig = {
-    dateFormat: 'd-m-Y H:i', // Formato de fecha y hora
-    enableTime: true, // Habilitar selección de hora
-    time_24hr: true, // Formato 24 horas
-    locale: 'es', // Idioma español
-    disableMobile: true, // Evitar calendario nativo en móviles
-    allowInput: true, // Permitir entrada manual
-    minDate: 'today', // Mínimo día actual
-    minuteIncrement: 5, // Incremento de minutos
+    dateFormat: 'd-m-Y H:i',    // Formato visual de fecha
+    enableTime: true,            // Habilitar selección de hora
+    time_24hr: true,            // Formato 24 horas
+    locale: 'es',               // Idioma español
+    disableMobile: true,        // Evitar calendario nativo en móviles
+    allowInput: true,           // Permitir entrada manual
+    minDate: 'today',           // Mínimo día actual
+    minuteIncrement: 5,         // Incremento de minutos
     disable: [
         function (date: Date) {
-            // Deshabilita cualquier fecha anterior a hoy
+            // Función que deshabilita fechas anteriores a hoy
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             return date < today;
@@ -183,7 +207,8 @@ const dateTimeConfig = {
     ]
 }
 
-// Estado del formulario - Inicializado con valores correctos
+// ESTADO DEL FORMULARIO
+// Estructura principal de datos del plan con valores iniciales
 const planData = ref({
     title: '',
     category: '',
@@ -208,18 +233,21 @@ const planData = ref({
     passengers: [] as any[]
 })
 
-// Para almacenar los datos originales en modo edición (inicializado igual que planData)
-const originalPlanData = ref({ ...planData.value })
-const message = ref('')
-const loading = ref(false)
-const deleteLoading = ref(false)
+// ESTADO DE CONTROL
+const originalPlanData = ref({ ...planData.value })  // Copia de datos originales para detectar cambios
+const message = ref('')                              // Mensajes de feedback al usuario
+const loading = ref(false)                           // Estado de carga del formulario
+const deleteLoading = ref(false)                     // Estado de carga específico para eliminación
+const showDeleteModal = ref(false)                   // Control del modal de confirmación
 
-// Obtener el ID del plan en modo edición
+// COMPUTED PROPERTIES
+// Obtiene el ID del plan desde props o parámetros de ruta
 const getPlanId = computed(() => {
     return props.planId || (route.params.id as string)
 })
 
-// Cargar los datos del plan si estamos en modo edición
+// FUNCIONES DE CARGA DE DATOS
+// Carga los datos del plan existente cuando estamos en modo edición
 const loadPlanData = async () => {
     if (!props.isEditMode) return
 
@@ -227,6 +255,7 @@ const loadPlanData = async () => {
         loading.value = true
         await checkUser()
 
+        // Verificar autenticación
         if (!tokenStore) {
             console.error('No hay token de usuario disponible')
             router.push('/login')
@@ -236,7 +265,7 @@ const loadPlanData = async () => {
         const planId = getPlanId.value
         console.log('Cargando plan con ID:', planId)
 
-        // URL corregida aquí: getPlanById en lugar de solo /{id}
+        // Llamada a la API para obtener los datos del plan
         const response = await axios.get(`http://localhost:8000/plan/getPlanById/${planId}`, {
             headers: {
                 'Content-Type': 'application/json',
@@ -245,11 +274,9 @@ const loadPlanData = async () => {
         })
 
         console.log('Datos del plan recibidos:', response.data)
-
-        // Verificamos si los datos vienen como plan o directamente
         const planDataResponse = response.data.plan
 
-        // Formatear la fecha para flatpickr
+        // Formatear la fecha para que sea compatible con FlatPickr
         let formattedDate = ''
         if (planDataResponse.dateTime) {
             const planDate = new Date(planDataResponse.dateTime)
@@ -261,7 +288,7 @@ const loadPlanData = async () => {
             formattedDate = `${day}-${month}-${year} ${hours}:${minutes}`
         }
 
-        // Asignar los datos al formulario
+        // Mapear los datos recibidos al formulario
         planData.value = {
             title: planDataResponse.title || '',
             category: planDataResponse.category || '',
@@ -286,7 +313,7 @@ const loadPlanData = async () => {
             passengers: planDataResponse.passengers || []
         }
 
-        // Guardar una copia de los datos originales
+        // Guardar copia de los datos originales para detectar cambios
         originalPlanData.value = JSON.parse(JSON.stringify(planData.value))
 
     } catch (err) {
@@ -297,7 +324,8 @@ const loadPlanData = async () => {
     }
 }
 
-// Manejar la ruta seleccionada desde el componente de mapa
+// MANEJADORES DE EVENTOS
+// Maneja la ruta seleccionada desde el componente MapSelector
 const handleRoute = (routeData: { origin: string, destination: string, duration: string, distance: string }) => {
     planData.value.route.location.origin = routeData.origin
     planData.value.route.location.destination = routeData.destination
@@ -306,7 +334,8 @@ const handleRoute = (routeData: { origin: string, destination: string, duration:
     console.log('Ruta seleccionada:', routeData)
 }
 
-// Validar el formulario
+// FUNCIONES DE VALIDACIÓN
+// Valida que todos los campos requeridos estén completos
 const validateForm = () => {
     if (!planData.value.title || !planData.value.category || !planData.value.description ||
         !planData.value.route.location.origin || !planData.value.route.location.destination ||
@@ -320,11 +349,12 @@ const validateForm = () => {
     return true
 }
 
-// Parsear fecha de FlatPickr antes de enviar
+// FUNCIONES DE FORMATO DE DATOS
+// Convierte la fecha de FlatPickr al formato ISO para el backend
 const parseDateForSubmit = () => {
     if (!planData.value.dateTime) return ''
 
-    // Convertir formato "dd-mm-yyyy HH:MM" a objeto Date para el backend
+    // Parsear formato "dd-mm-yyyy HH:MM" a objeto Date
     const parts = planData.value.dateTime.split(' ')
     if (parts.length !== 2) return planData.value.dateTime
 
@@ -343,7 +373,8 @@ const parseDateForSubmit = () => {
     return dateObj.toISOString()
 }
 
-// Eliminar el plan
+// FUNCIONES DE CRUD
+// Elimina el plan actual (solo disponible en modo edición)
 const deletePlan = async () => {
     try {
         deleteLoading.value = true
@@ -357,7 +388,7 @@ const deletePlan = async () => {
 
         const planId = getPlanId.value
 
-        // Llamar a la API para eliminar el plan
+        // Llamada a la API para eliminar el plan
         await axios.delete(`http://localhost:8000/plan/delete/${planId}`, {
             headers: {
                 'Content-Type': 'application/json',
@@ -365,7 +396,7 @@ const deletePlan = async () => {
             }
         })
 
-        // Emitir evento de eliminación exitosa
+        // Emitir evento de eliminación exitosa al componente padre
         emit('plan-deleted', planData.value.title)
 
     } catch (err) {
@@ -376,7 +407,7 @@ const deletePlan = async () => {
     }
 }
 
-// Enviar el formulario (crear o actualizar)
+// Función principal para crear o actualizar un plan
 const submitForm = async () => {
     try {
         await checkUser()
@@ -386,25 +417,24 @@ const submitForm = async () => {
             return
         }
 
-        // En modo edición no verificamos el DNI ya que el usuario ya pudo crear el plan
+        // Verificar DNI solo para creación de nuevos planes
         if (!props.isEditMode && !hasDni.value) {
             console.error('Falta DNI verificado')
             message.value = 'Necesitas tener un DNI verificado para crear planes'
             return
         }
 
-        // Validar el formulario
+        // Validar todos los campos del formulario
         validateForm()
 
         loading.value = true
 
-        // Crear copia de los datos para enviar
+        // Preparar datos para envío con fecha formateada
         const dataToSubmit = JSON.parse(JSON.stringify(planData.value))
-        // Convertir la fecha al formato adecuado
         dataToSubmit.dateTime = parseDateForSubmit()
 
         if (props.isEditMode) {
-            // Actualizar plan existente
+            // FLUJO DE ACTUALIZACIÓN
             await axios.put(`http://localhost:8000/plan/update/${getPlanId.value}`, dataToSubmit, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -414,7 +444,7 @@ const submitForm = async () => {
             message.value = 'Plan actualizado con éxito.'
             emit('plan-updated', planData.value.title)
         } else {
-            // Crear nuevo plan
+            // FLUJO DE CREACIÓN
             await axios.post('http://localhost:8000/plan/create', dataToSubmit, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -425,7 +455,7 @@ const submitForm = async () => {
             emit('plan-created', planData.value.title)
             console.log(planData.value.title);
 
-            // Reset del formulario en modo creación
+            // Resetear formulario después de creación exitosa
             planData.value = {
                 title: '',
                 category: '',
@@ -463,10 +493,11 @@ const submitForm = async () => {
     }
 }
 
-// Cancelar edición
+// FUNCIONES DE NAVEGACIÓN Y CONTROL
+// Maneja la cancelación de la edición con confirmación si hay cambios
 const cancelForm = () => {
     if (props.isEditMode) {
-        // Preguntar antes de cancelar si hay cambios
+        // Detectar si hay cambios no guardados
         const hasChanges = JSON.stringify(planData.value) !== JSON.stringify(originalPlanData.value)
 
         if (hasChanges) {
@@ -481,14 +512,14 @@ const cancelForm = () => {
     }
 }
 
-const showDeleteModal = ref(false)
-
+// Confirma la eliminación cerrando el modal y ejecutando la eliminación
 const confirmDelete = async () => {
     showDeleteModal.value = false
     await deletePlan()
 }
 
-// Cargar datos al montar el componente
+// HOOKS DE CICLO DE VIDA
+// Se ejecuta al montar el componente
 onMounted(async () => {
     await checkUser()
     if (props.isEditMode) {
@@ -496,7 +527,8 @@ onMounted(async () => {
     }
 })
 
-// Observar cambios en el planId para recargar los datos si cambia
+// WATCHERS
+// Observa cambios en el planId para recargar datos si cambia
 watch(() => props.planId, async (newId, oldId) => {
     if (newId && newId !== oldId && props.isEditMode) {
         await loadPlanData()

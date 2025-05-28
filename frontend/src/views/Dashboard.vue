@@ -1,16 +1,25 @@
 <template lang="pug">
+    // Layout base que envuelve la vista
     firstComponent
-        PlanFiltersMenu(:allPlans="plansList" :hasDni="hasDni" @update:filteredPlans="onFilteredPlansUpdate")
+        // Menú de filtros con los planes y estado del DNI
+        PlanFiltersMenu(
+            :allPlans="plansList"
+            :hasDni="hasDni"
+            @update:filteredPlans="onFilteredPlansUpdate" 
+        )
+
+        // Lista de planes filtrados, pasando también si tiene DNI y planes con solicitud pendiente
         PlanList(
-            :filteredPlans="filteredPlans" 
-            :hasDni="hasDni" 
+            :filteredPlans="filteredPlans"
+            :hasDni="hasDni"
             :message="feedback" 
             :pendingRequestPlans="pendingRequestPlans"
             @joinPlan="joinPlan" 
-            @leavePlan="leavePlan"
+            @leavePlan="leavePlan" 
         )
 
-    .v-modal.modal-overlay(v-if="!hasDni && showModal" )
+    // Modal que aparece si el usuario no tiene DNI registrado
+    .v-modal.modal-overlay(v-if="!hasDni && showModal")
         .modal-content
             h3 No tienes un DNI registrado
             p Para poder interactuar con la aplicación, necesitas registrar tu DNI.
@@ -18,7 +27,6 @@
                 button.go-to-register(@click="goToRegister") Registrar ahora
                 button.later(@click="closeModal") Más tarde
 </template>
-
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
@@ -31,17 +39,24 @@ import PlanFiltersMenu from '../components/PlanFiltersMenu.vue'
 import PlanList from '../components/PlanList.vue'
 import { storeToRefs } from 'pinia'
 
+// Store de autenticación y estado del usuario
 const store = useRegisterStore()
 const { checkUser, tokenStore } = store
 const { hasDni } = storeToRefs(store)
+
 const router = useRouter()
 
+// Listado completo y filtrado de planes
 const plansList = ref<IPlan[]>([])
 const filteredPlans = ref<IPlan[]>([])
+
+// IDs de planes donde el usuario ya solicitó unirse
 const pendingRequestPlans = ref<string[]>([])
+
 const feedback = 'No hay planes disponibles para esta categoria y/o fecha.'
 const showModal = ref(true)
 
+// Solicita la lista de planes disponibles
 const listOfPlans = async () => {
     try {
         const response = await axios.get('http://localhost:8000/plan/list', {
@@ -52,7 +67,7 @@ const listOfPlans = async () => {
         })
         if (response.data.ok) {
             plansList.value = response.data.data
-            filteredPlans.value = response.data.data
+            filteredPlans.value = response.data.data // Por defecto muestra todos
         } else {
             console.error('ERROR AL OBTENER LOS PLANES')
         }
@@ -61,10 +76,12 @@ const listOfPlans = async () => {
     }
 }
 
+// Se actualiza la lista de planes filtrados desde PlanFiltersMenu
 const onFilteredPlansUpdate = (plans: IPlan[]) => {
     filteredPlans.value = plans
 }
 
+// Envía una solicitud para unirse a un plan
 const joinPlan = async (payload: { planId: string, message: string }) => {
     await checkUser()
     try {
@@ -85,17 +102,19 @@ const joinPlan = async (payload: { planId: string, message: string }) => {
     }
 }
 
+// Permite abandonar un plan al que ya se unió
 const leavePlan = async (planId: string) => {
     try {
         const response = await axios.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
             headers: {
                 Authorization: `Bearer ${tokenStore}`
             }
-        });
+        })
         if (response.data.ok) {
             console.log('Te has salido del plan')
-            await listOfPlans()
+            await listOfPlans() // Recarga los planes para reflejar cambios
 
+            // Remueve el plan de la lista de solicitudes pendientes
             const index = pendingRequestPlans.value.indexOf(planId)
             if (index !== -1) {
                 pendingRequestPlans.value.splice(index, 1)
@@ -108,6 +127,7 @@ const leavePlan = async (planId: string) => {
     }
 }
 
+// Obtiene las solicitudes pendientes del usuario (planes en los que pidió unirse)
 const getPendingRequests = async () => {
     try {
         const response = await axios.get('http://localhost:8000/plan/pendingRequest', {
@@ -115,32 +135,38 @@ const getPendingRequests = async () => {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
             }
-        });
+        })
 
         if (response.data.ok && response.data.plans) {
-            pendingRequestPlans.value = response.data.plans.map((plan: any) => plan.planId);
+            pendingRequestPlans.value = response.data.plans.map((plan: any) => plan.planId)
         }
     } catch (error) {
-        console.log('Error al obtener solicitudes pendientes:', error);
+        console.log('Error al obtener solicitudes pendientes:', error)
     }
 }
 
+// Redirige al usuario a editar su perfil para registrar su DNI
 const goToRegister = () => {
     router.push('/editProfile')
 }
 
+// Cierra el modal informativo
 const closeModal = () => {
     showModal.value = false
 }
 
+// Al cargar la vista
 onMounted(async () => {
-    await checkUser()
+    await checkUser() // Verifica el usuario autenticado
+
+    // Muestra el modal si no tiene DNI
     if (!hasDni.value) {
         showModal.value = true
     }
 
-    await getPendingRequests()
-    console.log('Solicitudes pendientes del usuario:', pendingRequestPlans.value.length);
-    await listOfPlans()
+    await getPendingRequests() // Carga las solicitudes del usuario
+    console.log('Solicitudes pendientes del usuario:', pendingRequestPlans.value.length)
+
+    await listOfPlans() // Carga los planes disponibles
 })
 </script>

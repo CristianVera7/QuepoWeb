@@ -3,18 +3,22 @@
       .edit-plan-view    
         .content-container
           .form-section
+            // Componente del formulario de plan, reutilizado en modo edición
             PlanForm(
               :isEditMode="true"
               :planId="planId"
-              @plan-updated="handlePlanUpdated"
-              @plan-deleted="handlePlanDeleted"
+              @plan-updated="handlePlanUpdated" 
+              @plan-deleted="handlePlanDeleted" 
             )
             
+        // Modal de éxito que se muestra tras actualizar o eliminar un plan
         .success-modal(v-if="showSuccessModal")
             .modal-content
+                // Ícono cambia según si fue actualización o eliminación
                 i(:class="isDeleteSuccess ? 'fas fa-trash' : 'fas fa-check-circle'")
-                h3 {{ modalTitle }}
-                p {{ successMessage }}
+                h3 {{ modalTitle }} // Título dinámico del modal
+                p {{ successMessage }} // Mensaje dinámico del modal
+                // Botón que redirige a la vista de planes
                 button.modal-button(@click="navigateToDashboard") {{ isDeleteSuccess ? 'Volver a mis planes' : 'Ver mis planes' }}
 </template>
 
@@ -28,40 +32,41 @@ import { useRegisterStore } from '../stores/registerStore'
 // Router y route para la navegación
 const router = useRouter()
 const route = useRoute()
+// Se obtiene el ID del plan desde la URL
 const planId = route.params.id as string
 
-// Store para verificar el usuario
+// Store para verificar el usuario autenticado
 const { checkUser } = useRegisterStore()
 
-// Estado para el modal de éxito
+// Estados del modal de éxito
 const showSuccessModal = ref(false)
 const successMessage = ref('')
 const isDeleteSuccess = ref(false)
 const modalTitle = ref('Plan actualizado con éxito!')
 
-// Comprobar si el usuario está autenticado al cargar la vista
+// Verificar autenticación del usuario al cargar la vista
 onMounted(async () => {
     await checkUser()
 })
 
-// Manejar la actualización exitosa de un plan
+// Callback al actualizar un plan exitosamente
 const handlePlanUpdated = (planTitle: string) => {
-    isDeleteSuccess.value = false
+    isDeleteSuccess.value = false // No fue eliminación
     modalTitle.value = 'Plan actualizado con éxito!'
     successMessage.value = `Tu plan "${planTitle}" ha sido actualizado correctamente.`
     showSuccessModal.value = true
 }
 
-// Manejar la eliminación exitosa de un plan
+// Callback al eliminar un plan exitosamente
 const handlePlanDeleted = (planTitle: string) => {
-    isDeleteSuccess.value = true
+    isDeleteSuccess.value = true // Fue una eliminación
     modalTitle.value = 'Plan eliminado con éxito!'
     successMessage.value = `Tu plan "${planTitle}" ha sido eliminado correctamente.`
     showSuccessModal.value = true
-    router.push('/myPlans')
+    router.push('/myPlans') // Redirige tras eliminar
 }
 
-// Navegar al dashboard
+// Redirige manualmente a la vista de planes
 const navigateToDashboard = () => {
     router.push('/myPlans')
 }

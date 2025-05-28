@@ -104,7 +104,7 @@ $link-hover: rgba(0, 68, 255, 0.815);
         .fieldError {
             border: 2px solid #e53935; // Rojo más profesional
             background-color: rgba(255, 235, 235, 0.5); // Fondo sutil para indicar error
-            animation: shake 0.12s ease-in-out 0s 2;
+            animation: shake-subtle 0.15s ease-in-out 0s 2;
             box-shadow: 0 0 0 1px rgba(229, 57, 53, 0.3); // Sombra sutil para resaltar el error
         }
 
@@ -258,11 +258,17 @@ $link-hover: rgba(0, 68, 255, 0.815);
     }
 }
 
-/* Keyframes para la animación de shake */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+/* Keyframes para la animación de shake más sutil y profesional */
+@keyframes shake-subtle {
+    0%, 100% { 
+        transform: translateX(0); 
+    }
+    25% { 
+        transform: translateX(-2px); 
+    }
+    75% { 
+        transform: translateX(2px); 
+    }
 }
 
 /* Keyframes para la animación de mensajes de error */

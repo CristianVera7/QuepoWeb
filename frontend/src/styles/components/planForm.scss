@@ -231,13 +231,13 @@ $highlight-color: rgba(76, 175, 80, 0.2);
     h3 {
       display: flex;
       align-items: center;
-      color: $primary-dark;
+      color: $text-color;
       margin-bottom: 1rem;
       font-size: 1.3rem;
 
       i {
         margin-right: 0.7rem;
-        color: $text-color;
+        color: $primary-dark;
       }
     }
 
