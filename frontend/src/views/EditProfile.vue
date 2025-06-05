@@ -25,12 +25,12 @@
 
                 // Botón para mostrar/ocultar el formulario de cambio de contraseña
                 button(type="button" class="toggle-password-btn" @click="showPasswordForm = !showPasswordForm") 
-                    | {{ showPasswordForm ? 'Ocultar formulario de contraseña' : 'Cambiar contraseña' }}
+                    | {{ showPasswordForm ? 'Ocultar formulario de contraseña' : '¿Deseas cambiar tu contraseña?' }}
 
                 // Transición animada para mostrar formulario de cambio de contraseña
                 Transition(name="fade-slide")
                     .formPassword(v-if="showPasswordForm")
-                        h3 Cambiar contraseña
+                        h3.changePassword Cambiar contraseña
 
                         // Campo contraseña actual
                         .input-group
@@ -58,7 +58,7 @@
                 i.fas.fa-check-circle
                 h3 Perfil actualizado con éxito!
                 p {{ successMessage }}
-                button.modal-button(@click="navigateToDashboard") Ver mis planes
+                button.modal-button(@click="navigateToDashboard") Volver a inicio
 
         // Modal de error si falla la actualización
         .error-modal(v-if="showErrorModal")

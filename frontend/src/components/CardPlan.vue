@@ -119,7 +119,7 @@
                         .dni-warning(v-if="!hasDni")
                             i.fas.fa-exclamation-triangle  
                             router-link(to="editProfile") Debes tener un DNI registrado en tu cuenta para unirte.
-                                p Haga click para completar su perfil
+                                p.feedBackDNI Haga click para completar su perfil
                         
                         // Botón "Unirse" - solo si hay plazas, no es creador, no es pasajero, no tiene solicitud pendiente y tiene DNI
                         button.join-button(
@@ -159,10 +159,10 @@
                             i.fas.fa-sign-out-alt
                             | Salir del plan
     
-    // Modal de confirmación para salir del plan (se renderiza en el body)
+    // Modal de confirmación para salir del plan
     Teleport(to="body")
-        .modal-overlay(v-if="showLeaveConfirmation" @click.self="closeLeaveModal")
-            .modal-content
+        .modal-overlay-exit(v-if="showLeaveConfirmation" @click.self="closeLeaveModal")
+            .modal-content-exit
                 .modal-header
                     h3 
                         i.fas.fa-exclamation-triangle

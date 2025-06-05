@@ -288,6 +288,7 @@
                     border-radius: 8px;
                     font-size: 0.9rem;
                     border-left: 4px solid #F44336;
+                    height: 8rem;
 
                     i {
                         display: grid;
@@ -305,10 +306,14 @@
                         place-items: center;
                         color: inherit;
                         color: #e7180a;
-                        margin: 1rem;
+                        margin: 0.5rem;
                         text-align: center;
                         text-decoration: none;
 
+                        
+                    }
+                    .feedBackDNI{
+                        color: #e7180a;
                         &:hover {
                             text-decoration: underline;
                             text-decoration-thickness: 1px;
@@ -453,7 +458,7 @@
 }
 
 // Estilos para el modal de confirmación
-.modal-overlay {
+.modal-overlay-exit {
     position: fixed;
     top: 0;
     left: 0;
@@ -466,7 +471,7 @@
     z-index: 1000;
     backdrop-filter: blur(3px);
 
-    .modal-content {
+    .modal-content-exit {
         background-color: #01300af5;
         width: 90%;
         max-width: 450px;

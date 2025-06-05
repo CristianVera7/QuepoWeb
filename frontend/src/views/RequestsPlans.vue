@@ -22,7 +22,7 @@
                             button.reject(@click="rejectPassenger(plan.planId, passenger.id)") Rechazar
 
             // Si no hay solicitudes, se muestra este mensaje
-            p(v-else) No tienes solicitudes pendientes
+            p.noRequest(v-else) No tienes solicitudes pendientes.
 </template>
 
 <script setup lang="ts">

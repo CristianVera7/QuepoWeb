@@ -3,7 +3,6 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import routing from './routes/routing'
 import connect from './dbConnect/dbConnect'
-import fileUpload from 'express-fileupload'
 
 dotenv.config()
 

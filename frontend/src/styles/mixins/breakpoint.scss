@@ -2,14 +2,14 @@
 
 // Definición de breakpoints para diseño responsive
 $breakpoints: (
-  xxs: 400px,   // Móviles pequeños
-  xs: 480px,   // Móviles pequeños
-  sm: 560px,   // Móviles grandes
-  md: 768px,   // Tablets
+  xxs: 400px,
+  xs: 480px,  
+  sm: 560px,   
+  md: 768px,  
   lg: 992px, 
   +lg:1024px, 
-  xl: 1200px,  // Desktops grandes
-  xxl: 1400px  // Pantallas extra grandes
+  xl: 1200px,  
+  xxl: 1400px  
 );
 
 // Mixin para media queries

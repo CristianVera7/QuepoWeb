@@ -2,17 +2,26 @@ import { Request, Response, NextFunction } from 'express'
 import Plan from '../models/Plan'
 import User from '../models/User'
 
+/**
+ * Crear un nuevo plan de viaje
+ * - Verifica autenticación del usuario y presencia de nickname
+ * - Valida que todos los campos obligatorios estén presentes
+ * - Confirma que el usuario tenga DNI registrado
+ * - Crea el plan con toda la información proporcionada
+ */
 async function createPlan(req: Request, res: Response, next: NextFunction) {
     const { title, category, description, route, dateTime, placesAvailable, price, carInformation } = req.body
     const creatorUser = req.user?.id
     const creatorNickName = req.user?.nickName
 
+    // Verificar autenticación y nickname
     if (!creatorUser || !creatorNickName) {
         console.log('No hay id de usuario en el token o no hay nickname')
         res.status(403).json({ message: 'Usuario no autenticado o falta nickname', ok: false })
         return
     }
 
+    // Validar campos obligatorios
     if (!title || !category || !description || !route || !dateTime || !placesAvailable || !price || !carInformation) {
         console.log('Faltan campos obligatorios')
         res.status(400).json({
@@ -23,6 +32,7 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
     }
 
     try {
+        // Verificar que el usuario tenga DNI registrado
         const user = await User.findById(creatorUser).select('dni')
         if (!user || !user.dni || user.dni.trim() === '') {
             console.log('El usuario no tiene DNI registrado')
@@ -30,6 +40,7 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Crear nuevo plan con todos los datos
         const newPlan = new Plan({
             title,
             category,
@@ -56,7 +67,7 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
             },
         })
 
-
+        // Guardar plan en base de datos
         console.log('Creando plan', newPlan)
         await newPlan.save()
         res.status(201).json({
@@ -70,12 +81,19 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+/**
+ * Listar todos los planes disponibles
+ * - Obtiene todos los planes de la base de datos
+ * - Añade información sobre si el usuario actual es creador o pasajero de cada plan
+ */
 async function listPlans(req: Request, res: Response, next: NextFunction) {
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
     try {
+        // Obtener todos los planes
         const plans = await Plan.find()
 
+        // Agregar información de roles para cada plan
         const plansWithRoles = plans.map(plan => {
             const isCreator = plan.creatorUser.toString() === userId;
             const isPassenger = plan.passengers.some(passenger => passenger.id.toString() === userId);
@@ -87,7 +105,6 @@ async function listPlans(req: Request, res: Response, next: NextFunction) {
             };
         });
 
-
         res.status(200).json({
             message: 'Lista de planes',
             ok: true,
@@ -98,9 +115,14 @@ async function listPlans(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+/**
+ * Listar planes por categoría específica
+ * - Filtra planes según la categoría proporcionada en los parámetros
+ */
 async function listPlansByCategory(req: Request, res: Response, next: NextFunction) {
     try {
         const { category } = req.params
+        // Buscar planes por categoría
         const plans = await Plan.find({ category })
         res.status(200).json({
             message: `Lista de planes de la categoria ${category}`,
@@ -112,10 +134,16 @@ async function listPlansByCategory(req: Request, res: Response, next: NextFuncti
     }
 }
 
+/**
+ * Obtener un plan específico por ID
+ * - Solo permite acceso al creador del plan
+ * - Verifica autenticación y propiedad del plan
+ */
 async function getPlanById(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const userId = req.user?.id;
 
+    // Verificar autenticación
     if (!userId) {
         res.status(403).json({
             message: 'Usuario no autenticado',
@@ -125,6 +153,7 @@ async function getPlanById(req: Request, res: Response, next: NextFunction) {
     }
 
     try {
+        // Buscar el plan por ID
         const plan = await Plan.findById(id);
 
         if (!plan) {
@@ -135,6 +164,7 @@ async function getPlanById(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Verificar que el usuario sea el creador
         const isCreator = plan.creatorUser.toString() === userId.toString();
         if (!isCreator) {
             res.status(404).json({
@@ -156,10 +186,17 @@ async function getPlanById(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+/**
+ * Actualizar un plan existente
+ * - Busca el plan por ID
+ * - Actualiza todos los campos con los nuevos valores
+ * - Guarda los cambios en la base de datos
+ */
 async function updatePlan(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const userId = req.user?.id;
 
+    // Verificar autenticación
     if (!userId) {
         res.status(403).json({
             message: 'Usuario no autenticado',
@@ -180,6 +217,7 @@ async function updatePlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Extraer datos del cuerpo de la petición
         const {
             title,
             category,
@@ -218,38 +256,47 @@ async function updatePlan(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-
-
-
+/**
+ * Solicitar unirse a un plan
+ * - Verifica que el usuario tenga DNI registrado
+ * - Confirma que el plan existe y el usuario no sea el creador
+ * - Verifica que no haya solicitado ya unirse o esté ya en el plan
+ * - Añade al usuario a la lista de pasajeros pendientes
+ */
 async function joinPlan(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
     const { message } = req.body
 
+    // Verificar autenticación
     if (!userId) {
         res.status(403).json({ message: 'Usuario no autenticado', ok: false });
         return
     }
 
     try {
+        // Verificar que el usuario tenga DNI
         const user = await User.findById(userId).select('dni');
         if (!user || !user.dni || user.dni.trim() === '') {
             res.status(400).json({ message: 'Debes registrar tu DNI para unirte a un plan', ok: false });
             return
         }
 
+        // Buscar el plan
         const plan = await Plan.findById(id);
         if (!plan) {
             res.status(404).json({ message: 'Plan no encontrado', ok: false });
             return
         }
 
+        // Verificar que no sea el creador del plan
         if (plan.creatorUser.toString() === userId.toString()) {
             res.status(400).json({ message: 'No puedes unirte a tu propio plan', ok: false });
             return
         }
 
+        // Verificar que no esté ya pendiente o en el plan
         const alreadyPending = plan.pendingPassengers.some(p => p.id === userId);
         const alreadyIn = plan.passengers.some(p => p.id === userId);
 
@@ -258,6 +305,7 @@ async function joinPlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Añadir a pasajeros pendientes
         plan.pendingPassengers.push({
             id: userId,
             nickName: userNickName,
@@ -276,35 +324,45 @@ async function joinPlan(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-
+/**
+ * Aprobar un pasajero pendiente
+ * - Verifica que el usuario sea el creador del plan
+ * - Mueve al pasajero de pendientes a pasajeros confirmados
+ * - Reduce el número de plazas disponibles
+ */
 async function approvePassenger(req: Request, res: Response, next: NextFunction) {
     const { planId, passengerId } = req.params;
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
 
+    // Verificar autenticación
     if (!userId) {
         res.status(403).json({ message: 'Usuario no autenticado', ok: false });
         return
     }
 
     try {
+        // Buscar el plan
         const plan = await Plan.findById(planId);
         if (!plan) {
             res.status(404).json({ message: 'Plan no encontrado', ok: false });
             return
         }
 
+        // Verificar que sea el creador
         if (plan.creatorUser.toString() !== userId.toString()) {
             res.status(403).json({ message: 'No autorizado para aprobar pasajeros', ok: false });
             return
         }
 
+        // Buscar al pasajero en pendientes
         const passenger = plan.pendingPassengers.find(p => p.id === passengerId);
         if (!passenger) {
             res.status(404).json({ message: 'Pasajero no encontrado en pendientes', ok: false });
             return
         }
 
+        // Mover de pendientes a confirmados
         plan.passengers.push(passenger);
         plan.pendingPassengers.pull({ id: passengerId });
         plan.placesAvailable = Math.max(0, plan.placesAvailable - 1);
@@ -316,28 +374,37 @@ async function approvePassenger(req: Request, res: Response, next: NextFunction)
     }
 }
 
+/**
+ * Rechazar un pasajero pendiente
+ * - Verifica que el usuario sea el creador del plan
+ * - Elimina al pasajero de la lista de pendientes
+ */
 async function rejectPassenger(req: Request, res: Response, next: NextFunction) {
     const { planId, passengerId } = req.params;
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
 
+    // Verificar autenticación
     if (!userId || !userNickName) {
         res.status(403).json({ message: 'Usuario no autenticado', ok: false });
         return
     }
 
     try {
+        // Buscar el plan
         const plan = await Plan.findById(planId);
         if (!plan) {
             res.status(404).json({ message: 'Plan no encontrado', ok: false });
             return
         }
 
+        // Verificar que sea el creador
         if (plan.creatorUser.toString() !== userId.toString()) {
             res.status(403).json({ message: 'No autorizado para rechazar pasajeros', ok: false });
             return
         }
 
+        // Eliminar de pasajeros pendientes
         plan.pendingPassengers.pull({ id: passengerId });
         await plan.save();
 
@@ -347,16 +414,23 @@ async function rejectPassenger(req: Request, res: Response, next: NextFunction) 
     }
 }
 
+/**
+ * Obtener pasajeros pendientes de los planes creados por el usuario
+ * - Busca todos los planes donde el usuario es creador
+ * - Retorna información de los pasajeros pendientes de cada plan
+ */
 async function getPendingPassengers(req: Request, res: Response, next: NextFunction) {
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
 
+    // Verificar autenticación
     if (!userId || !userNickName) {
         res.status(403).json({ message: 'Usuario no autenticado', ok: false });
         return;
     }
 
     try {
+        // Buscar planes creados por el usuario
         const plans = await Plan.find({ creatorUser: userId });
 
         if (!plans || plans.length === 0) {
@@ -367,6 +441,8 @@ async function getPendingPassengers(req: Request, res: Response, next: NextFunct
             });
             return;
         }
+
+        // Mapear información de pasajeros pendientes
         const allPendingPassengers = plans.map(plan => ({
             planId: plan._id,
             planTitle: plan.title,
@@ -383,15 +459,22 @@ async function getPendingPassengers(req: Request, res: Response, next: NextFunct
     }
 }
 
+/**
+ * Obtener planes donde el usuario tiene solicitudes pendientes
+ * - Busca planes donde el usuario está en la lista de pasajeros pendientes
+ * - Retorna los IDs de esos planes
+ */
 async function getPendingRequests(req: Request, res: Response, next: NextFunction) {
     const userId = req.user?.id;
 
+    // Verificar autenticación
     if (!userId) {
         res.status(403).json({ message: 'Usuario no autenticado', ok: false });
         return
     }
 
     try {
+        // Buscar planes donde el usuario está como pendiente
         const plans = await Plan.find({ 'pendingPassengers.id': userId });
 
         if (!plans.length) {
@@ -403,6 +486,7 @@ async function getPendingRequests(req: Request, res: Response, next: NextFunctio
             return
         }
 
+        // Mapear solo los IDs de los planes
         const userPendingPlans = plans.map(plan => ({ planId: plan._id }));
 
         res.status(200).json({
@@ -415,13 +499,17 @@ async function getPendingRequests(req: Request, res: Response, next: NextFunctio
     }
 }
 
-
-
+/**
+ * Obtener planes del usuario (creados o donde participa)
+ * - Busca planes donde el usuario es creador o pasajero confirmado
+ * - Añade información de roles para cada plan
+ */
 async function myPlans(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = req.user?.id;
         const userNickName = req.user?.nickName;
 
+        // Verificar autenticación
         if (!userId || !userNickName) {
             res.status(403).json({
                 message: 'Usuario no autenticado o datos incompletos del token.',
@@ -430,6 +518,7 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Buscar planes donde es creador o pasajero
         const plans = await Plan.find({
             $or: [
                 { creatorUser: userId },
@@ -446,6 +535,7 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Agregar información de roles
         const plansWithRoles = plans.map(plan => {
             const isCreator = plan.creatorUser.toString() === userId;
             const isPassenger = plan.passengers.some(passenger => passenger.id.toString() === userId);
@@ -468,12 +558,19 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+/**
+ * Salir de un plan como pasajero
+ * - Verifica que el usuario esté inscrito como pasajero
+ * - Elimina al usuario de la lista de pasajeros
+ * - Incrementa el número de plazas disponibles
+ */
 async function leavePlan(req: Request, res: Response, next: NextFunction) {
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
     const { planId } = req.params
     try {
 
+        // Verificar autenticación
         if (!userId || !userNickName) {
             res.status(403).json({
                 message: 'Usuario no autenticado o datos incompletos del token.',
@@ -482,6 +579,7 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Buscar el plan
         const plan = await Plan.findById(planId);
         if (!plan) {
             res.status(404).json({
@@ -491,7 +589,7 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
-
+        // Verificar que esté inscrito como pasajero
         const wasPassenger = plan.passengers.some(p => p.id === userId);
         if (!wasPassenger) {
             res.status(400).json({
@@ -501,6 +599,7 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        // Eliminar de pasajeros e incrementar plazas
         plan.passengers.pull({ id: userId });
         plan.placesAvailable += 1
         await plan.save();
@@ -516,11 +615,17 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-//Eliminar plan:
+/**
+ * Eliminar un plan completamente
+ * - Verifica que el usuario sea el creador del plan
+ * - Elimina el plan de la base de datos
+ */
 async function deletePlan(req: Request, res: Response, next: NextFunction) {
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
     const { planId } = req.params
+
+    // Verificar autenticación
     if (!userId || !userNickName) {
         res.status(403).json({
             message: 'Usuario no autenticado o datos incompletos del token.',
@@ -530,6 +635,7 @@ async function deletePlan(req: Request, res: Response, next: NextFunction) {
     }
 
     try {
+        // Buscar el plan
         const plan = await Plan.findById(planId);
         if (!plan) {
             res.status(404).json({
@@ -538,7 +644,8 @@ async function deletePlan(req: Request, res: Response, next: NextFunction) {
             });
             return
         }
-        //comprobar si el usuario es el creador de este plan:
+
+        // Comprobar si el usuario es el creador de este plan
         if (plan.creatorUser.toString() !== userId) {
             res.status(403).json({
                 message: 'No tienes permisos para eliminar este plan.',
@@ -546,7 +653,8 @@ async function deletePlan(req: Request, res: Response, next: NextFunction) {
             });
             return
         }
-        //eliminar el plan:
+
+        // Eliminar el plan
         await plan.deleteOne();
         res.status(200).json({
             message: 'Plan eliminado exitosamente.',
@@ -557,8 +665,5 @@ async function deletePlan(req: Request, res: Response, next: NextFunction) {
         next(error)
     }
 }
-
-
-
 
 export default { createPlan, listPlans, getPlanById, updatePlan, listPlansByCategory, joinPlan, approvePassenger, rejectPassenger, getPendingPassengers, getPendingRequests, myPlans, leavePlan, deletePlan }

@@ -19,11 +19,11 @@
         )
 
     // Modal que aparece si el usuario no tiene DNI registrado
-    .v-modal.modal-overlay(v-if="!hasDni && showModal")
-        .modal-content
+    .v-modal.modalDNI-overlay(v-if="!hasDni && showModal")
+        .modalDNI-content
             h3 No tienes un DNI registrado
             p Para poder interactuar con la aplicación, necesitas registrar tu DNI.
-            .modal-actions
+            .modalDNI-actions
                 button.go-to-register(@click="goToRegister") Registrar ahora
                 button.later(@click="closeModal") Más tarde
 </template>

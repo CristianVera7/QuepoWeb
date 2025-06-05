@@ -14,6 +14,10 @@
         color: #2d3748;
         text-align: center;
     }
+
+    .noRequest{
+        color:#2e7d32;
+    }
 }
 
 .planCard {
@@ -89,6 +93,7 @@
             }
         }
     }
+    
 }
 
 @include mix.respond-max(md) {

@@ -1,6 +1,6 @@
 @use '../mixins/breakpoint.scss' as mix;
 
-.modal-overlay {
+.modalDNI-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -13,7 +13,7 @@
     z-index: 999;
 }
 
-.modal-content {
+.modalDNI-content {
     background-color: rgba(0, 41, 0, 0.966);
     padding: 2rem;
     border-radius: 8px;
@@ -35,13 +35,14 @@ p {
     padding: 1rem;
 }
 
-.modal-actions {
+.modalDNI-actions {
     display: flex;
     justify-content: space-between;
     margin-top: 1rem;
 
 
     button {
+        
         padding: 0.6rem 1.2rem;
         border-radius: 6px;
         font-weight: bold;
@@ -59,6 +60,7 @@ p {
         }
 
         &.later {
+
             background-color: #ec0000;
             color: rgb(255, 255, 255);
 
