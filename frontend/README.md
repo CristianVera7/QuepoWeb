@@ -62,3 +62,11 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
         (Descartamos los cambios porque ya estan guardados en develop, en caso de tener cosas nuevas, abria que stashear esos cambios)
         git restore frontend/README.md
         git checkout develop
+
+6. Para traer los cambios del repositorio a nuestra rama:
+    - asegurate de estar en tu rama en local
+        git checkout crisDevelop
+    - Trae los ultimos cambios del repositorio remoto
+        git fetch origin
+    - Haz el merge del repositorio a tu rama local:
+        git merge origin/main      #o lo que queramos coger, por ejemplo,  en develop: git merge origin/develop
