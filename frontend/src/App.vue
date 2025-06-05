@@ -7,5 +7,7 @@
 import { RouterView, useRouter } from 'vue-router'
 </script>
 
+<!-- Prueba de comflictos en gitHub -->
 <!-- Importa los estilos base del proyecto -->
 <style src="./styles/init.scss"></style>
+
