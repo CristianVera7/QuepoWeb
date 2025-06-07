@@ -63,9 +63,10 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
         git restore frontend/README.md
         git checkout develop
 
-6. fusionar a main (Cuando todos los cambios han sido probados en develop)
-
-    git checkout main                        # Cambia a la rama 'main' localmente, para trabajar sobre ella.
-    git pull origin main                     # Trae y actualiza tu rama 'main' local con la última versión del repositorio remoto.
-    git merge develop                        # Fusiona los cambios que están en la rama 'develop' dentro de 'main'.
-    git push origin main                     # Sube (push) la rama 'main' actualizada al repositorio remoto en GitHub.
+6. Para traer los cambios del repositorio a nuestra rama:
+    - asegurate de estar en tu rama en local
+        git checkout crisDevelop
+    - Trae los ultimos cambios del repositorio remoto
+        git fetch origin
+    - Haz el merge del repositorio a tu rama local:
+        git merge origin/main      #o lo que queramos coger, por ejemplo,  en develop: git merge origin/develop
