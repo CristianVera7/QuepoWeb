@@ -399,6 +399,7 @@ const cancelRequest = async (planId) => {
     } catch (error) {
         console.error('Error en la solicitud de cancelación:', error);
     }
+    //me cago en todo
 };
 
 
