@@ -87,7 +87,6 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
  * - Añade información sobre si el usuario actual es creador o pasajero de cada plan
  */
 async function listPlans(req: Request, res: Response, next: NextFunction) {
-
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
     console.log(userId, userNickName);
@@ -302,6 +301,7 @@ async function joinPlan(req: Request, res: Response, next: NextFunction) {
         const alreadyPending = plan.pendingPassengers.some(p => p.userId && p.userId.toString() === userId.toString());
         const alreadyIn = plan.passengers.some(p => p.userId && p.userId.toString() === userId.toString());
 
+
         if (alreadyPending || alreadyIn) {
             res.status(400).json({ message: 'Ya solicitaste o participas en este plan', ok: false });
             return
@@ -423,11 +423,11 @@ async function approvePassenger(req: Request, res: Response, next: NextFunction)
             return
         }
         console.log("PASAMOS POR AQUI");
-
+        
         // Buscar al pasajero en pendientes
         const pendingPassenger = plan.pendingPassengers.find(p => p.userId.toString() === passengerId.toString());
         console.log(pendingPassenger);
-
+        
         if (!pendingPassenger) {
             res.status(404).json({ message: 'Pasajero no encontrado en pendientes', ok: false });
             return
@@ -524,7 +524,9 @@ async function getPendingPassengers(req: Request, res: Response, next: NextFunct
         const allPendingPassengers = plans.map(plan => ({
             planId: plan._id,
             planTitle: plan.title,
-            pendingPassengers: plan.pendingPassengers.map((p: any) => ({
+
+            pendingPassengers: plan.pendingPassengers.map((p:any) => ({
+
                 userId: p.userId,
                 nickName: p.nickName,
                 message: p.message
@@ -620,7 +622,8 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
         // Agregar información de roles
         const plansWithRoles = plans.map(plan => {
             const isCreator = plan.creatorUser.toString() === userId;
-            const isPassenger = plan.passengers.some(passenger => passenger.userId && passenger.userId.toString() === userId.toString());
+            const isPassenger = plan.passengers.some(passenger =>passenger.userId && passenger.userId.toString() === userId.toString());
+
 
             return {
                 ...plan.toObject(),
@@ -673,7 +676,6 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
 
         console.log('userId: ', userId);
         console.log('plan.passengers: ', plan.passengers);
-
 
         // Verificar que esté inscrito como pasajero
         const wasPassenger = plan.passengers.some(p => p.userId.toString() === userId.toString());

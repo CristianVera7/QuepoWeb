@@ -59,12 +59,14 @@ const showModal = ref(true)
 // Solicita la lista de planes disponibles
 const listOfPlans = async () => {
     try {
+        console.log("PASAMOS POR AQUI 👌");
         const response = await axios.get('http://localhost:8000/plan/list', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
             }
         })
+        
         if (response.data.ok) {
             plansList.value = response.data.data
             filteredPlans.value = response.data.data // Por defecto muestra todos
