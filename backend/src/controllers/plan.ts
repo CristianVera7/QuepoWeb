@@ -540,7 +540,7 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
         const plans = await Plan.find({
             $or: [
                 { creatorUser: userId },
-                { 'passengers.id': userId }
+                { 'passengers.userId': userId }
             ]
         });
 
@@ -607,6 +607,10 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        console.log('userId: ', userId);
+        console.log('plan.passengers: ', plan.passengers);
+        
+        
         // Verificar que esté inscrito como pasajero
         const wasPassenger = plan.passengers.some(p => p.userId.toString() === userId.toString());
         if (!wasPassenger) {
