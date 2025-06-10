@@ -9,7 +9,7 @@
 import firstComponent from '../components/FirstComponent.vue';
 import PlanFiltersMenu from '../components/PlanFiltersMenu.vue';
 import PlanList from '../components/PlanList.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useRegisterStore } from '../stores/registerStore';
 import type { IPlan } from '../types/plan';
@@ -50,11 +50,15 @@ const listOfPlans = async () => {
         if (response.data.ok) {
             console.log('Planes obtenidos:', response.data.plansList);
             plansList.value = response.data.plansList;
-            displayedPlans.value = response.data.plansList; // se inicializan los planes visibles
+            displayedPlans.value = [...plansList.value]
+            // displayedPlans.value = response.data.plansList; // se inicializan los planes visibles
         } else {
             console.log('ERROR AL OBTENER LOS PLANES');
+            displayedPlans.value = [];
         }
     } catch (error) {
+        console.log('Comprobacion del error');
+        displayedPlans.value = [];
         console.error(error);
     }
 };
@@ -97,6 +101,7 @@ const getPendingRequests = async () => {
         console.log('Error al obtener solicitudes pendientes:', error);
     }
 }
+
 
 // Cuando se monta la vista, se valida al usuario y se cargan sus planes y solicitudes pendientes
 onMounted(async () => {
