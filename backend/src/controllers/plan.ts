@@ -87,8 +87,10 @@ async function createPlan(req: Request, res: Response, next: NextFunction) {
  * - Añade información sobre si el usuario actual es creador o pasajero de cada plan
  */
 async function listPlans(req: Request, res: Response, next: NextFunction) {
+
     const userId = req.user?.id;
     const userNickName = req.user?.nickName;
+    console.log(userId, userNickName);
     try {
         // Obtener todos los planes
         const plans = await Plan.find()
@@ -96,7 +98,7 @@ async function listPlans(req: Request, res: Response, next: NextFunction) {
         // Agregar información de roles para cada plan
         const plansWithRoles = plans.map(plan => {
             const isCreator = plan.creatorUser.toString() === userId;
-            const isPassenger = plan.passengers.some(passenger => passenger.id.toString() === userId);
+            const isPassenger = plan.passengers.some(passenger => passenger.userId && passenger.userId.toString() === userId?.toString());
 
             return {
                 ...plan.toObject(),
@@ -175,7 +177,7 @@ async function getPlanById(req: Request, res: Response, next: NextFunction) {
         }
 
         res.status(200).json({
-            message: `Encontrado el plan: ${plan.title}`,
+            message: `Plan encontrado: ${plan.title}`,
             ok: true,
             plan: plan,
             isCreator
@@ -297,8 +299,8 @@ async function joinPlan(req: Request, res: Response, next: NextFunction) {
         }
 
         // Verificar que no esté ya pendiente o en el plan
-        const alreadyPending = plan.pendingPassengers.some(p => p.id === userId);
-        const alreadyIn = plan.passengers.some(p => p.id === userId);
+        const alreadyPending = plan.pendingPassengers.some(p => p.userId && p.userId.toString() === userId.toString());
+        const alreadyIn = plan.passengers.some(p => p.userId && p.userId.toString() === userId.toString());
 
         if (alreadyPending || alreadyIn) {
             res.status(400).json({ message: 'Ya solicitaste o participas en este plan', ok: false });
@@ -306,11 +308,13 @@ async function joinPlan(req: Request, res: Response, next: NextFunction) {
         }
 
         // Añadir a pasajeros pendientes
+        const userFind = await User.findById(userId);
+        if (!userFind) throw new Error('Usuario no encontrado');
+
         plan.pendingPassengers.push({
-            id: userId,
-            nickName: userNickName,
-            dni: user.dni,
-            message: message
+            userId: userFind._id,
+            nickName: userFind.nickName,
+            message: message,
         });
 
         await plan.save();
@@ -323,6 +327,70 @@ async function joinPlan(req: Request, res: Response, next: NextFunction) {
         next(err);
     }
 }
+
+async function cancelJoinRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+        console.log('cancelJoinRequest iniciada');
+
+        const userId = req.user?.id;
+        const userNickName = req.user?.nickName;
+        const { planId } = req.params;
+
+        console.log(`userId: ${userId}, userNickName: ${userNickName}, planId: ${planId}`);
+
+        if (!userId || !userNickName) {
+            console.warn('Usuario no autenticado o token incompleto');
+            res.status(403).json({
+                message: 'Usuario no autenticado o datos incompletos del token.',
+                ok: false
+            });
+            return
+        }
+
+        const plan = await Plan.findById(planId);
+        if (!plan) {
+            console.warn('Plan no encontrado:', planId);
+            res.status(404).json({
+                message: 'Plan no encontrado.',
+                ok: false
+            });
+            return
+        }
+        console.log('Plan encontrado:', planId);
+
+        const isPending = plan.pendingPassengers.some(p => p.userId.toString() === userId.toString());
+
+        if (!isPending) {
+            console.warn('No existe solicitud pendiente para el usuario:', userId);
+            res.status(400).json({
+                message: 'No tienes una solicitud pendiente para este plan.',
+                ok: false
+            });
+            return
+        }
+
+        plan.pendingPassengers = plan.pendingPassengers.filter(p => p.userId.toString() !== userId.toString());
+        await plan.save();
+
+        console.log('Solicitud pendiente eliminada y plan guardado');
+
+        res.status(200).json({
+            message: 'Tu solicitud pendiente ha sido cancelada exitosamente.',
+            ok: true,
+            updatedPlan: plan
+        });
+        return
+    } catch (error) {
+        console.error('Error en cancelJoinRequest:', error);
+        res.status(500).json({
+            message: 'Error interno del servidor',
+            ok: false,
+            error: error
+        });
+        return
+    }
+}
+
 
 /**
  * Aprobar un pasajero pendiente
@@ -354,17 +422,27 @@ async function approvePassenger(req: Request, res: Response, next: NextFunction)
             res.status(403).json({ message: 'No autorizado para aprobar pasajeros', ok: false });
             return
         }
+        console.log("PASAMOS POR AQUI");
 
         // Buscar al pasajero en pendientes
-        const passenger = plan.pendingPassengers.find(p => p.id === passengerId);
-        if (!passenger) {
+        const pendingPassenger = plan.pendingPassengers.find(p => p.userId.toString() === passengerId.toString());
+        console.log(pendingPassenger);
+
+        if (!pendingPassenger) {
             res.status(404).json({ message: 'Pasajero no encontrado en pendientes', ok: false });
             return
         }
 
+        // Crear pasajero aprobado
+        const confirmedPassenger = {
+            userId: pendingPassenger.userId,
+            nickName: pendingPassenger.nickName,
+            isApproved: true
+        }
+
         // Mover de pendientes a confirmados
-        plan.passengers.push(passenger);
-        plan.pendingPassengers.pull({ id: passengerId });
+        plan.passengers.push(confirmedPassenger);
+        plan.pendingPassengers = plan.pendingPassengers.filter(p => p.userId.toString() !== passengerId.toString());
         plan.placesAvailable = Math.max(0, plan.placesAvailable - 1);
         await plan.save();
 
@@ -405,7 +483,7 @@ async function rejectPassenger(req: Request, res: Response, next: NextFunction) 
         }
 
         // Eliminar de pasajeros pendientes
-        plan.pendingPassengers.pull({ id: passengerId });
+        plan.pendingPassengers = plan.pendingPassengers.filter(p => p.userId.toString() !== passengerId.toString());
         await plan.save();
 
         res.status(200).json({ message: 'Pasajero rechazado/eliminado', ok: true });
@@ -446,7 +524,11 @@ async function getPendingPassengers(req: Request, res: Response, next: NextFunct
         const allPendingPassengers = plans.map(plan => ({
             planId: plan._id,
             planTitle: plan.title,
-            pendingPassengers: plan.pendingPassengers
+            pendingPassengers: plan.pendingPassengers.map((p: any) => ({
+                userId: p.userId,
+                nickName: p.nickName,
+                message: p.message
+            }))
         }));
 
         res.status(200).json({
@@ -475,7 +557,7 @@ async function getPendingRequests(req: Request, res: Response, next: NextFunctio
 
     try {
         // Buscar planes donde el usuario está como pendiente
-        const plans = await Plan.find({ 'pendingPassengers.id': userId });
+        const plans = await Plan.find({ 'pendingPassengers.userId': userId });
 
         if (!plans.length) {
             res.status(200).json({
@@ -522,7 +604,7 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
         const plans = await Plan.find({
             $or: [
                 { creatorUser: userId },
-                { 'passengers.id': userId }
+                { 'passengers.userId': userId }
             ]
         });
 
@@ -538,7 +620,7 @@ async function myPlans(req: Request, res: Response, next: NextFunction) {
         // Agregar información de roles
         const plansWithRoles = plans.map(plan => {
             const isCreator = plan.creatorUser.toString() === userId;
-            const isPassenger = plan.passengers.some(passenger => passenger.id.toString() === userId);
+            const isPassenger = plan.passengers.some(passenger => passenger.userId && passenger.userId.toString() === userId.toString());
 
             return {
                 ...plan.toObject(),
@@ -589,8 +671,12 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
             return
         }
 
+        console.log('userId: ', userId);
+        console.log('plan.passengers: ', plan.passengers);
+
+
         // Verificar que esté inscrito como pasajero
-        const wasPassenger = plan.passengers.some(p => p.id === userId);
+        const wasPassenger = plan.passengers.some(p => p.userId.toString() === userId.toString());
         if (!wasPassenger) {
             res.status(400).json({
                 message: 'No estás inscrito en este plan.',
@@ -600,7 +686,7 @@ async function leavePlan(req: Request, res: Response, next: NextFunction) {
         }
 
         // Eliminar de pasajeros e incrementar plazas
-        plan.passengers.pull({ id: userId });
+        plan.passengers = plan.passengers.filter(p => p.userId.toString() !== userId.toString());
         plan.placesAvailable += 1
         await plan.save();
 
@@ -646,7 +732,7 @@ async function deletePlan(req: Request, res: Response, next: NextFunction) {
         }
 
         // Comprobar si el usuario es el creador de este plan
-        if (plan.creatorUser.toString() !== userId) {
+        if (plan.creatorUser.toString() !== userId.toString()) {
             res.status(403).json({
                 message: 'No tienes permisos para eliminar este plan.',
                 ok: false
@@ -666,4 +752,4 @@ async function deletePlan(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-export default { createPlan, listPlans, getPlanById, updatePlan, listPlansByCategory, joinPlan, approvePassenger, rejectPassenger, getPendingPassengers, getPendingRequests, myPlans, leavePlan, deletePlan }
+export default { createPlan, listPlans, getPlanById, updatePlan, listPlansByCategory, joinPlan, cancelJoinRequest, approvePassenger, rejectPassenger, getPendingPassengers, getPendingRequests, myPlans, leavePlan, deletePlan }

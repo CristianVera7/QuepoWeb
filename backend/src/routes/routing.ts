@@ -45,6 +45,9 @@ function routing(app: Express): void {
 
   // Elimina un plan completo (requiere autenticación)
   app.delete('/plan/delete/:planId', authController.validateToken, plan.deletePlan)
+
+  // Cancela una solicitud de unirse a un plan (requiere autenticación)
+  app.delete('/plans/:planId/cancel-request', authController.validateToken, plan.cancelJoinRequest);
   
 
   // ---------------- USER ROUTES ----------------
