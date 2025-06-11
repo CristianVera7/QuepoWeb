@@ -9,7 +9,7 @@
                     .plan-image-overlay
                         .plan-category {{ plan.category }}
                         // Botón de cerrar cuando está expandida
-                        button.close-button(v-if="isExpanded" @click.stop="cancelRequest")
+                        button.close-button(v-if="isExpanded" @click.stop="toggleExpansion")
                             i.fas.fa-times
                 
                 .plan-content
@@ -49,25 +49,36 @@
                                     span {{ plan.placesAvailable }}
                         .plan-footer(v-show="!isExpanded" )
                             .plan-footer__togle-section
-                                .nature-divider
-                                .expanded-button(@click="toggleExpansion")
-                                    p Ver más
-                                .nature-divider
-                            .button-container
+                                .wrapper-divider
+                                    .nature-divider
+                                    .expanded-button(@click="toggleExpansion")
+                                        p Ver más
+                                    .nature-divider
+                                .button-container
                                     // Advertencia si el usuario no tiene DNI registrado
                                     .dni-warning(v-if="!hasDni")
-                                        i.fas.fa-exclamation-triangle  
-                                        router-link(to="editProfile") Debes tener un DNI registrado en tu cuenta para unirte.
-                                            p.feedBackDNI Haga click para completar su perfil
-                                    
+                                        .header-warning
+                                            i.fas.fa-exclamation-triangle
+                                            p Documento de identidad requerido
+                                        .body-warning
+                                            button(@click="editProfile")
+                                                i.fas.fa-user-edit
+                                                | Completa tu perfil
+
                                     // Botón "Unirse" - solo si hay plazas, no es creador, no es pasajero, no tiene solicitud pendiente y tiene DNI
-                                    .join-button(
-                                        v-if="plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && !showMessageBox && hasDni "
+                                    button.join-button(
+                                        v-if="plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && !showMessageBox && hasDni"
                                         @click="toggleMessageBox"
                                     ) 
                                         i.fas.fa-sign-in-alt
                                         | Unirse
-                                    
+                                    // Caja de mensaje para enviar solicitud de unión
+                                    .message-box(v-if="showMessageBox")
+                                        textarea.box(v-model="message" placeholder="Escribe un mensaje para el creador..." rows="3")
+                                        button.send-button(@click="joinPlanEmit" :disabled="!message.trim()") 
+                                            i.fas.fa-paper-plane
+                                            | Enviar solicitud
+                    
                                     // Estado "Solicitud pendiente" - cuando el usuario ya envió una solicitud
                                     .section-pending
                                         p.pending-button(
@@ -81,20 +92,13 @@
                                             i.fas.fa-times
                                             | Cancelar
                         
-                                    // Caja de mensaje para enviar solicitud de unión
-                                    .message-box(v-if="showMessageBox")
-                                        textarea(v-model="message" placeholder="Escribe un mensaje para el creador..." rows="3")
-                                        button.send-button(@click="joinPlanEmit" :disabled="!message.trim()") 
-                                            i.fas.fa-paper-plane
-                                            | Enviar solicitud
-                    
                                     // Botón deshabilitado cuando no hay plazas disponibles
                                     button.no-places-button(v-if="!plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && hasDni" disabled)
                                         i.fas.fa-ban
                                         | No hay plazas
                                         
                                     // Botón "Editar" - solo visible para el creador del plan
-                                    button.edit-button(v-if="plan.isCreator" @click="editPlan")
+                                    button.edit-plan-button(v-if="plan.isCreator" @click="editPlan")
                                         i.fas.fa-edit
                                         | Editar
                                         
@@ -180,54 +184,57 @@
                                 | Plazas disponibles: 
                                 strong {{ plan.placesAvailable }}
                             
-                            .button-container
+                            .button-container-expanded
                                 // Advertencia si el usuario no tiene DNI registrado
-                                .dni-warning(v-if="!hasDni")
-                                    i.fas.fa-exclamation-triangle  
-                                    router-link(to="editProfile") Debes tener un DNI registrado en tu cuenta para unirte.
-                                        p.feedBackDNI Haga click para completar su perfil
-                                
+                                .dni-warning-expanded(v-if="!hasDni")
+                                    .header-warning-expanded
+                                        i.fas.fa-exclamation-triangle
+                                        p Documento de identidad requerido
+                                    .body-warning-expanded
+                                        // Botón que redirige a editar perfil
+                                        button(@click="editProfile")
+                                            i.fas.fa-user-edit
+                                            | Completa tu perfil
                                 // Botón "Unirse" - solo si hay plazas, no es creador, no es pasajero, no tiene solicitud pendiente y tiene DNI
-                                .join-button(
+                                button.join-button-expanded(
                                     v-if="plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && !showMessageBox && hasDni"
                                     @click="toggleMessageBox"
                                 ) 
                                     i.fas.fa-sign-in-alt
                                     | Unirse
                                 
+                                // Caja de mensaje para enviar solicitud de unión
+                                .message-box-expanded(v-if="showMessageBox")
+                                    textarea.box-expanded(v-model="message" placeholder="Escribe un mensaje para el creador..." rows="3")
+                                    button.send-button-expanded(@click="joinPlanEmit" :disabled="!message.trim()") 
+                                        i.fas.fa-paper-plane
+                                        | Enviar solicitud
                                 // Estado "Solicitud pendiente" - cuando el usuario ya envió una solicitud
                                 .section-pending-expanded
-                                    p.pending-button(
+                                    p.pending-button-expanded(
                                         v-if="hasPendingRequest"
                                         disabled
                                     )
                                         i.fas.fa-clock
                                         | Solicitud pendiente
-                                    button.cancel-request-button(v-if="hasPendingRequest" @click="toggleMessageBox")
+                                    button.cancel-request-button-expanded(v-if="hasPendingRequest" @click="cancelRequest")
                                         i.fas.fa-times
                                         | Cancelar
                 
-                                // Caja de mensaje para enviar solicitud de unión
-                                .message-box(v-if="showMessageBox")
-                                    textarea(v-model="message" placeholder="Escribe un mensaje para el creador..." rows="3")
-                                    button.send-button(@click="joinPlanEmit" :disabled="!message.trim()") 
-                                        i.fas.fa-paper-plane
-                                        | Enviar solicitud
-                
+                                // Botón "Salir del plan" - solo visible para pasajeros actuales
+                                button.leave-button-expanded(v-if="plan.isPassenger" @click="openLeaveModal")
+                                    i.fas.fa-sign-out-alt
+                                    | Salir del plan
+                                    
+                                // Botón "Editar" - solo visible para el creador del plan
+                                button.edit-plan-button-expanded(v-if="plan.isCreator" @click="editPlan")
+                                    i.fas.fa-edit
+                                    | Editar
+                                    
                                 // Botón deshabilitado cuando no hay plazas disponibles
                                 button.no-places-button(v-if="!plan.placesAvailable && !plan.isCreator && !plan.isPassenger && !hasPendingRequest && hasDni" disabled)
                                     i.fas.fa-ban
                                     | No hay plazas
-                                    
-                                // Botón "Editar" - solo visible para el creador del plan
-                                button.edit-button(v-if="plan.isCreator" @click="editPlan")
-                                    i.fas.fa-edit
-                                    | Editar
-                                    
-                                // Botón "Salir del plan" - solo visible para pasajeros actuales
-                                button.leave-button(v-if="plan.isPassenger" @click="openLeaveModal")
-                                    i.fas.fa-sign-out-alt
-                                    | Salir del plan
 
         // Overlay de fondo cuando la card está expandida - usando Teleport
         Teleport(to="body")
@@ -251,80 +258,76 @@
 
 <script setup lang="ts">
 import { type IPlan } from '../types/plan'
-import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, reactive, computed, watch, onUnmounted } from 'vue';
 import fishing from '../img/plans/fishing.jpg'
 import hiking from '../img/plans/hiking.png'
 import climbing from '../img/plans/climbing.jpg'
 import defaultImg from '../img/plans/defaultImg.jpg'
 import router from '../router';
-import axios from 'axios'
 import { useRegisterStore } from '../stores/registerStore'
 import { storeToRefs } from 'pinia'
 
-// Props del componente
+// Props y tipos
 interface Props {
     plan: IPlan,
     hasDni: boolean,
     pendingRequestPlans?: string[]
 }
 
-// Definición de tipos para el sistema de secciones expandibles
-type ExpandableSectionKey = 'journeyInfo' | 'carInfo' | 'passengersInfo';
-interface ExpandedSections {
-    journeyInfo: boolean;
-    carInfo: boolean;
-    passengersInfo: boolean;
-    [key: string]: boolean;
+type ExpandableSectionKey = 'journeyInfo' | 'carInfo' | 'passengersInfo'
+
+// Tipado de categorías válidas
+type Categoria = 'pesca' | 'senderismo' | 'escalada'
+
+// Función para validar categoría
+const isCategoria = (value: string): value is Categoria => {
+    return ['pesca', 'senderismo', 'escalada'].includes(value)
 }
 
-// Acceso al store de registro para verificar DNI
-const { checkUser, tokenStore } = useRegisterStore()
+// Imágenes por categoría con tipado estricto
+const images: Record<Categoria, string> = {
+    pesca: fishing,
+    senderismo: hiking,
+    escalada: climbing
+}
+
+// Store y props
 const { hasDni } = storeToRefs(useRegisterStore())
 const props = defineProps<Props>()
-const emit = defineEmits(['joinPlan', 'leavePlan'])
+const emit = defineEmits(['joinPlan', 'leavePlan', 'cancelRequest'])
 
-// Estado principal de expansión de la card
+// Estados reactivos principales
 const isExpanded = ref(false)
-
-// Estados reactivos para el flujo de unirse al plan
 const showMessageBox = ref(false)
 const message = ref('')
-
-// Estados reactivos para el flujo de salir del plan
 const showLeaveConfirmation = ref(false)
 
-// Verifica si el usuario tiene una solicitud pendiente para este plan
-const hasPendingRequest = computed(() => {
-    return props.pendingRequestPlans?.includes(props.plan._id) ?? false;
-});
+//funcion para redirigir al usuario a editar su perfil si no tiene DNI
+const editProfile = () => {
+    router.push({ name: 'editProfile' })
+}
 
-// Estado reactivo para controlar qué secciones están expandidas
-const expandedSections = reactive<ExpandedSections>({
-    journeyInfo: true, // Por defecto abierta cuando se expande la card
+// Control de secciones expandibles - inicializado con valores por defecto
+const expandedSections = reactive({
+    journeyInfo: true,
     carInfo: false,
     passengersInfo: false
 })
 
-/**
- * Función principal para expandir/colapsar la card
- */
-const toggleExpansion = () => {
-    isExpanded.value = !isExpanded.value;
-};
+// Computed para verificar solicitud pendiente
+const hasPendingRequest = computed(() =>
+    props.pendingRequestPlans?.includes(props.plan._id) ?? false
+)
 
-/**
- * Función para controlar las secciones expandibles dentro de la vista expandida
- */
+// Funciones principales
+const toggleExpansion = () => isExpanded.value = !isExpanded.value
+
 const toggleSection = (section: ExpandableSectionKey) => {
-    expandedSections[section] = !expandedSections[section];
-};
-
-/**
- * FLUJO DE UNIRSE AL PLAN
- */
-const toggleMessageBox = () => {
-    showMessageBox.value = !showMessageBox.value
+    expandedSections[section] = !expandedSections[section]
 }
+
+// Flujo de unirse al plan
+const toggleMessageBox = () => showMessageBox.value = !showMessageBox.value
 
 const joinPlanEmit = () => {
     emit('joinPlan', { planId: props.plan._id, message: message.value })
@@ -332,27 +335,18 @@ const joinPlanEmit = () => {
     showMessageBox.value = false
 }
 
-/**
- * FLUJO DE SALIR DEL PLAN
- */
-const openLeaveModal = () => {
-    showLeaveConfirmation.value = true
-}
+const cancelRequest = () => emit('cancelRequest', props.plan._id)
 
-const closeLeaveModal = () => {
-    showLeaveConfirmation.value = false
-}
+// Flujo de salir del plan
+const openLeaveModal = () => showLeaveConfirmation.value = true
+const closeLeaveModal = () => showLeaveConfirmation.value = false
 
 const confirmLeavePlan = () => {
-    leavePlanEmit(props.plan._id)
+    emit('leavePlan', props.plan._id)
     closeLeaveModal()
 }
 
-const leavePlanEmit = (planId: string) => {
-    emit('leavePlan', planId)
-}
-
-// Formatea fecha para mostrar solo día/mes/año
+// Utilidades
 const formatDate = (dateTime: string) => {
     return new Date(dateTime).toLocaleString(undefined, {
         day: '2-digit',
@@ -363,75 +357,43 @@ const formatDate = (dateTime: string) => {
     })
 }
 
-// Retorna la imagen de fondo según la categoría del plan
 const defaultImage = (category: string) => {
-    const categoryLower = category.toLowerCase();
-    switch (categoryLower) {
-        case 'pesca': return fishing;
-        case 'senderismo': return hiking;
-        case 'escalada': return climbing;
-        default: return defaultImg;
+    const key = category.toLowerCase()
+    return isCategoria(key) ? images[key] : defaultImg
+}
+
+const editPlan = () => {
+    if (props.plan?._id) {
+        router.push({ name: 'editPlan', params: { id: props.plan._id } })
     }
 }
 
-// Redirige a la página de edición del plan
-const editPlan = () => {
-    if (props.plan && props.plan._id) {
-        router.push({ name: 'editPlan', params: { id: props.plan._id } });
-    }
-};
+// Watcher para manejar el scroll del body cuando se expande/colapsa
+watch(isExpanded, (expanded) => {
+    document.body.style.overflow = expanded ? 'hidden' : 'auto'
+    document.body.classList.toggle('card-expanded', expanded)
 
-const cancelRequest = async (planId) => {
-    try {
-        const response = await axios.delete(`http://localhost:8000/plans/${planId}/cancel-request`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${tokenStore}`
-            }
-        });
-
-        if (response.data.ok) {
-            console.log('Solicitud cancelada correctamente');
-            // actualiza UI, etc.
-        } else {
-            console.error('Error al cancelar la solicitud:', response.data.message);
-        }
-    } catch (error) {
-        console.error('Error en la solicitud de cancelación:', error);
-    }
-    //me cago en todo
-};
-
-
-
-// Watcher para manejar el bloqueo del scroll del body
-watch(isExpanded, (newValue) => {
-    if (newValue) {
-        // Al expandir, bloquear scroll del body
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('card-expanded');
-
-        // Resetear secciones a su estado por defecto
-        expandedSections.journeyInfo = true;
-        expandedSections.carInfo = false;
-        expandedSections.passengersInfo = false;
+    if (expanded) {
+        // Resetear secciones al expandir
+        Object.assign(expandedSections, {
+            journeyInfo: true,
+            carInfo: false,
+            passengersInfo: false
+        })
     } else {
-        // Al colapsar, restaurar scroll del body
-        document.body.style.overflow = 'auto';
-        document.body.classList.remove('card-expanded');
-
-        // Resetear estados de mensaje
-        showMessageBox.value = false;
-        message.value = '';
+        // Limpiar estados al colapsar
+        showMessageBox.value = false
+        message.value = ''
     }
-});
+})
 
-// Limpiar estilos al desmontar el componente
+// Cleanup al desmontar componente
 onUnmounted(() => {
-    document.body.style.overflow = 'auto';
-    document.body.classList.remove('card-expanded');
-});
+    document.body.style.overflow = 'auto'
+    document.body.classList.remove('card-expanded')
+})
 </script>
+
 
 <style scoped lang="scss">
 @keyframes modalFadeIn {
@@ -809,9 +771,33 @@ onUnmounted(() => {
 
             .compact-view {
                 flex-shrink: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
 
                 .plan-header {
-                    margin-bottom: 1rem;
+                    margin-bottom: 0;
+
+                    .nature-divider {
+                        position: relative;
+                        height: 2px;
+                        background: linear-gradient(90deg, transparent, #4CAF50, #43a047, #006d12, transparent);
+                        width: 100%;
+                        margin: 0.5rem auto;
+                        border-radius: 2px;
+                        overflow: hidden;
+
+                        &::after {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: -100%;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+                            animation: shimmer 2s infinite;
+                        }
+                    }
 
                     .plan-title {
                         display: flex;
@@ -876,25 +862,239 @@ onUnmounted(() => {
                     }
                 }
 
-                .plan-footer__togle-section {
-                    margin: 2rem 0;
+                .plan-footer {
+                    .plan-footer__togle-section {
+                        display: grid;
+                        gap: 0.9rem;
 
-                    .expanded-button {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
+                        .wrapper-divider {
+                            .expanded-button {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
 
-                        p {
-                            font-size: 0.85rem;
-                            color: #43a047;
-                            cursor: pointer;
-                            transition: all 0.2s ease;
-                            margin: 0.3rem;
-                            padding: 0px;
+                                p {
+                                    font-size: 0.85rem;
+                                    color: #43a047;
+                                    cursor: pointer;
+                                    transition: all 0.2s ease;
+                                    margin: 0.3rem;
+                                    padding: 0px;
 
-                            &:hover {
-                                color: #43a047;
-                                text-decoration: underline;
+                                    &:hover {
+                                        color: #43a047;
+                                        text-decoration: underline;
+                                    }
+                                }
+
+                            }
+                        }
+
+                        .button-container {
+                            display: flex;
+                            align-items: center;
+                            place-content: center;
+                            justify-content: center;
+
+                            button {
+                                @include button-base;
+                                padding: 0.9rem 2rem;
+                                width: 70%;
+                                margin: 0 auto;
+                                font-size: 1rem;
+                            }
+
+                            // DNI Warning
+                            .dni-warning {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                margin-bottom: 0;
+
+                                .header-warning {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    padding: auto;
+
+                                    i {
+                                        color: #F44336;
+                                        font-size: 1.2rem;
+                                    }
+
+                                    p {
+                                        margin: 0;
+                                        font-size: 0.8rem;
+                                        font-weight: bold;
+                                        color: #F44336;
+                                    }
+                                }
+
+                                .body-warning {
+                                    padding: 1rem;
+                                    text-align: center;
+                                    color: #F44336;
+
+                                    p {
+                                        color: #F44336;
+                                        margin: 0;
+                                        font-weight: 500;
+                                    }
+
+                                    button {
+                                        i {
+                                            margin-left: 0.5rem;
+                                        }
+
+                                        white-space:nowrap;
+                                        display:inline-block;
+                                        color: white;
+                                        font-weight: bold;
+                                        width:90%;
+                                        border-radius: 8px;
+                                        background-color: #ffa931;
+                                        @include button-base;
+                                        box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
+                                        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+                                        &:hover {
+                                            background-color: #ec971f;
+                                            box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
+                                        }
+                                        
+                                    }
+                                }
+                            }
+
+                            .join-button {
+                                background-color: #4CAF50;
+                                color: #ffffff;
+                                box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
+
+                                &:hover {
+                                    background-color: #43a047;
+                                    box-shadow: 0 6px 15px rgba(#4CAF50, 0.4);
+                                    transform: translateY(-2px);
+                                }
+
+                                &:disabled {
+                                    background-color: rgba(255, 255, 255, 0.2);
+                                    color: rgba(#01440a, 0.5);
+                                    cursor: not-allowed;
+                                    box-shadow: none;
+                                }
+                            }
+
+                            .message-box {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 1rem;
+                                width: 100%;
+
+                                .box {
+                                    padding: 0.8rem 1rem;
+                                    border-radius: 8px;
+                                    border: 1px solid #4CAF50;
+                                    resize: vertical;
+                                    font-size: 0.95rem;
+                                    color: #01440a;
+                                    background-color: rgba(255, 255, 255, 0.8);
+                                    transition: border-color 0.3s ease;
+
+                                    &:focus {
+                                        border-color: #43a047;
+                                        outline: none;
+                                    }
+                                }
+
+                                .send-button {
+                                    background-color: #4CAF50;
+                                    color: #ffffff;
+                                    box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
+                                    @include button-base;
+                                    padding: 0.9rem 0;
+                                    margin: 0 auto;
+                                    width: 70%;
+
+                                    &:hover {
+                                        background-color: #43a047;
+                                        box-shadow: 0 6px 15px rgba(#4CAF50, 0.4);
+                                        transform: translateY(-2px);
+                                    }
+
+                                    &:disabled {
+                                        background-color: rgba(#006d12, 0.63);
+
+                                        color: rgba(#ffff, 0.5);
+                                        cursor: not-allowed;
+                                        box-shadow: none;
+                                    }
+                                }
+                            }
+
+                            .no-places-button {
+                                background-color: rgba(#006d12, 0.63);
+                                color: rgba(255, 255, 255, 0.76);
+                                cursor: not-allowed;
+                            }
+
+                            .edit-plan-button {
+                                background-color: #2196F3;
+                                color: #ffffff;
+                                box-shadow: 0 4px 12px rgba(#2196F3, 0.3);
+
+                                &:hover {
+                                    background-color: #1e88e5;
+                                    box-shadow: 0 6px 15px rgba(#2196F3, 0.4);
+                                    transform: translateY(-2px);
+                                }
+                            }
+
+                            .leave-button {
+                                background-color: #F44336;
+                                color: #ffffff;
+                                box-shadow: 0 4px 12px rgba(#F44336, 0.3);
+
+                                &:hover {
+                                    background-color: #e53935;
+                                    box-shadow: 0 6px 15px rgba(#F44336, 0.4);
+                                    transform: translateY(-2px);
+                                }
+                            }
+
+                            .section-pending {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+
+                                .pending-button {
+                                    color: #f0ad4e;
+                                    cursor: not-allowed;
+                                    opacity: 0.8;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    margin: 0 0 1rem;
+                                    padding: 0px;
+
+                                    i {
+                                        margin-right: 0.4rem;
+                                    }
+                                }
+
+                                .cancel-request-button {
+                                    background-color: #ffffff;
+                                    color: #727272;
+                                    box-shadow: 0 4px 12px rgba(#8b8b8b00, 0.3);
+                                    width: 100%;
+
+                                    &:hover {
+                                        background-color: #f7f7f7;
+                                        box-shadow: 0 6px 15px rgba(#8b8b8b, 0.4);
+                                        transform: translateY(-2px);
+                                    }
+                                }
                             }
                         }
                     }
@@ -905,200 +1105,8 @@ onUnmounted(() => {
                 margin-top: 1.5rem;
                 flex: 1;
                 padding-right: 8px;
-            }
-
-            .button-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-
-                // DNI Warning
-                .dni-warning {
-                    display: flex;
-                    justify-content: space-between;
-                    background-color: rgba(244, 67, 54, 0.2);
-                    color: lighten(#F44336, 20%);
-                    border-radius: 8px;
-                    font-size: 0.9rem;
-                    border-left: 4px solid #F44336;
-                    height: 8rem;
-
-                    i {
-                        display: grid;
-                        place-items: center;
-                        font-size: 1rem;
-                        color: #F44336;
-                        padding: 1rem;
-                        background-color: rgba(#F44336, 0.18);
-                        border-top-left-radius: 8px;
-                        border-bottom-left-radius: 8px;
-                    }
-
-                    a {
-                        display: grid;
-                        place-items: center;
-                        color: darken(#F44336, 10%);
-                        margin: 0.5rem;
-                        text-align: center;
-                        text-decoration: none;
-                    }
-
-                    .feedBackDNI {
-                        color: darken(#F44336, 10%);
-
-                        &:hover {
-                            text-decoration: underline;
-                            text-decoration-thickness: 1px;
-                        }
-                    }
-                }
-
-                button {
-                    @include button-base;
-                    padding: 0.9rem 2rem;
-                    width: 70%;
-                    margin: 0 auto;
-
-                    i {
-                        margin-right: 0.7rem;
-                    }
-                }
-
-                .join-button {
-                    background-color: #4CAF50;
-                    color: #ffffff;
-                    box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
-                    @include button-base;
-                    padding: 0.9rem 2rem;
-                    width: 70%;
-                    margin: 0 auto;
-
-                    &:hover {
-                        background-color: #43a047;
-                        box-shadow: 0 6px 15px rgba(#4CAF50, 0.4);
-                        transform: translateY(-2px);
-                    }
-
-                    &:disabled {
-                        background-color: rgba(255, 255, 255, 0.2);
-                        color: rgba(#01440a, 0.5);
-                        cursor: not-allowed;
-                        box-shadow: none;
-                    }
-                }
-
-                .no-places-button {
-                    background-color: rgba(#006d12, 0.63);
-                    color: rgba(255, 255, 255, 0.76);
-                    cursor: not-allowed;
-                }
-
-                .edit-button {
-                    background-color: #2196F3;
-                    color: #ffffff;
-                    box-shadow: 0 4px 12px rgba(#2196F3, 0.3);
-
-                    &:hover {
-                        background-color: #1e88e5;
-                        box-shadow: 0 6px 15px rgba(#2196F3, 0.4);
-                        transform: translateY(-2px);
-                    }
-                }
-
-                .leave-button {
-                    background-color: #F44336;
-                    color: #ffffff;
-                    box-shadow: 0 4px 12px rgba(#F44336, 0.3);
-
-                    &:hover {
-                        background-color: #e53935;
-                        box-shadow: 0 6px 15px rgba(#F44336, 0.4);
-                        transform: translateY(-2px);
-                    }
-                }
-
-                .section-pending {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-
-                    .pending-button {
-                        color: #f0ad4e;
-                        cursor: not-allowed;
-                        opacity: 0.8;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        margin: 0 0 1rem;
-                        padding: 0px;
-
-                        i {
-                            margin-right: 0.4rem;
-                        }
-                    }
-
-                    .cancel-request-button {
-                        background-color: #ffffff;
-                        color: #727272;
-                        box-shadow: 0 4px 12px rgba(#8b8b8b, 0.3);
-                        @include button-base;
-                        padding: 0.9rem 2rem;
-                        margin: 0 auto;
-
-                        &:hover {
-                            background-color: #f7f7f7;
-                            box-shadow: 0 6px 15px rgba(#8b8b8b, 0.4);
-                            transform: translateY(-2px);
-                        }
-                    }
 
 
-                }
-
-                .message-box {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
-                    width: 100%;
-
-                    textarea {
-                        padding: 0.8rem 1rem;
-                        border-radius: 8px;
-                        border: 1px solid #4CAF50;
-                        resize: vertical;
-                        font-size: 0.95rem;
-                        color: #01440a;
-                        background-color: rgba(255, 255, 255, 0.8);
-                        transition: border-color 0.3s ease;
-
-                        &:focus {
-                            border-color: #43a047;
-                            outline: none;
-                        }
-                    }
-
-                    .send-button {
-                        background-color: #4CAF50;
-                        color: #ffffff;
-                        box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
-                        width: 80%;
-
-                        &:hover {
-                            background-color: #43a047;
-                            box-shadow: 0 6px 15px rgba(#4CAF50, 0.4);
-                            transform: translateY(-2px);
-                        }
-
-                        &:disabled {
-                            background-color: rgb(155, 155, 155);
-
-                            color: rgba(#01440a, 0.5);
-                            cursor: not-allowed;
-                            box-shadow: none;
-                        }
-                    }
-                }
             }
         }
 
@@ -1156,7 +1164,7 @@ onUnmounted(() => {
 
         .nature-divider {
             position: relative;
-            height: 2px;
+            min-height: 2px;
             background: linear-gradient(90deg, transparent, #4CAF50, #43a047, #006d12, transparent);
             width: 100%;
             margin: 0.5rem auto;
@@ -1220,7 +1228,6 @@ onUnmounted(() => {
             font-size: 0.95rem;
 
             span {
-                // @include hover-lift;
                 background-color: rgba(255, 255, 255, 0.8);
                 padding: 0.5rem 0.8rem;
                 border-radius: 6px;
@@ -1273,65 +1280,82 @@ onUnmounted(() => {
                 }
             }
 
-            .button-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+            .button-container-expanded {
+                display: grid;
                 gap: 1rem;
+                width: 100%;
 
                 // DNI Warning
-                .dni-warning {
+                .dni-warning-expanded {
                     display: flex;
-                    justify-content: space-between;
-                    background-color: rgba(244, 67, 54, 0.2);
-                    color: lighten(#F44336, 20%);
-                    border-radius: 8px;
-                    font-size: 0.9rem;
-                    border-left: 4px solid #F44336;
-                    height: 8rem;
+                    flex-direction: column;
+                    height: auto;
 
-                    i {
-                        display: grid;
-                        place-items: center;
-                        font-size: 1rem;
-                        color: #F44336;
+                    .header-warning-expanded {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: auto;
+
+                        i {
+                            color: #F44336;
+                            font-size: 1.2rem;
+                        }
+
+                        p {
+                            margin: 0;
+                            font-weight: bold;
+                            color: #F44336;
+                        }
+                    }
+
+                    .body-warning-expanded {
                         padding: 1rem;
-                        background-color: rgba(#F44336, 0.18);
-                        border-top-left-radius: 8px;
-                        border-bottom-left-radius: 8px;
-                    }
-
-                    a {
-                        display: grid;
-                        place-items: center;
-                        color: darken(#F44336, 10%);
-                        margin: 0.5rem;
                         text-align: center;
-                        text-decoration: none;
-                    }
+                        color: #F44336;
 
-                    .feedBackDNI {
-                        color: darken(#F44336, 10%);
+                        p {
+                            color: #F44336;
+                            margin: 0;
+                            font-weight: 500;
+                        }
 
-                        &:hover {
-                            text-decoration: underline;
-                            text-decoration-thickness: 1px;
+                        button {
+                            color: white;
+                            text-decoration: none;
+                            font-weight: bold;
+                            padding: 1rem;
+                            border-radius: 8px;
+                            background-color: #ffa931;
+                            @include button-base;
+                            //Sombra
+                            box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
+                            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+                            &:hover {
+                                background-color: #ec971f;
+                                box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
+                            }
+
+                            i {
+                                margin-left: 0.5rem;
+                            }
                         }
                     }
                 }
 
                 button {
                     @include button-base;
-                    padding: 0.9rem 2rem;
-                    width: 70%;
+                    padding: 0.9rem 0;
                     margin: 0 auto;
+                    width: 50%;
 
                     i {
                         margin-right: 0.7rem;
                     }
                 }
 
-                .join-button {
+                .join-button-expanded {
                     background-color: #4CAF50;
                     color: #ffffff;
                     box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
@@ -1350,83 +1374,13 @@ onUnmounted(() => {
                     }
                 }
 
-                .no-places-button {
-                    background-color: rgba(#006d12, 0.63);
-                    color: rgba(255, 255, 255, 0.76);
-                    cursor: not-allowed;
-                }
 
-                .edit-button {
-                    background-color: #2196F3;
-                    color: #ffffff;
-                    box-shadow: 0 4px 12px rgba(#2196F3, 0.3);
-
-                    &:hover {
-                        background-color: #1e88e5;
-                        box-shadow: 0 6px 15px rgba(#2196F3, 0.4);
-                        transform: translateY(-2px);
-                    }
-                }
-
-                .leave-button {
-                    background-color: #F44336;
-                    color: #ffffff;
-                    box-shadow: 0 4px 12px rgba(#F44336, 0.3);
-
-                    &:hover {
-                        background-color: #e53935;
-                        box-shadow: 0 6px 15px rgba(#F44336, 0.4);
-                        transform: translateY(-2px);
-                    }
-                }
-
-                .section-pending-expanded {
-                    display: flex;
-                    justify-content: space-between;
-                    width: 100%;
-
-                    .pending-button {
-                        color: #f0ad4e;
-                        cursor: not-allowed;
-                        opacity: 0.8;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        margin: 0 0 1rem;
-                        padding: 0px;
-                        width: 50%;
-
-                        i {
-                            margin-right: 0.4rem;
-                        }
-                    }
-
-                    .cancel-request-button {
-                        background-color: #ffffff;
-                        color: #727272;
-                        box-shadow: 0 4px 12px rgba(#8b8b8b, 0.3);
-                        @include button-base;
-                        padding: 0.9rem 2rem;
-                        margin: 0 auto;
-                        width: 30%;
-
-                        &:hover {
-                            background-color: #f7f7f7;
-                            box-shadow: 0 6px 15px rgba(#8b8b8b, 0.4);
-                            transform: translateY(-2px);
-                        }
-                    }
-
-
-                }
-
-                .message-box {
-                    display: flex;
-                    flex-direction: column;
+                .message-box-expanded {
+                    display: grid;
                     gap: 1rem;
                     width: 100%;
 
-                    textarea {
+                    .box-expanded {
                         padding: 0.8rem 1rem;
                         border-radius: 8px;
                         border: 1px solid #4CAF50;
@@ -1435,6 +1389,7 @@ onUnmounted(() => {
                         color: #01440a;
                         background-color: rgba(255, 255, 255, 0.8);
                         transition: border-color 0.3s ease;
+                        width: 100%;
 
                         &:focus {
                             border-color: #43a047;
@@ -1442,11 +1397,10 @@ onUnmounted(() => {
                         }
                     }
 
-                    .send-button {
+                    .send-button-expanded {
                         background-color: #4CAF50;
                         color: #ffffff;
                         box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
-                        width: 80%;
 
                         &:hover {
                             background-color: #43a047;
@@ -1463,6 +1417,71 @@ onUnmounted(() => {
                         }
                     }
                 }
+
+                .section-pending-expanded {
+                    display: grid;
+                    width: 100%;
+
+                    .pending-button-expanded {
+                        color: #f0ad4e;
+                        cursor: not-allowed;
+                        opacity: 0.8;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin: 0 0 1rem;
+                        padding: 0px;
+
+                        i {
+                            margin-right: 0.4rem;
+                        }
+                    }
+
+                    .cancel-request-button-expanded {
+                        background-color: #ffffff;
+                        color: #727272;
+                        box-shadow: 0 4px 12px rgba(#8b8b8b, 0.3);
+                        @include button-base;
+                        margin: 0 auto;
+
+                        &:hover {
+                            background-color: #f7f7f7;
+                            box-shadow: 0 6px 15px rgba(#8b8b8b, 0.4);
+                            transform: translateY(-2px);
+                        }
+                    }
+                }
+
+                .leave-button-expanded {
+                    background-color: #F44336;
+                    color: #ffffff;
+                    box-shadow: 0 4px 12px rgba(#F44336, 0.3);
+
+                    &:hover {
+                        background-color: #e53935;
+                        box-shadow: 0 6px 15px rgba(#F44336, 0.4);
+                        transform: translateY(-2px);
+                    }
+                }
+
+                .edit-plan-button-expanded {
+                    background-color: #2196F3;
+                    color: #ffffff;
+                    box-shadow: 0 4px 12px rgba(#2196F3, 0.3);
+
+                    &:hover {
+                        background-color: #1e88e5;
+                        box-shadow: 0 6px 15px rgba(#2196F3, 0.4);
+                        transform: translateY(-2px);
+                    }
+                }
+
+
+                .no-places-button {
+                    background-color: rgba(#006d12, 0.63);
+                    color: rgba(255, 255, 255, 0.76);
+                    cursor: not-allowed;
+                }
             }
         }
     }
@@ -1475,5 +1494,5 @@ onUnmounted(() => {
 </style>
 
 //COMPARANDO ESTE STYLE CON EL ANTIGUO(COMPONETIZADO), APLICAR LOS BREAKPOINTS Y ESTILOS DE RESPONSIVE DEL
-ANTIGUO(COMPONETIZADO)
+//ANTIGUO(COMPONETIZADO)
 //DEJANDO LISTO ESTE ARCHIVO PARA USAR EN EL ARCHIVO DE ESTILOS (COMPONETIZADO) CON LOS BREAKPOINTS QUE EXISTIAN
