@@ -8,7 +8,7 @@
                 //- Campo de título del plan
                 .form-group
                     label(for="plan-title") Título
-                    input#plan-title(type="text" placeholder="Título de tu aventura" v-model="planData.title" required)
+                    input#plan-title(type="text" placeholder="Título de tu aventura" v-model="planData.title" required maxlength="39")
                 
                 //- Selector de categoría del plan
                 .form-group
