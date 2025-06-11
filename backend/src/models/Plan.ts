@@ -1,5 +1,16 @@
-import mongoose from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 
+
+interface Passenger {
+  userId: Types.ObjectId
+  nickName: string;
+  isApproved: boolean
+}
+interface PendingPassenger {
+  userId: Types.ObjectId; // 👈 Esto está bien
+  nickName: string;
+  message: string;
+}
 export interface Plan {
   title: string
   category: string
@@ -13,13 +24,13 @@ export interface Plan {
     distance: string
   }
   dateTime: Date
-  creatorUser: string
+  creatorUser: Types.ObjectId
   creatorNickName: string
   dni: string
   placesAvailable: number
   price: number
-  passengers: string[]
-  pendingPassengers: string[]
+  passengers: Passenger[]
+  pendingPassengers: PendingPassenger[]
   carInformation: {
     carIdentifier: string
     brand: string
@@ -28,7 +39,7 @@ export interface Plan {
   }
 }
 
-const planSchema = new mongoose.Schema({
+const planSchema = new mongoose.Schema<Plan>({
   title: { type: String, required: true },
   category: {
     type: String,
@@ -51,15 +62,13 @@ const planSchema = new mongoose.Schema({
   placesAvailable: { type: Number, required: true },
   price: { type: Number, required: true },
   passengers: [{
-    id: { type: String },
-    nickName: { type: String },
-    dni: { type: String },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    nickName: {type: String, required: true},
     isApproved: { type: Boolean, default: false }
   }],
   pendingPassengers: [{
-    id: { type: String },
-    nickName: { type: String },
-    dni: { type: String },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    nickName: {type: String, required: true},
     message: { type: String, default: '' }
   }],
   carInformation: {

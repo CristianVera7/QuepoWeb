@@ -9,7 +9,7 @@ export interface User {
   dni?: string
 }
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<User>({
   //Hacer unico el nickName
   nickName: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, trim: true, match: VALID_EMAIL },
