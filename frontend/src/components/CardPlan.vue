@@ -20,8 +20,8 @@
                             h4.plan-title
                                 strong {{ plan.title }}
                             .nature-divider
-                            p.plan-description {{ plan.description }}
-                        
+                            p.plan-description {{ isExpanded ? plan.description : truncate(plan.description, 85) }}
+
                         .compact-info
                             .info-item-card
                                 .wrapper-info-item
@@ -301,6 +301,13 @@ const isExpanded = ref(false)
 const showMessageBox = ref(false)
 const message = ref('')
 const showLeaveConfirmation = ref(false)
+
+// Función para truncar texto con puntos suspensivos
+const truncate = (text: string, length: number) => {
+    if (!text) return ''
+    if (text.length <= length) return text
+    return text.substring(0, length) + '...'
+}
 
 //funcion para redirigir al usuario a editar su perfil si no tiene DNI
 const editProfile = () => {
@@ -678,7 +685,7 @@ onUnmounted(() => {
                 position: sticky;
                 top: 0;
                 z-index: 1003;
-                min-height: 200px;
+                height: 200px;
                 max-height: 300px;
             }
 
@@ -706,7 +713,7 @@ onUnmounted(() => {
 
             .background-img {
                 width: 100%;
-                height: 100%;
+                height: 200px;
                 object-fit: cover;
                 transition: transform 0.3s ease;
             }
