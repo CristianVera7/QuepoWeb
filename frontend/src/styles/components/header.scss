@@ -163,6 +163,8 @@
             .dropdown-item {
                 display: flex;
                 align-items: center;
+                text-align: center;
+                
                 font-size: clamp(0.9rem, 1.2vw, 1.2rem); // Texto responsive
                 padding: 0.65rem 1.2rem;
                 white-space: nowrap;
@@ -175,6 +177,15 @@
                 }
 
                 &:last-child {
+                    color: #ff1900b9;
+                    font-weight: 600;
+                }
+
+                i{
+                    color:#00ad09;;
+                    margin-right: 0.5rem;
+                }
+                .out{
                     color: #ff1900b9;
                     font-weight: 600;
                 }
