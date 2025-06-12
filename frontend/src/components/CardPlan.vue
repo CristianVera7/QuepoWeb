@@ -32,9 +32,9 @@
                             .info-item-card
                                 .wrapper-info-item
                                     i.fas.fa-calendar
-                                    strong Fecha y hora:
+                                    strong {{ formatDate(plan.dateTime).split(',')[0] }}
                                 .detail
-                                    span {{ formatDate(plan.dateTime).replace(',', '') }}
+                                    span {{ formatDate(plan.dateTime).split(',')[1] }}
                             .info-item-card
                                 .wrapper-info-item
                                     i.fas.fa-euro-sign
