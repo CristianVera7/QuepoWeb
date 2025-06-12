@@ -646,6 +646,7 @@
                         .wrapper-info-item {
                             display: flex;
                             align-items: center;
+                            place-content: center;
                             gap: 0.3rem;
 
                             @include mix.respond-max(sm) {
@@ -671,8 +672,7 @@
 
                         .detail {
                             display: flex;
-                            align-items: center;
-                            place-content: center;
+                            justify-content: center;
 
                             span {
                                 margin: 0;
