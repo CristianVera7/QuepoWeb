@@ -735,6 +735,15 @@
                                 margin: 0 auto;
                                 font-size: 1rem;
 
+                                @include mix.respond(xxl) {
+                                    width: 70%;
+                                    padding: 0.8rem 1.5rem;
+                                }
+                               
+                                @include mix.respond-between(sm, xxl) {
+                                    width: 70%;
+                                    padding: 0.8rem 1.5rem;
+                                }
                                 @include mix.respond-max(sm) {
                                     width: 80%;
                                     padding: 0.8rem 1.5rem;
