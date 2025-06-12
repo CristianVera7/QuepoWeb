@@ -70,7 +70,7 @@ const listOfPlans = async () => {
         
         if (response.data.ok) {
             plansList.value = response.data.data
-            filteredPlans.value = response.data.data // Por defecto muestra todos
+            // filteredPlans.value = response.data.data // Por defecto muestra todos
         } else {
             console.error('ERROR AL OBTENER LOS PLANES')
         }
