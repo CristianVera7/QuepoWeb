@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 // Composables de Vue
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 // Tipado para planes
 import type { IPlan } from '../types/plan';
 // Picker de fechas
@@ -144,6 +144,13 @@ const filteredPlans = computed(() => {
         if (!plan || !plan.dateTime || !plan.category) return false;
 
         const planDate = new Date(plan.dateTime);
+        // planDate.setHours(0, 0, 0, 0)
+        
+        // // Oculta siempre los planes pasados
+        // const today = new Date();
+        // today.setHours(0, 0, 0, 0);
+        // if (planDate < today) return false;
+        // console.log('planDate:', planDate, 'today:', today, 'plan:', plan);
 
         // Filtro por categoría
         const matchesCategory =
@@ -184,4 +191,12 @@ onMounted(() => {
 
     applyFilters();
 });
+
+// Nuevo watcher para reaccionar a cambios en allPlans
+watch(
+    () => props.allPlans,
+    () => {
+        applyFilters();
+    }
+);
 </script>
