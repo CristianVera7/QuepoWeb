@@ -45,7 +45,7 @@ import { useRegisterStore } from '../stores/registerStore'
 import { storeToRefs } from 'pinia'
 import { ref, onMounted } from 'vue'
 import type { IPlan } from '../types/plan'
-import axios from 'axios'
+import api from '../api/index'
 
 // Acceso al store de registro y extracción de refs
 const registerStore = useRegisterStore()
@@ -65,7 +65,7 @@ const highlightRequests = ref(false)
 // Función para verificar notificaciones (planes pendientes o perfil incompleto)
 const checkNotifications = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/plan/pending', {
+        const response = await api.get('http://localhost:8000/plan/pending', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`

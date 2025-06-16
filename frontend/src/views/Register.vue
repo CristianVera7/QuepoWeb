@@ -127,7 +127,7 @@ const registerUser = async () => {
 
     try {
         // Petición POST al backend para registrar nuevo usuario
-        const response = await axios.post('http://localhost:8000/user/register', user.value)
+        const response = await api.post('http://localhost:8000/user/register', user.value)
 
         // Si ya existe, muestra alerta
         if (response.data.ok === false) return alert('Este usuario ya existe')

@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import axios from 'axios'
+import api from '../api/index'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -148,7 +148,7 @@ const initializeMap = () => {
 
     // Crear instancia del mapa centrado en Madrid
     leafletMap = L.map(mapRef.value).setView([40.4168, -3.7038], 6)
-    
+
     // Agregar capa de tiles de OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -156,7 +156,7 @@ const initializeMap = () => {
 
     // Event listener para clics en el mapa
     leafletMap.on('click', onMapClick)
-    
+
     // Actualizar mapa con coordenadas existentes si las hay
     updateMapWithExistingCoords()
 }
@@ -275,7 +275,7 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
 
         // Llamada a la API de geocodificación
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=es&limit=5`
-        const response = await axios.get<NominatimResponse[]>(url)
+        const response = await api.get<NominatimResponse[]>(url)
 
         if (response.data.length === 0) {
             if (!skipNotification) {
@@ -347,7 +347,7 @@ const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
 
         // Llamada a la API de geocodificación inversa
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=es`
-        const response = await axios.get<NominatimResponse>(url)
+        const response = await api.get<NominatimResponse>(url)
 
         if (!response.data || !response.data.address) {
             showNotification('No se pudo determinar la dirección de esta ubicación', 'error')
@@ -371,9 +371,9 @@ const calculateRoute = async (skipNotification: boolean = false) => {
 
     try {
         loading.value = true
-        
+
         // Llamada a la API de cálculo de rutas
-        const response = await axios.post(
+        const response = await api.post(
             'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
             {
                 coordinates: [

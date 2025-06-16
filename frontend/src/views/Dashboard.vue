@@ -33,7 +33,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRegisterStore } from '../stores/registerStore'
-import axios from 'axios'
+import api from '../api/index'
 import { type IPlan } from '../types/plan'
 import firstComponent from '../components/FirstComponent.vue'
 import PlanFiltersMenu from '../components/PlanFiltersMenu.vue'
@@ -61,17 +61,17 @@ const showModal = ref(true)
 const listOfPlans = async () => {
     try {
         console.log("PASAMOS POR AQUI 👌");
-        const response = await axios.get('http://localhost:8000/plan/list', {
+        const response = await api.get('http://localhost:8000/plan/list', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
             }
         })
-        
+
         if (response.data.ok) {
             plansList.value = response.data.data
             console.log(plansList.value);
-            
+
             // filteredPlans.value = response.data.data // Por defecto muestra todos
         } else {
             console.error('ERROR AL OBTENER LOS PLANES')
@@ -90,7 +90,7 @@ const onFilteredPlansUpdate = (plans: IPlan[]) => {
 const joinPlan = async (payload: { planId: string, message: string }) => {
     await checkUser()
     try {
-        const response = await axios.post(`http://localhost:8000/plan/join/${payload.planId}`, { message: payload.message }, {
+        const response = await api.post(`http://localhost:8000/plan/join/${payload.planId}`, { message: payload.message }, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
@@ -110,7 +110,7 @@ const joinPlan = async (payload: { planId: string, message: string }) => {
 // En el componente padre
 const cancelRequest = async (planId: string) => {
     try {
-        const response = await axios.delete(`http://localhost:8000/plans/${planId}/cancel-request`, {
+        const response = await api.delete(`http://localhost:8000/plans/${planId}/cancel-request`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -132,7 +132,7 @@ const cancelRequest = async (planId: string) => {
 // Permite abandonar un plan al que ya se unió
 const leavePlan = async (planId: string) => {
     try {
-        const response = await axios.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
+        const response = await api.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
             headers: {
                 Authorization: `Bearer ${tokenStore}`
             }
@@ -157,7 +157,7 @@ const leavePlan = async (planId: string) => {
 // Obtiene las solicitudes pendientes del usuario (planes en los que pidió unirse)
 const getPendingRequests = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/plan/pendingRequest', {
+        const response = await api.get('http://localhost:8000/plan/pendingRequest', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
