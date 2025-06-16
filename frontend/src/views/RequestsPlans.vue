@@ -11,18 +11,18 @@
                     h3.planTitle {{ plan.planTitle }}
 
                     // Itera sobre los pasajeros que han solicitado unirse al plan
-                    .passengerCard(v-for="passenger in plan.pendingPassengers" :key="passenger._id")
+                    .passengerCard(v-for="passenger in plan.pendingPassengers" :key="passenger.userId")
                         .passengerInfo
                             h4 {{ passenger.nickName }} se quiere unir al plan.
                             p {{ passenger.nickName }}: {{ passenger.message }}
 
                         // Botones para aceptar o rechazar la solicitud
                         .actions
-                            button.approve(@click="approvePassenger(plan.planId, passenger.id)") Aceptar
-                            button.reject(@click="rejectPassenger(plan.planId, passenger.id)") Rechazar
+                            button.approve(@click="approvePassenger(plan.planId, passenger.userId)") Aceptar
+                            button.reject(@click="rejectPassenger(plan.planId, passenger.userId)") Rechazar
 
             // Si no hay solicitudes, se muestra este mensaje
-            p(v-else) No tienes solicitudes pendientes
+            p.noRequest(v-else) No tienes solicitudes pendientes.
 </template>
 
 <script setup lang="ts">

@@ -18,11 +18,11 @@ export const useRegisterStore = defineStore('registerUser', {
     // Estado inicial del store
     state: (): IStore => {
         return {
-            emailStore: '',        // Email del usuario registrado
-            isRegistered: false,  // Indica si el usuario está registrado
-            tokenStore: '',       // Token JWT del usuario
-            isLogged: false,      // Indica si el usuario tiene sesión iniciada
-            hasDni: false         // Indica si el usuario ha registrado su DNI
+            emailStore: '',        
+            isRegistered: false,  
+            tokenStore: '',       
+            isLogged: false,      
+            hasDni: false         
         }
     },
 

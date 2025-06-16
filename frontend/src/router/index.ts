@@ -72,7 +72,7 @@ function safeRedirect(to: any, next: any, targetName: string) {
 }
 
 // Middleware global que se ejecuta antes de cada cambio de ruta
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
     const store = useRegisterStore()
     const { checkUser } = store // Método para verificar el estado del usuario
     const { isRegistered, isLogged } = storeToRefs(store) // Acceso reactivo a los flags de sesión

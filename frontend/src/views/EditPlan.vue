@@ -16,8 +16,8 @@
             .modal-content
                 // Ícono cambia según si fue actualización o eliminación
                 i(:class="isDeleteSuccess ? 'fas fa-trash' : 'fas fa-check-circle'")
-                h3 {{ modalTitle }} // Título dinámico del modal
-                p {{ successMessage }} // Mensaje dinámico del modal
+                h3 {{ modalTitle }} 
+                p {{ successMessage }}
                 // Botón que redirige a la vista de planes
                 button.modal-button(@click="navigateToDashboard") {{ isDeleteSuccess ? 'Volver a mis planes' : 'Ver mis planes' }}
 </template>

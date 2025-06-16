@@ -12,11 +12,16 @@ const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
 
-// Accede a la store del usuario registrado y verifica si hay sesión activa
-const store = useRegisterStore()
-await store.checkUser()
+async function initializeApp() {
+  // Accede a la store del usuario registrado y verifica si hay sesión activa
+  const store = useRegisterStore()
+  await store.checkUser()
 
-// Registra el router para manejar rutas de navegación
-app.use(router)
-// Monta la aplicación en el elemento con id="app" del DOM
-app.mount('#app')
+  // Registra el router para manejar rutas de navegación
+  app.use(router)
+
+  // Monta la aplicación en el elemento con id="app" del DOM
+  app.mount('#app')
+}
+
+initializeApp()

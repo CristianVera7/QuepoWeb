@@ -15,15 +15,16 @@
             :message="feedback" 
             :pendingRequestPlans="pendingRequestPlans"
             @joinPlan="joinPlan" 
+            @cancelRequest="cancelRequest"
             @leavePlan="leavePlan" 
         )
 
     // Modal que aparece si el usuario no tiene DNI registrado
-    .v-modal.modal-overlay(v-if="!hasDni && showModal")
-        .modal-content
+    .v-modal.modalDNI-overlay(v-if="!hasDni && showModal")
+        .modalDNI-content
             h3 No tienes un DNI registrado
             p Para poder interactuar con la aplicación, necesitas registrar tu DNI.
-            .modal-actions
+            .modalDNI-actions
                 button.go-to-register(@click="goToRegister") Registrar ahora
                 button.later(@click="closeModal") Más tarde
 </template>
@@ -59,15 +60,19 @@ const showModal = ref(true)
 // Solicita la lista de planes disponibles
 const listOfPlans = async () => {
     try {
+        console.log("PASAMOS POR AQUI 👌");
         const response = await axios.get('http://localhost:8000/plan/list', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
             }
         })
+        
         if (response.data.ok) {
             plansList.value = response.data.data
-            filteredPlans.value = response.data.data // Por defecto muestra todos
+            console.log(plansList.value);
+            
+            // filteredPlans.value = response.data.data // Por defecto muestra todos
         } else {
             console.error('ERROR AL OBTENER LOS PLANES')
         }
@@ -99,6 +104,28 @@ const joinPlan = async (payload: { planId: string, message: string }) => {
         }
     } catch (error) {
         console.log(error)
+    }
+}
+
+// En el componente padre
+const cancelRequest = async (planId: string) => {
+    try {
+        const response = await axios.delete(`http://localhost:8000/plans/${planId}/cancel-request`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${tokenStore}`
+            }
+        });
+
+        if (response.data.ok) {
+            // Actualizar pendingRequestPlans directamente
+            const index = pendingRequestPlans.value.indexOf(planId)
+            if (index !== -1) {
+                pendingRequestPlans.value.splice(index, 1)
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
 

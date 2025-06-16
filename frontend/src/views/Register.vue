@@ -85,7 +85,7 @@
 // Importación de componentes auxiliares y dependencias
 import NavMenuMobile from '../components/NavMenuMobile.vue'
 import Sponsors from '../components/Sponsors.vue'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { validateForm } from '../validations/validationUser'
@@ -142,7 +142,11 @@ const registerUser = async () => {
 
         console.log('USUARIO CREADO CORRECTAMENTE 👍')
     } catch (error) {
-        console.log('Ha habido un problema al crear al usuario ❌', error)
+        const err = error as AxiosError<{ message: string }>;
+        console.log('Error completo:', err);
+
+        const message = err?.response?.data?.message || 'Error al crear el usuario';
+        alert(message);
     }
 }
 

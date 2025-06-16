@@ -7,15 +7,15 @@
                     // Formulario de creación de plan, no está en modo edición
                     PlanForm(
                         :isEditMode="false"
-                        @plan-created="handlePlanCreated" 
+                        @plan-created="handlePlanCreated"
                     )
 
         // Modal que se muestra al crear exitosamente un plan
         .success-modal(v-if="showSuccessModal")
             .modal-content
-                i.fas.fa-check-circle // Icono de éxito
+                i.fas.fa-check-circle 
                 h3 Plan creado con éxito!
-                p {{ successMessage }} // Mensaje personalizado con el nombre del plan
+                p {{ successMessage }} 
                 button.modal-button(@click="navigateToDashboard") Ver mis planes
 </template>
 

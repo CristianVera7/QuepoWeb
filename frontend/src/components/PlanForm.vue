@@ -8,7 +8,7 @@
                 //- Campo de título del plan
                 .form-group
                     label(for="plan-title") Título
-                    input#plan-title(type="text" placeholder="Título de tu aventura" v-model="planData.title" required)
+                    input#plan-title(type="text" placeholder="Título de tu aventura" v-model="planData.title" required maxlength="39")
                 
                 //- Selector de categoría del plan
                 .form-group
@@ -277,16 +277,23 @@ const loadPlanData = async () => {
         const planDataResponse = response.data.plan
 
         // Formatear la fecha para que sea compatible con FlatPickr
+        // Formatear la fecha para que sea compatible con FlatPickr en hora local
         let formattedDate = ''
         if (planDataResponse.dateTime) {
             const planDate = new Date(planDataResponse.dateTime)
-            const day = String(planDate.getDate()).padStart(2, '0')
-            const month = String(planDate.getMonth() + 1).padStart(2, '0')
-            const year = planDate.getFullYear()
-            const hours = String(planDate.getHours()).padStart(2, '0')
-            const minutes = String(planDate.getMinutes()).padStart(2, '0')
-            formattedDate = `${day}-${month}-${year} ${hours}:${minutes}`
+
+            const [datePart, timePart] = planDate.toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).split(', ')
+
+            formattedDate = `${datePart} ${timePart}`
         }
+
 
         // Mapear los datos recibidos al formulario
         planData.value = {
@@ -453,7 +460,7 @@ const submitForm = async () => {
             })
             message.value = 'Plan creado con éxito.'
             emit('plan-created', planData.value.title)
-            console.log(planData.value.title);
+            console.log(dataToSubmit);
 
             // Resetear formulario después de creación exitosa
             planData.value = {
