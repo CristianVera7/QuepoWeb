@@ -6,7 +6,7 @@ import { createPinia } from 'pinia'
 import 'leaflet/dist/leaflet.css'
 import { useRegisterStore } from './stores/registerStore'
 // Importar configuración de API
-import api from './api'
+import api from './api/index'
 
 // Crea una nueva instancia de la aplicación Vue
 const app = createApp(App)
