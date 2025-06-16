@@ -70,7 +70,7 @@ import Sponsors from '../components/Sponsors.vue'
 
 // Importación de validación y tipos
 import { Form, Field, ErrorMessage, type ValidationResult } from 'vee-validate'
-import axios from 'axios'
+import api from '../api/index'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { validateForm } from '../validations/validationUser'
@@ -115,8 +115,8 @@ const user = ref<IUser>({
 const loginUser = async () => {
     try {
         // Petición al backend para autenticar usuario
-        const response = await axios.post('http://localhost:8000/user/login', user.value)
-        
+        const response = await api.post('http://localhost:8000/user/login', user.value)
+
         if (response.data.ok) {
             // Si la autenticación es exitosa, guardar el token
             localStorage.setItem('User loged', response.data.token)

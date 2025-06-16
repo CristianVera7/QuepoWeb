@@ -148,7 +148,7 @@
 import { ref, onMounted, computed, watch, defineProps, defineEmits } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PlanFiltersMenu from './PlanFiltersMenu.vue'
-import axios from 'axios'
+import api from '../api/index'
 import { useRegisterStore } from '../stores/registerStore'
 import { storeToRefs } from 'pinia'
 import MapSelector from './MapSelector.vue'
@@ -266,7 +266,7 @@ const loadPlanData = async () => {
         console.log('Cargando plan con ID:', planId)
 
         // Llamada a la API para obtener los datos del plan
-        const response = await axios.get(`http://localhost:8000/plan/getPlanById/${planId}`, {
+        const response = await api.get(`http://localhost:8000/plan/getPlanById/${planId}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -396,7 +396,7 @@ const deletePlan = async () => {
         const planId = getPlanId.value
 
         // Llamada a la API para eliminar el plan
-        await axios.delete(`http://localhost:8000/plan/delete/${planId}`, {
+        await api.delete(`http://localhost:8000/plan/delete/${planId}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -442,7 +442,7 @@ const submitForm = async () => {
 
         if (props.isEditMode) {
             // FLUJO DE ACTUALIZACIÓN
-            await axios.put(`http://localhost:8000/plan/update/${getPlanId.value}`, dataToSubmit, {
+            await api.put(`http://localhost:8000/plan/update/${getPlanId.value}`, dataToSubmit, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${tokenStore}`
@@ -452,7 +452,7 @@ const submitForm = async () => {
             emit('plan-updated', planData.value.title)
         } else {
             // FLUJO DE CREACIÓN
-            await axios.post('http://localhost:8000/plan/create', dataToSubmit, {
+            await api.post('http://localhost:8000/plan/create', dataToSubmit, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${tokenStore}`

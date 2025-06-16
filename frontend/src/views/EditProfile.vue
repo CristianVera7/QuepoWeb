@@ -93,7 +93,7 @@ import PlanFiltersMenu from '../components/PlanFiltersMenu.vue';
 import { onMounted, ref, watch } from 'vue';
 import { useRegisterStore } from '../stores/registerStore';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import api from '../api/index';
 import { storeToRefs } from 'pinia';
 
 // Validaciones
@@ -134,7 +134,7 @@ const repeatNewPassword = ref('');
 // Obtiene los datos del usuario logueado al cargar la vista
 const getUserData = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/user/get', {
+        const response = await api.get('http://localhost:8000/user/get', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -205,7 +205,7 @@ const updateUserData = async () => {
             }
         }
 
-        const response = await axios.put('http://localhost:8000/user/update', user.value, {
+        const response = await api.put('http://localhost:8000/user/update', user.value, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -216,7 +216,7 @@ const updateUserData = async () => {
         successMessage.value = 'Tu perfil ha sido actualizado correctamente.';
         showSuccessModal.value = true;
     } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
+        if (api.isAxiosError(error)) {
             errorMessage.value = error.response?.data?.message || 'Error desconocido';
         } else {
             errorMessage.value = 'Ha ocurrido un error desconocido.';
@@ -252,7 +252,7 @@ const performDeleteAccount = async () => {
     }
 
     try {
-        await axios.delete('http://localhost:8000/user/delete', {
+        await api.delete('http://localhost:8000/user/delete', {
             data: { password: deletePassword.value },
             headers: {
                 'Content-Type': 'application/json',
@@ -268,7 +268,7 @@ const performDeleteAccount = async () => {
         router.push('/register');
 
     } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
+        if (api.isAxiosError(error)) {
             deleteError.value = error.response?.data?.message || 'Error al eliminar cuenta';
         } else {
             deleteError.value = 'Ha ocurrido un error inesperado.';

@@ -10,7 +10,7 @@ import firstComponent from '../components/FirstComponent.vue';
 import PlanFiltersMenu from '../components/PlanFiltersMenu.vue';
 import PlanList from '../components/PlanList.vue';
 import { ref, onMounted, watch } from 'vue';
-import axios from 'axios';
+import api from '../api/index';
 import { useRegisterStore } from '../stores/registerStore';
 import type { IPlan } from '../types/plan';
 import { storeToRefs } from 'pinia';
@@ -40,7 +40,7 @@ const onFilteredPlansUpdate = (plans: IPlan[]) => {
 // Función que obtiene los planes del usuario desde el backend
 const listOfPlans = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/plan/myPlans', {
+        const response = await api.get('http://localhost:8000/plan/myPlans', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
@@ -66,7 +66,7 @@ const listOfPlans = async () => {
 // Función para que el usuario abandone un plan
 const leavePlan = async (planId: string) => {
     try {
-        const response = await axios.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
+        const response = await api.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
             headers: {
                 Authorization: `Bearer ${tokenStore}`
             }
@@ -86,7 +86,7 @@ const leavePlan = async (planId: string) => {
 // Función que obtiene los planes con solicitudes pendientes del usuario
 const getPendingRequests = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/plan/pendingRequest', {
+        const response = await api.get('http://localhost:8000/plan/pendingRequest', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`

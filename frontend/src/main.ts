@@ -5,9 +5,15 @@ import { createPinia } from 'pinia'
 // Hoja de estilos de Leaflet (mapas)
 import 'leaflet/dist/leaflet.css'
 import { useRegisterStore } from './stores/registerStore'
+// Importar configuración de la API
+import api from './api/index'
 
 // Crea una nueva instancia de la aplicación Vue
 const app = createApp(App)
+
+// Hacer la API disponible globalmente (opcional)
+app.config.globalProperties.$api = api
+
 // Crea una instancia de Pinia y la registra en la app
 const pinia = createPinia()
 app.use(pinia)

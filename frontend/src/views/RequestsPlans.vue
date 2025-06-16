@@ -35,7 +35,7 @@ import PlanFiltersMenu from '../components/PlanFiltersMenu.vue';
 /**
  * Importaciones necesarias para el manejo de estado, datos y ciclo de vida.
  */
-import axios from 'axios';
+import api from '../api/index';
 import { ref, onMounted } from 'vue';
 import { useRegisterStore } from '../stores/registerStore';
 import type { IPlan } from '../types/plan';
@@ -57,7 +57,7 @@ const requests = ref<IPlan[]>([]);
  */
 const getRequestsPlans = async () => {
     try {
-        const response = await axios.get('http://localhost:8000/plan/pending', {
+        const response = await api.get('http://localhost:8000/plan/pending', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`, // Se usa el token del usuario autenticado.
@@ -79,7 +79,7 @@ const getRequestsPlans = async () => {
 const approvePassenger = async (planId: string, passengerId: string) => {
     try {
         console.log(planId, passengerId);
-        const response = await axios.post(
+        const response = await api.post(
             `http://localhost:8000/plan/${planId}/passengers/${passengerId}/approve`,
             {},
             {
@@ -103,7 +103,7 @@ const approvePassenger = async (planId: string, passengerId: string) => {
  * Al igual que aprobar, hace un POST al endpoint correspondiente.
  */
 const rejectPassenger = async (planId: string, passengerId: string) => {
-    await axios.post(
+    await api.post(
         `http://localhost:8000/plan/${planId}/passengers/${passengerId}/reject`,
         {},
         {
@@ -126,4 +126,3 @@ onMounted(() => {
     getRequestsPlans();
 });
 </script>
-
