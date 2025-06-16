@@ -9,12 +9,17 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// Permitir múltiples orígenes
-const allowedOrigins = [
-  'http://localhost:5174',
-  'https://0pxkvm6c-5174.uks1.devtunnels.ms'
-]
-
+// Permitir múltiples orígenes: Desarrollo en local
+// const allowedOrigins = [
+//   'http://localhost:5174',       // Desarrollo local del frontend
+//   'http://localhost:5000',       // Frontend en Docker
+//   'https://0pxkvm6c-5174.uks1.devtunnels.ms' 
+// ]
+//En produccion:
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .filter(Boolean)
+  
 app.use(
   cors({
     origin: (origin, callback) => {

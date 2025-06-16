@@ -70,3 +70,16 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
         git fetch origin
     - Haz el merge del repositorio a tu rama local:
         git merge origin/main      #o lo que queramos coger, por ejemplo,  en develop: git merge origin/develop
+
+//DOCKER
+# Parar todo
+docker-compose down
+
+# Limpiar imágenes viejas
+docker-compose down --rmi all
+
+# Limpiar cache de build
+docker builder prune -a
+
+# Reconstruir desde cero
+docker-compose up --build
