@@ -95,6 +95,7 @@ import { useRegisterStore } from '../stores/registerStore';
 import { useRouter } from 'vue-router';
 import api from '../api/index';
 import { storeToRefs } from 'pinia';
+import { isAxiosError } from 'axios';
 
 // Validaciones
 import { validatePasswordChange } from '../validations/validationEditProfile';
@@ -142,7 +143,7 @@ const getUserData = async () => {
         });
         user.value = response.data.data;
         originalDni.value = response.data.data.dni || '';
-    } catch (error) {
+    } catch (error:unknown) {
         console.error(error);
         errorMessage.value = 'Error al obtener los datos del perfil';
         showErrorModal.value = true;
@@ -216,7 +217,7 @@ const updateUserData = async () => {
         successMessage.value = 'Tu perfil ha sido actualizado correctamente.';
         showSuccessModal.value = true;
     } catch (error: unknown) {
-        if (api.isAxiosError(error)) {
+        if (isAxiosError(error)) {
             errorMessage.value = error.response?.data?.message || 'Error desconocido';
         } else {
             errorMessage.value = 'Ha ocurrido un error desconocido.';
@@ -268,7 +269,7 @@ const performDeleteAccount = async () => {
         router.push('/register');
 
     } catch (error: unknown) {
-        if (api.isAxiosError(error)) {
+        if (isAxiosError(error)) {
             deleteError.value = error.response?.data?.message || 'Error al eliminar cuenta';
         } else {
             deleteError.value = 'Ha ocurrido un error inesperado.';

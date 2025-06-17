@@ -1,5 +1,6 @@
 // Importación de Axios para hacer peticiones HTTP y tipos para manejo de errores
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
+import api from '../api/index'
 // Importación de Pinia para definir un store global
 import { defineStore } from 'pinia'
 
