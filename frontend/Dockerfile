@@ -1,24 +1,31 @@
-# Imagen base con Node.js
-FROM node:22
+# Etapa de construcción
+FROM node:22 as builder
 
-# Directorio de trabajo
 WORKDIR /app
 
-# Copiar dependencias e instalar
+# Copiar dependencias
 COPY package*.json ./
+
+# Instalar dependencias
 RUN npm install
 
-# Copiar el resto del proyecto
+# Copiar código fuente
 COPY . .
 
-# Construir el proyecto directamente con npx
-RUN npx --yes vue-tsc -b && npx vite build
+# Construir la aplicación
+RUN npx --yes vue-tsc -b && npx --yes vite build
 
-# Instalar serve globalmente
+# Etapa de producción
+FROM node:22-alpine
+
+# Instalar serve
 RUN npm install -g serve
 
-# Exponer el puerto
+# Copiar archivos construidos
+COPY --from=builder /app/dist /app/dist
+
+WORKDIR /app
+
 EXPOSE 5000
 
-# Comando para correr la app
 CMD ["serve", "-s", "dist", "-l", "5000"]
