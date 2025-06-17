@@ -71,6 +71,12 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
     - Haz el merge del repositorio a tu rama local:
         git merge origin/main      #o lo que queramos coger, por ejemplo,  en develop: git merge origin/develop
 
+//En tu PC (Windows), asegurate de estar en la carpeta correcta:
+    cd C:\Users\CRISTIAN\Desktop\QuepoTeam
+//forzar LF solo en este repositorio
+    git config core.autocrlf input
+
+
 //DOCKER
 # Parar todo
 docker-compose down

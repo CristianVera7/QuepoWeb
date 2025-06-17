@@ -85,12 +85,13 @@
 // Importación de componentes auxiliares y dependencias
 import NavMenuMobile from '../components/NavMenuMobile.vue'
 import Sponsors from '../components/Sponsors.vue'
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { validateForm } from '../validations/validationUser'
 import { useRegisterStore } from '../stores/registerStore'
 import { type IUser } from '../types/user'
+import api from '../api'
 
 // Hooks de Vue Router
 const route = useRoute()
@@ -127,7 +128,7 @@ const registerUser = async () => {
 
     try {
         // Petición POST al backend para registrar nuevo usuario
-        const response = await api.post('http://localhost:8000/user/register', user.value)
+        const response = await api.post('/user/register', user.value)
 
         // Si ya existe, muestra alerta
         if (response.data.ok === false) return alert('Este usuario ya existe')
