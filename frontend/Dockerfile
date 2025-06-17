@@ -4,20 +4,23 @@ FROM node:22
 # Directorio de trabajo
 WORKDIR /app
 
-# Copiar dependencias
+# Copiar dependencias e instalar
 COPY package*.json ./
 RUN npm install
 
-# Copiar resto del proyecto
+# 🔧 Solución clave: dar permisos de ejecución a vue-tsc
+RUN chmod +x node_modules/.bin/vue-tsc
+
+# Copiar el resto del proyecto
 COPY . .
 
 # Construir el proyecto
 RUN npm run build
 
-# Servir con serve
+# Instalar serve globalmente
 RUN npm install -g serve
 
-# Exponer puerto
+# Exponer el puerto
 EXPOSE 5000
 
 # Comando para correr la app
