@@ -93,3 +93,22 @@ docker builder prune -a
 
 # Reconstruir desde cero
 docker-compose up --build
+
+# Para parar el servidor:
+<!-- Si tienes el comando corriendo en la terminal, solo tienes que hacer: -->
+
+Ctrl + C
+<!-- Esto detiene los contenedores levantados por docker-compose up. -->
+
+<!-- Si lo dejaste corriendo en segundo plano (con -d, modo "detached"), entonces: -->
+
+docker-compose down
+<!-- Esto detiene y elimina los contenedores, pero NO borra tus volúmenes o imágenes. -->
+
+# Para volver a arrancar el servidor:
+<!-- Si ya construiste con --build una vez, ya no necesitas hacerlo de nuevo a menos que hayas cambiado el Dockerfile u otra configuración. Puedes simplemente hacer: -->
+docker-compose up
+
+# Si hiciste cambios y quieres reconstruir:
+
+docker-compose up --build

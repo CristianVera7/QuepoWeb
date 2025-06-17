@@ -80,7 +80,7 @@ const approvePassenger = async (planId: string, passengerId: string) => {
     try {
         console.log(planId, passengerId);
         const response = await api.post(
-            `http://localhost:8000/plan/${planId}/passengers/${passengerId}/approve`,
+            `/plan/${planId}/passengers/${passengerId}/approve`,
             {},
             {
                 headers: {
@@ -104,7 +104,7 @@ const approvePassenger = async (planId: string, passengerId: string) => {
  */
 const rejectPassenger = async (planId: string, passengerId: string) => {
     await api.post(
-        `http://localhost:8000/plan/${planId}/passengers/${passengerId}/reject`,
+        `/plan/${planId}/passengers/${passengerId}/reject`,
         {},
         {
             headers: {

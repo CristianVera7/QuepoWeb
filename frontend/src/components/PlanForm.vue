@@ -266,7 +266,7 @@ const loadPlanData = async () => {
         console.log('Cargando plan con ID:', planId)
 
         // Llamada a la API para obtener los datos del plan
-        const response = await api.get(`http://localhost:8000/plan/getPlanById/${planId}`, {
+        const response = await api.get(`/plan/getPlanById/${planId}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -396,7 +396,7 @@ const deletePlan = async () => {
         const planId = getPlanId.value
 
         // Llamada a la API para eliminar el plan
-        await api.delete(`http://localhost:8000/plan/delete/${planId}`, {
+        await api.delete(`/plan/delete/${planId}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -442,7 +442,7 @@ const submitForm = async () => {
 
         if (props.isEditMode) {
             // FLUJO DE ACTUALIZACIÓN
-            await api.put(`http://localhost:8000/plan/update/${getPlanId.value}`, dataToSubmit, {
+            await api.put(`/plan/update/${getPlanId.value}`, dataToSubmit, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${tokenStore}`
