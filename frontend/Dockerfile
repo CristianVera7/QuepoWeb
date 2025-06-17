@@ -3,6 +3,9 @@ FROM node:22 as builder
 
 WORKDIR /app
 
+# Instalar vue-tsc globalmente
+RUN npm install -g vue-tsc@latest vite@latest
+
 # Copiar dependencias
 COPY package*.json ./
 
@@ -12,8 +15,8 @@ RUN npm install
 # Copiar código fuente
 COPY . .
 
-# Construir la aplicación
-RUN npx --yes vue-tsc -b && npx --yes vite build
+# Construir usando los binarios globales
+RUN vue-tsc -b && vite build
 
 # Etapa de producción
 FROM node:22-alpine
