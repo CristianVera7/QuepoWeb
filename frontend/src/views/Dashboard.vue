@@ -61,7 +61,7 @@ const showModal = ref(true)
 const listOfPlans = async () => {
     try {
         console.log("PASAMOS POR AQUI 👌");
-        const response = await api.get('http://localhost:8000/plan/list', {
+        const response = await api.get('/plan/list', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
@@ -157,7 +157,7 @@ const leavePlan = async (planId: string) => {
 // Obtiene las solicitudes pendientes del usuario (planes en los que pidió unirse)
 const getPendingRequests = async () => {
     try {
-        const response = await api.get('http://localhost:8000/plan/pendingRequest', {
+        const response = await api.get('/plan/pendingRequest', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`

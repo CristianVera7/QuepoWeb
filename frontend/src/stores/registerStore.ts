@@ -87,8 +87,7 @@ export const useRegisterStore = defineStore('registerUser', {
                 }
 
                 const params = { email: this.emailStore }
-                const URI = 'http://localhost:8000'
-                const response = await api.post(`${URI}/user/find`, params)
+                const response = await api.post(`/user/find`, params)
 
                 // Si el usuario no existe, limpia todo
                 if (!response.data.ok) {
@@ -116,9 +115,8 @@ export const useRegisterStore = defineStore('registerUser', {
                     return
                 }
 
-                const URI = 'http://localhost:8000'
                 const tokenHeader = { Authorization: 'Bearer ' + this.tokenStore }
-                const response = await api.get(`${URI}/isLoged`, { headers: tokenHeader })
+                const response = await api.get(`/isLoged`, { headers: tokenHeader })
 
                 // Si el token no es válido, lo elimina y actualiza estado
                 if (!response.data.ok) {
@@ -146,7 +144,7 @@ export const useRegisterStore = defineStore('registerUser', {
                 return
             }
             try {
-                const response = await api.get(`http://localhost:8000/user/hasDni`, {
+                const response = await api.get(`/user/hasDni`, {
                     headers: {
                         Authorization: 'Bearer ' + this.tokenStore
                     }

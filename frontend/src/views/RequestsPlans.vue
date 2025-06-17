@@ -57,7 +57,7 @@ const requests = ref<IPlan[]>([]);
  */
 const getRequestsPlans = async () => {
     try {
-        const response = await api.get('http://localhost:8000/plan/pending', {
+        const response = await api.get('/plan/pending', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`, // Se usa el token del usuario autenticado.

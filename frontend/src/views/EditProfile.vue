@@ -135,7 +135,7 @@ const repeatNewPassword = ref('');
 // Obtiene los datos del usuario logueado al cargar la vista
 const getUserData = async () => {
     try {
-        const response = await api.get('http://localhost:8000/user/get', {
+        const response = await api.get('/user/get', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -143,7 +143,7 @@ const getUserData = async () => {
         });
         user.value = response.data.data;
         originalDni.value = response.data.data.dni || '';
-    } catch (error:unknown) {
+    } catch (error: unknown) {
         console.error(error);
         errorMessage.value = 'Error al obtener los datos del perfil';
         showErrorModal.value = true;
@@ -206,7 +206,7 @@ const updateUserData = async () => {
             }
         }
 
-        const response = await api.put('http://localhost:8000/user/update', user.value, {
+        const response = await api.put('/user/update', user.value, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -253,7 +253,7 @@ const performDeleteAccount = async () => {
     }
 
     try {
-        await api.delete('http://localhost:8000/user/delete', {
+        await api.delete('/user/delete', {
             data: { password: deletePassword.value },
             headers: {
                 'Content-Type': 'application/json',

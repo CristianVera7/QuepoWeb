@@ -452,7 +452,7 @@ const submitForm = async () => {
             emit('plan-updated', planData.value.title)
         } else {
             // FLUJO DE CREACIÓN
-            await api.post('http://localhost:8000/plan/create', dataToSubmit, {
+            await api.post('/plan/create', dataToSubmit, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${tokenStore}`
