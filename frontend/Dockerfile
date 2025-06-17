@@ -8,13 +8,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# 🔧 Solución clave: dar permisos de ejecución a vue-tsc
-RUN chmod +x node_modules/.bin/vue-tsc
-
 # Copiar el resto del proyecto
 COPY . .
 
-# Construir el proyecto
+# Construir el proyecto (npx maneja los permisos automáticamente)
 RUN npm run build
 
 # Instalar serve globalmente
