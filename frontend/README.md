@@ -74,7 +74,7 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
 
 # En el servidor
     ssh cristian@109.205.183.241
-    cd~quepoteam
+    cd ~/quepoteam
 <!-- Eliminar tus cambios locales y archivos no versionados que bloquean el pull
 Tené cuidado, esto borra TODO local que no esté en el repo remoto. -->
 
