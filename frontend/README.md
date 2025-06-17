@@ -71,10 +71,20 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
     - Haz el merge del repositorio a tu rama local:
         git merge origin/main      #o lo que queramos coger, por ejemplo,  en develop: git merge origin/develop
 
-//En tu PC (Windows), asegurate de estar en la carpeta correcta:
-    cd C:\Users\CRISTIAN\Desktop\QuepoTeam
-//forzar LF solo en este repositorio
-    git config core.autocrlf input
+
+# En el servidor
+    ssh cristian@109.205.183.241
+    cd~quepoteam
+<!-- Eliminar tus cambios locales y archivos no versionados que bloquean el pull
+Tené cuidado, esto borra TODO local que no esté en el repo remoto. -->
+
+# Limpia los cambios en tracked files
+    git reset --hard
+
+# Borra archivos no versionados y directorios (como frontend/.env)
+    git clean -fd
+<!-- Ahora sí, podés hacer pull sin problemas -->
+    git pull origin master
 
 
 //DOCKER
