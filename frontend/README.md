@@ -1,9 +1,3 @@
-# Vue 3 + TypeScript + Vite
-
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 <script setup> SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
-
 1. Solo uno del equipo debe hacerlo (YA ESTÁ HECHO)
 
     git checkout -b develop                  # Crear la rama develop desde main
@@ -74,16 +68,16 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
 
 # En el servidor
     ssh cristian@109.205.183.241
-    cd~quepoteam
+    cd ~/quepoteam
 <!-- Eliminar tus cambios locales y archivos no versionados que bloquean el pull
-Tené cuidado, esto borra TODO local que no esté en el repo remoto. -->
+Ten cuidado, esto borra TODO local que no esté en el repo remoto. -->
 
 # Limpia los cambios en tracked files
     git reset --hard
 
 # Borra archivos no versionados y directorios (como frontend/.env)
     git clean -fd
-<!-- Ahora sí, podés hacer pull sin problemas -->
+<!-- Ahora sí, puedes hacer pull sin problemas -->
     git pull origin master
 
 
