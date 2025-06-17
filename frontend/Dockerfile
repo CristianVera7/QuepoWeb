@@ -11,8 +11,8 @@ RUN npm install
 # Copiar el resto del proyecto
 COPY . .
 
-# Construir el proyecto (npx maneja los permisos automáticamente)
-RUN npm run build
+# Construir el proyecto directamente con npx
+RUN npx --yes vue-tsc -b && npx vite build
 
 # Instalar serve globalmente
 RUN npm install -g serve
