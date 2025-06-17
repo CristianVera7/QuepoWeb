@@ -40,7 +40,7 @@ const onFilteredPlansUpdate = (plans: IPlan[]) => {
 // Función que obtiene los planes del usuario desde el backend
 const listOfPlans = async () => {
     try {
-        const response = await api.get('http://localhost:8000/plan/myPlans', {
+        const response = await api.get('/plan/myPlans', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
@@ -86,7 +86,7 @@ const leavePlan = async (planId: string) => {
 // Función que obtiene los planes con solicitudes pendientes del usuario
 const getPendingRequests = async () => {
     try {
-        const response = await api.get('http://localhost:8000/plan/pendingRequest', {
+        const response = await api.get('/plan/pendingRequest', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`

@@ -65,7 +65,7 @@ const highlightRequests = ref(false)
 // Función para verificar notificaciones (planes pendientes o perfil incompleto)
 const checkNotifications = async () => {
     try {
-        const response = await api.get('http://localhost:8000/plan/pending', {
+        const response = await api.get('/plan/pending', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
