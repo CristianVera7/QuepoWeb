@@ -12,12 +12,15 @@ const PORT = process.env.PORT || 3000
 // CORS ABIERTO - PERMITE TODOS LOS ORÍGENES
 app.use(
   cors({
-    origin: true, // o simplemente: origin: '*'
+    origin: true, // permite todos los orígenes
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 )
+
+// Maneja las peticiones OPTIONS para cualquier ruta - muy importante para CORS
+app.options('*', cors())
 
 app.use(express.json())
 
