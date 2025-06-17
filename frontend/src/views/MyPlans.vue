@@ -66,7 +66,7 @@ const listOfPlans = async () => {
 // Función para que el usuario abandone un plan
 const leavePlan = async (planId: string) => {
     try {
-        const response = await api.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
+        const response = await api.delete(`/plan/passengerDelete/${planId}`, {
             headers: {
                 Authorization: `Bearer ${tokenStore}`
             }

@@ -90,7 +90,7 @@ const onFilteredPlansUpdate = (plans: IPlan[]) => {
 const joinPlan = async (payload: { planId: string, message: string }) => {
     await checkUser()
     try {
-        const response = await api.post(`http://localhost:8000/plan/join/${payload.planId}`, { message: payload.message }, {
+        const response = await api.post(`/plan/join/${payload.planId}`, { message: payload.message }, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${tokenStore}`
@@ -110,7 +110,7 @@ const joinPlan = async (payload: { planId: string, message: string }) => {
 // En el componente padre
 const cancelRequest = async (planId: string) => {
     try {
-        const response = await api.delete(`http://localhost:8000/plans/${planId}/cancel-request`, {
+        const response = await api.delete(`/plans/${planId}/cancel-request`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tokenStore}`
@@ -132,7 +132,7 @@ const cancelRequest = async (planId: string) => {
 // Permite abandonar un plan al que ya se unió
 const leavePlan = async (planId: string) => {
     try {
-        const response = await api.delete(`http://localhost:8000/plan/passengerDelete/${planId}`, {
+        const response = await api.delete(`/plan/passengerDelete/${planId}`, {
             headers: {
                 Authorization: `Bearer ${tokenStore}`
             }

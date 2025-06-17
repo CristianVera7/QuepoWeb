@@ -7,19 +7,18 @@ import connect from './dbConnect/dbConnect'
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const DEFAULT_PORT = 3000
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT
 
-// CORS ABIERTO - PERMITE TODOS LOS ORÍGENES
 app.use(
   cors({
-    origin: true, // permite todos los orígenes
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 )
 
-// Maneja las peticiones OPTIONS para cualquier ruta - muy importante para CORS
 app.options('*', cors())
 
 app.use(express.json())
@@ -27,6 +26,26 @@ app.use(express.json())
 connect()
 routing(app)
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port: ${PORT}`)
-})
+function startServer(portToTry: number) {
+  const server = app.listen(portToTry, () => {
+    console.log(`🚀 Server running on port: ${portToTry}`)
+  })
+
+  server.on('error', (err) => {
+    const error = err as NodeJS.ErrnoException; // err puede tener 'code'
+
+    if (error.code === 'EADDRINUSE') {
+      console.warn(`⚠️ Port ${portToTry} is in use, trying port ${DEFAULT_PORT}`)
+      if (portToTry !== DEFAULT_PORT) {
+        startServer(DEFAULT_PORT)
+      } else {
+        console.error('No available ports found.')
+      }
+    } else {
+      console.error(err)
+    }
+  })
+}
+
+
+startServer(PORT)

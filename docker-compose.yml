@@ -8,7 +8,7 @@ services:
       - "8000:8000"
     environment:
       PORT: "8000"
-      URLDB: "mongodb://db:27017/quepoDB"
+      URLDB: "mongodb://db:27017/quepoDB_prod"
       TOKEN_SECRET: "TokenTotalmenteSecreto"
       TOKEN_EXPIRES: "18000000"
       ALLOWED_ORIGINS: "http://62.175.45.209:5000"
