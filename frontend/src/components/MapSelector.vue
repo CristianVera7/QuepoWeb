@@ -49,19 +49,6 @@ import api from '../api/index'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// Arreglar la ruta del icono para producción
-(delete (L.Icon.Default.prototype as any)._getIconUrl);
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 // Define la estructura de coordenadas geográficas
 interface Coordinates {
     lat: number | null;
@@ -277,18 +264,17 @@ const onMapClick = async (e: L.LeafletMouseEvent) => {
     }
 }
 
-// Convierte direcciones de texto a coordenadas usando la API de Nominatim
+// Convierte direcciones de texto a coordenadas usando tu backend como proxy
 const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: boolean = false) => {
     const query = address.value[type]
-    if (!query || query.length < 3) return // Validación mínima de entrada
+    if (!query || query.length < 3) return
 
     try {
         loading.value = true
-        await handleNominatimRateLimit() // Respetar límites de la API
+        await handleNominatimRateLimit()
 
-        // Llamada a la API de geocodificación
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&accept-language=es&limit=5`
-        const response = await api.get<NominatimResponse[]>(url)
+        // CAMBIO: Usar tu backend en lugar de llamada directa
+        const response = await api.get<NominatimResponse[]>(`/map/geocode?q=${encodeURIComponent(query)}`)
 
         if (response.data.length === 0) {
             if (!skipNotification) {
@@ -297,12 +283,10 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
             return
         }
 
-        // Mostrar alternativas al usuario si hay múltiples resultados significativamente diferentes
         if (response.data.length > 1 && !skipNotification) {
             const firstResult = response.data[0]
             const alternatives = response.data.slice(1, 3)
 
-            // Verificar si las alternativas son realmente diferentes
             const areAlternativesDifferent = alternatives.some((alt: NominatimResponse) => {
                 return alt.display_name.split(',')[0] !== firstResult.display_name.split(',')[0]
             })
@@ -314,14 +298,12 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
             }
         }
 
-        // Procesar el resultado principal y actualizar el estado
         const { lat, lon } = response.data[0]
         const parsedLat = parseFloat(lat)
         const parsedLng = parseFloat(lon)
 
         coords.value[type] = { lat: parsedLat, lng: parsedLng }
 
-        // Simplificar la dirección mostrada al usuario
         if (!skipNotification) {
             address.value[type] = response.data[0].display_name.split(',').slice(0, 3).join(',')
         }
@@ -341,7 +323,6 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
                 .openPopup()
         }
 
-        // Centrar mapa en la nueva ubicación
         leafletMap?.setView([parsedLat, parsedLng], 13)
     } catch (error) {
         console.error('Error al geocodificar:', error)
@@ -353,21 +334,19 @@ const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: 
     }
 }
 
-// Convierte coordenadas a direcciones legibles
+// Convierte coordenadas a direcciones legibles usando tu backend como proxy
 const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     try {
         await handleNominatimRateLimit()
 
-        // Llamada a la API de geocodificación inversa
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=es`
-        const response = await api.get<NominatimResponse>(url)
+        // CAMBIO: Usar tu backend en lugar de llamada directa
+        const response = await api.get<NominatimResponse>(`/map/reverse-geocode?lat=${lat}&lon=${lng}`)
 
         if (!response.data || !response.data.address) {
             showNotification('No se pudo determinar la dirección de esta ubicación', 'error')
             return 'Ubicación desconocida'
         }
 
-        // Construir dirección legible desde los componentes de dirección
         const a = response.data.address
         return [a.road || a.street || a.path || '', a.city || a.town || a.village || '', a.country || ''].filter(Boolean).join(', ')
     } catch (error) {

@@ -79,9 +79,9 @@ function routing(app: Express): void {
 
   // ---------------- MAP ROUTES ----------------
   // Obtiene coordenadas geográficas a partir de una dirección
-  // app.get('/map/geocode', map.geocode)
+  app.get('/map/geocode', map.geocode)
 
-  // app.get('/map/reverse-geocode', map.reverseGeocode);
+  app.get('/map/reverse-geocode', map.reverseGeocode);
 }
 
 export default routing    // Exporta la función para ser utilizada en la inicialización del servidor

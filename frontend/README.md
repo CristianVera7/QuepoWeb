@@ -93,7 +93,7 @@ docker-compose down --rmi all
 docker builder prune -a
 
 # Reconstruir desde cero
-docker-compose up --build
+<!-- docker-compose up --build -->
 <!--Para dejarlo corriendo en segundo plano-->
 docker-compose up --build -d
 
