@@ -1,24 +1,18 @@
-import mongoose from 'mongoose'
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-const isDocker = process.env.IS_DOCKER === 'true'
-
-// Garantiza que URLDB sea un string siempre
-const URLDB: string = isDocker
-  ? process.env.URLDB ?? ''
-  : 'mongodb://localhost:27018/quepoDB'
-
+import mongoose from 'mongoose'                                          // Importa Mongoose para conectarse a MongoDB
+import dotenv from 'dotenv'                                              // Importa dotenv para leer variables de entorno
+dotenv.config()                                                          // Carga las variables definidas en el archivo .env
+const URLDB = process.env.URLDB || 'mongodb://db:27017/quepoDB_prod'     // Toma la URL de conexión a la base de datos desde las variables de entorno
+// Si no se encuentra la URL, lanza un error para evitar intentar conectarse
 if (!URLDB) {
-  throw new Error('❌ URLDB no está definida')
+  throw new Error('URLDB no está definida en el archivo .env')
 }
-
-export default async function connect(): Promise<void> {
+// Función asíncrona que realiza la conexión a la base de datos
+export default async function connect() {
   try {
+    // Intenta conectar a MongoDB con la URL especificada
     await mongoose.connect(URLDB)
-    console.log(`✅ Conexión con DB realizada: ${URLDB}`)
+    console.log('Conexion con DB realizada', URLDB)   // Si tiene éxito, imprime mensaje de confirmación
   } catch (err) {
-    console.error('❌ Error conectando a la DB:', err)
+    console.log(err)                           // En caso de error, lo muestra por consola
   }
 }

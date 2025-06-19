@@ -65,6 +65,7 @@
     - Haz el merge del repositorio a tu rama local:
         git merge origin/main      #o lo que queramos coger, por ejemplo,  en develop: git merge origin/develop
 
+######
 
 # En el servidor
     ssh cristian@109.205.183.241
@@ -94,9 +95,10 @@ docker builder prune -a
 # Reconstruir desde cero
 docker-compose up --build
 
+######
+
 # Para parar el servidor:
 <!-- Si tienes el comando corriendo en la terminal, solo tienes que hacer: -->
-
 Ctrl + C
 <!-- Esto detiene los contenedores levantados por docker-compose up. -->
 
