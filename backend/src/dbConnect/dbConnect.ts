@@ -11,7 +11,9 @@ export default async function connect() {
   try {
     // Intenta conectar a MongoDB con la URL especificada
     await mongoose.connect(URLDB)
+    
     console.log('Conexion con DB realizada', URLDB)   // Si tiene éxito, imprime mensaje de confirmación
+
   } catch (err) {
     console.log(err)                           // En caso de error, lo muestra por consola
   }

@@ -1,4 +1,4 @@
-1. Solo uno del equipo debe hacerlo (YA ESTÁ HECHO)
+
 
     git checkout -b develop                  # Crear la rama develop desde main
     git push origin develop                  # Subir develop a GitHub
