@@ -8,6 +8,14 @@
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
+    @include mix.respond-max(xxs) {
+        margin: 1rem;
+    }
+
+    @include mix.respond-between(xxs, xl) {
+        margin: 1rem;
+    }
+
     .tittlePlan {
         font-size: 1.75rem;
         margin-bottom: 1.5rem;
@@ -15,8 +23,8 @@
         text-align: center;
     }
 
-    .noRequest{
-        color:#2e7d32;
+    .noRequest {
+        color: #2e7d32;
     }
 }
 
@@ -44,7 +52,7 @@
         border: 1px solid #edf2f7;
 
         .passengerInfo {
-            max-width: 60%;
+            // max-width: 60%;
 
             h4 {
                 display: flex;
@@ -55,7 +63,7 @@
             }
 
             p {
-                margin: 0.25rem 0 0 0;
+                margin: 0.25rem;
                 font-size: 1rem;
                 color: #2e7d32;
             }
@@ -93,7 +101,7 @@
             }
         }
     }
-    
+
 }
 
 @include mix.respond-max(md) {
@@ -133,20 +141,24 @@
     }
 }
 
-@include mix.respond-max(xs)  {
+@include mix.respond-between(xxs, xs) {
     .planCard {
         .planTitle {
             font-size: 1.1rem;
+            width: 100%;
         }
     }
 
     .passengerCard {
         .passengerInfo {
+            display:grid;
+            gap:1rem;
             h4 {
-                font-size: 1rem;
+                
             }
 
             p {
+                display:contents;
                 font-size: 0.9rem;
             }
         }

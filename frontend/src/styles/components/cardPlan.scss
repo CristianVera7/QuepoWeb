@@ -286,6 +286,7 @@
     align-items: flex-start;
     padding: 1rem;
     width: 100%;
+    
 
     // Responsive grid adjustments
     @include mix.respond-max(xxs) {
@@ -297,6 +298,7 @@
     @include mix.respond-between(xxs, sm) {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1rem;
+        padding: 0.5rem;
     }
 
     @include mix.respond-between(sm, md) {
@@ -356,7 +358,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 35vw;
+            width: 30vw;
             height: 90vh;
             z-index: 1001;
             border-radius: 16px;
@@ -368,20 +370,19 @@
             border: 2px solid rgba(#4CAF50, 0.4);
 
             @include mix.respond-max(xxs) {
-                width: 70%;
+                width: 90%;
                 height: 90vh;
             }
-            @include mix.respond-between(xxs, md) {
-                width: 70%;
+            @include mix.respond-between(xxs, sm) {
+                width: 90%;
                 height: 90vh;
             }
 
-
-            @include mix.respond-between(md, +lg) {
+            @include mix.respond-between(sm, +lg) {
                 width: 65%;
             }
 
-            @include mix.respond-max(xl) {
+            @include mix.respond-between(+lg, xl) {
                 width: 50vw;
             }
 

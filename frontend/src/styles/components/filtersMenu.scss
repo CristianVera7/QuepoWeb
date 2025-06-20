@@ -19,9 +19,21 @@ $transition-default: all 0.3s ease;
     display: flex;
     align-items: center;
     place-content: center;
+    justify-content: space-around;
     margin: 3em 2rem;
     flex-wrap: wrap;
-    gap: 2.5rem;
+
+    @include mix.respond-max(xxs) {
+        text-align: center;
+        place-content: center;
+        // padding: 0;
+        margin:0;
+    }
+
+    @include mix.respond-between(xxs, sm) {
+        text-align: center;
+        place-content: center;
+    }
 
     // Estilos comunes para categorías y dateTime
     .categories,
@@ -30,6 +42,16 @@ $transition-default: all 0.3s ease;
         align-items: center;
         padding: 1rem;
         border-radius: $border-radius-md;
+
+        @include mix.respond-max(xxs) {
+            display: grid;
+            width: 70%;
+        }
+
+        @include mix.respond-between(xxs, sm) {
+            display: grid;
+            width: 70%;
+        }
 
         label {
             color: $color-white;
@@ -60,6 +82,18 @@ $transition-default: all 0.3s ease;
     .dateTime {
         flex-wrap: wrap;
 
+        label {
+            @include mix.respond-max(xxs) {
+                display: grid;
+                width: 100%;
+            }
+            @include mix.respond-between(xxs, sm) {
+                display: grid;
+                width: 100%;
+            }
+
+        }
+
         input {
             color: $color-white;
             background-color: $color-bg-main;
@@ -68,6 +102,15 @@ $transition-default: all 0.3s ease;
             border: 1px solid $color-white;
             margin-right: 1.5rem;
             width: 140px;
+
+            @include mix.respond-max(xxs) {
+                display: grid;
+                width: 100%;
+            }
+            @include mix.respond-between(xxs, sm) {
+                display: grid;
+                width: 100%;
+            }
 
             &::placeholder {
                 color: rgba(255, 255, 255, 0.6);
@@ -87,6 +130,18 @@ $transition-default: all 0.3s ease;
         padding: 1rem;
         border-radius: $border-radius-md;
         flex-wrap: wrap;
+
+        @include mix.respond-max(xxs) {
+            text-align: center;
+            place-content: center;
+            width: 100%;
+        }
+
+        @include mix.respond-between(xxs, sm) {
+            text-align: center;
+            place-content: center;
+            width: 100%;
+        }
 
         button {
             background-color: $color-white;
@@ -201,8 +256,7 @@ $transition-default: all 0.3s ease;
         color: $color-white;
     }
 
-    .flatpickr-days {
-    }
+    .flatpickr-days {}
 
     // Días
     .flatpickr-day {
@@ -328,7 +382,7 @@ $transition-default: all 0.3s ease;
 
 // Agrupación de media queries al final
 
-@include mix.respond-max(+lg)  {
+@include mix.respond-max(+lg) {
     .headerDashboard {
         flex-wrap: wrap;
 
@@ -427,7 +481,7 @@ $transition-default: all 0.3s ease;
     }
 }
 
-@include mix.respond-max(sm)  {
+@include mix.respond-max(sm) {
     .filters {
         margin: 1.5em 0.5rem;
         gap: 1rem;
@@ -523,7 +577,7 @@ $transition-default: all 0.3s ease;
     }
 }
 
-@include mix.respond-max(xs)  {
+@include mix.respond-max(xs) {
     .flatpickr-calendar {
         width: 290px;
     }
