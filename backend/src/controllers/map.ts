@@ -163,4 +163,93 @@ async function reverseGeocode(req: Request, res: Response, next: NextFunction): 
   }
 }
 
-export default { geocode, reverseGeocode };
+// En tu controlador de mapas
+async function calculateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { coordinates } = req.body;
+    
+    if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+      res.status(400).json({
+        message: 'Se requieren exactamente 2 coordenadas [lng, lat] para origen y destino.',
+        ok: false
+      });
+      return;
+    }
+
+    // Validar formato de coordenadas
+    const [origin, destination] = coordinates;
+    if (!Array.isArray(origin) || !Array.isArray(destination) || 
+        origin.length !== 2 || destination.length !== 2) {
+      res.status(400).json({
+        message: 'Formato de coordenadas inválido. Debe ser [[lng, lat], [lng, lat]].',
+        ok: false
+      });
+      return;
+    }
+
+    const apiKey = '5b3ce3597851110001cf62483f8191c887b24389bc8fbfa5b3f59671'; // Mejor moverlo a variables de entorno
+
+    const response = await axios.post(
+      'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
+      { coordinates },
+      {
+        headers: {
+          'Authorization': apiKey,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000 // 15 segundos
+      }
+    );
+
+    res.status(200).json({
+      ok: true,
+      data: response.data
+    });
+
+  } catch (error: any) {
+    console.error('Error al calcular ruta:', error);
+
+    if (error.response) {
+      // Error de la API de OpenRouteService
+      const status = error.response.status;
+      let message = 'Error al calcular la ruta';
+
+      switch (status) {
+        case 400:
+          message = 'Coordenadas inválidas o no accesibles por carretera';
+          break;
+        case 401:
+        case 403:
+          message = 'Error de autenticación con el servicio de rutas';
+          break;
+        case 404:
+          message = 'No se encontró una ruta entre estos puntos';
+          break;
+        case 429:
+          message = 'Límite de peticiones excedido. Intenta más tarde';
+          break;
+        case 500:
+        case 503:
+          message = 'Servicio de rutas temporalmente no disponible';
+          break;
+      }
+
+      res.status(status).json({
+        message,
+        ok: false
+      });
+    } else if (error.code === 'ECONNABORTED') {
+      res.status(408).json({
+        message: 'Timeout al calcular la ruta',
+        ok: false
+      });
+    } else {
+      res.status(500).json({
+        message: 'Error interno al calcular la ruta',
+        ok: false
+      });
+    }
+  }
+}
+
+export default { geocode, reverseGeocode, calculateRoute };
