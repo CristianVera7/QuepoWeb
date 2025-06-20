@@ -2,7 +2,7 @@ import { type Express } from 'express'                       // Importa el tipo 
 import user from '../controllers/user'                       // Importa el controlador de usuarios
 import plan from '../controllers/plan'                       // Importa el controlador de planes
 import authController from '../controllers/authController'   // Importa el controlador de autenticación
-import map from '../controllers/map'                         // Importa el controlador de mapas
+// import map from '../controllers/map'                         // Importa el controlador de mapas
 
 function routing(app: Express): void {
 
@@ -77,11 +77,14 @@ function routing(app: Express): void {
   // Elimina la cuenta del usuario autenticado
   app.delete('/user/delete', authController.validateToken, user.deleteUser)
 
-  // ---------------- MAP ROUTES ----------------
-  // Obtiene coordenadas geográficas a partir de una dirección
-  app.get('/map/geocode', map.geocode)
+//   // ---------------- MAP ROUTES ----------------
+//   // Obtiene coordenadas geográficas a partir de una dirección
+//   app.get('/map/geocode', map.geocode)
 
-  app.get('/map/reverse-geocode', map.reverseGeocode);
+//   app.get('/map/reverse-geocode', map.reverseGeocode);
+
+//   // Agregar la ruta
+// app.post('/map/calculate-route', map.calculateRoute);
 }
 
 export default routing    // Exporta la función para ser utilizada en la inicialización del servidor

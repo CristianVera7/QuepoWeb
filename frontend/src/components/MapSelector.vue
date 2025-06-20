@@ -44,92 +44,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import api from '../api/index'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// Define la estructura de coordenadas geográficas
+// Configuración de iconos de Leaflet
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png'
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIconRetina,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow
+})
+
 interface Coordinates {
     lat: number | null;
     lng: number | null;
 }
 
-// Estado de las direcciones de texto ingresadas por el usuario
 interface AddressState {
     origin: string;
     destination: string;
 }
 
-// Estado del sistema de notificaciones
 interface NotificationState {
     message: string;
     type: 'info' | 'error' | 'success';
     visible: boolean;
 }
 
-// Respuesta de la API de geocodificación Nominatim
-interface NominatimResponse {
-    display_name: string;
-    lat: string;
-    lon: string;
-    address?: {
-        road?: string;
-        street?: string;
-        path?: string;
-        city?: string;
-        town?: string;
-        village?: string;
-        country?: string;
-        [key: string]: string | undefined;
-    };
+interface OpenCageResponse {
+    results: Array<{
+        formatted: string;
+        geometry: { lat: number; lng: number };
+    }>;
+    status: { code: number; message: string };
 }
 
-// Props: recibe datos de ruta existente del componente padre
 const props = defineProps<{
     initialRoute?: {
-        location: {
-            origin: string;
-            destination: string;
-        };
+        location: { origin: string; destination: string };
         distance: string;
         duration: string;
     } | null;
 }>()
 
-// Emit: comunica datos de ruta calculada al componente padre
 const emit = defineEmits<{
     (e: 'route-confirmed', data: {
-        origin: string
-        destination: string
-        duration: string
-        distance: string
+        origin: string;
+        destination: string;
+        duration: string;
+        distance: string;
     }): void
 }>()
 
-const mapRef = ref<HTMLElement | null>(null) // Referencia al elemento DOM del mapa
-const apiKey = '5b3ce3597851110001cf62483f8191c887b24389bc8fbfa5b3f59671' // API key para OpenRouteService
-const loading = ref(false) // Estado de carga global
-const notification = ref<NotificationState>({ message: '', type: 'info', visible: false }) // Sistema de notificaciones
-const address = ref<AddressState>({ origin: '', destination: '' }) // Direcciones de texto
+// CONFIGURACIÓN DE API KEYS
+const OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY || ''
+const OPENROUTE_API_KEY = import.meta.env.VITE_OPENROUTE_API_KEY || '5b3ce3597851110001cf62483f8191c887b24389bc8fbfa5b3f59671'
+
+// REFERENCIAS DEL DOM Y ESTADOS
+const mapRef = ref<HTMLElement | null>(null)
+const loading = ref(false)
+const notification = ref<NotificationState>({ message: '', type: 'info', visible: false })
+const address = ref<AddressState>({ origin: '', destination: '' })
 const coords = ref({
     origin: { lat: null as number | null, lng: null as number | null },
     destination: { lat: null as number | null, lng: null as number | null },
-}) // Coordenadas geográficas
+})
 const route = ref({
     origin: '',
     destination: '',
     distance: '',
     duration: '',
-}) // Datos de la ruta calculada
+})
 
-// Referencias a elementos del mapa que se manejan imperativamente
 let leafletMap: L.Map | null = null
 let originMarker: L.Marker | null = null
 let destinationMarker: L.Marker | null = null
 let routeLayer: L.Polyline | null = null
 
-// Verifica si hay datos de ruta existente del componente padre
+// PROPIEDADES COMPUTADAS
 const existingRouteData = computed(() => {
     return props.initialRoute &&
         props.initialRoute.location &&
@@ -137,383 +134,241 @@ const existingRouteData = computed(() => {
         props.initialRoute.location.destination
 })
 
-// Determina si se puede calcular una ruta (ambas coordenadas están disponibles)
 const isRouteReady = computed(() => {
     return !!(coords.value.origin.lat && coords.value.destination.lat)
 })
 
-// Configura el mapa Leaflet y sus event listeners
-const initializeMap = () => {
+// INICIALIZACIÓN DEL MAPA
+const initializeMap = async () => {
     if (!mapRef.value) return
-
-    // Crear instancia del mapa centrado en Madrid
-    leafletMap = L.map(mapRef.value).setView([40.4168, -3.7038], 6)
-
-    // Agregar capa de tiles de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(leafletMap)
-
-    // Event listener para clics en el mapa
-    leafletMap.on('click', onMapClick)
-
-    // Actualizar mapa con coordenadas existentes si las hay
-    updateMapWithExistingCoords()
+    try {
+        leafletMap = L.map(mapRef.value).setView([40.4168, -3.7038], 6)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap) 
+        leafletMap.on('click', onMapClick)
+        setTimeout(() => {
+            if (leafletMap) leafletMap.invalidateSize()
+        }, 100)
+        updateMapWithExistingCoords()
+    } catch (err) {
+        console.error('Error al inicializar el mapa:', err)
+        showNotification('Error al cargar el mapa.', 'error')
+    }
 }
 
-// Procesa y carga datos de ruta existente cuando el componente recibe props iniciales
+// CARGAR DATOS EXISTENTES
 const loadExistingRouteData = async () => {
     if (!existingRouteData.value) return
-
     try {
         loading.value = true
-
-        // Copiar datos de la prop inicial al estado local
         address.value.origin = props.initialRoute!.location.origin
         address.value.destination = props.initialRoute!.location.destination
-        route.value.origin = props.initialRoute!.location.origin
-        route.value.destination = props.initialRoute!.location.destination
-        route.value.distance = props.initialRoute!.distance
-        route.value.duration = props.initialRoute!.duration
-
-        // Convertir direcciones de texto a coordenadas
         await geocodeAddress('origin', true)
         await geocodeAddress('destination', true)
-
-        // Dibujar la ruta en el mapa si ambas coordenadas están disponibles
         if (coords.value.origin.lat && coords.value.destination.lat) {
             await calculateRoute(true)
         }
-    } catch (error) {
-        console.error('Error al cargar datos de ruta existente:', error)
-        showNotification('No se pudieron cargar los datos de la ruta existente', 'error')
     } finally {
         loading.value = false
     }
 }
 
-// Actualiza marcadores y vista del mapa basado en las coordenadas actuales
+// ACTUALIZAR MARCADORES EN EL MAPA
 const updateMapWithExistingCoords = () => {
     if (!leafletMap) return
-
-    // Crear/actualizar marcador de origen
     if (coords.value.origin.lat && coords.value.origin.lng) {
         if (originMarker) originMarker.remove()
-        originMarker = L.marker([coords.value.origin.lat, coords.value.origin.lng])
-            .addTo(leafletMap)
-            .bindPopup('Origen')
+        originMarker = L.marker([coords.value.origin.lat, coords.value.origin.lng]).addTo(leafletMap).bindPopup('Origen')
     }
-
-    // Crear/actualizar marcador de destino
     if (coords.value.destination.lat && coords.value.destination.lng) {
         if (destinationMarker) destinationMarker.remove()
-        destinationMarker = L.marker([coords.value.destination.lat, coords.value.destination.lng])
-            .addTo(leafletMap)
-            .bindPopup('Destino')
+        destinationMarker = L.marker([coords.value.destination.lat, coords.value.destination.lng]).addTo(leafletMap).bindPopup('Destino')
     }
-
-    // Ajustar la vista del mapa para mostrar ambos puntos o uno si solo hay uno
     if (coords.value.origin.lat && coords.value.destination.lat) {
         const bounds = L.latLngBounds(
             [coords.value.origin.lat, coords.value.origin.lng!],
             [coords.value.destination.lat, coords.value.destination.lng!]
         )
         leafletMap.fitBounds(bounds, { padding: [50, 50] })
-    } else if (coords.value.origin.lat) {
-        leafletMap.setView([coords.value.origin.lat, coords.value.origin.lng!], 13)
-    } else if (coords.value.destination.lat) {
-        leafletMap.setView([coords.value.destination.lat, coords.value.destination.lng!], 13)
     }
 }
 
-// Maneja clics del usuario en el mapa para establecer origen/destino
+// MANEJADOR DE CLICK EN EL MAPA
 const onMapClick = async (e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng
-
-    // Lógica para determinar si el clic establece origen o destino
-    // Si no hay origen, establece origen; si no hay destino, establece destino; si ambos existen, reemplaza origen
     let type: 'origin' | 'destination' = !coords.value.origin.lat ? 'origin' :
         !coords.value.destination.lat ? 'destination' : 'origin'
-
-    // Actualizar coordenadas en el estado
     coords.value[type] = { lat, lng }
 
     try {
         loading.value = true
-        // Convertir coordenadas a dirección legible (geocodificación inversa)
-        address.value[type] = await reverseGeocode(lat, lng)
+        const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${OPENCAGE_API_KEY}&language=es`
+        const res = await fetch(url)
+        const data = await res.json()
 
-        // Crear y mostrar marcador en el mapa
-        if (type === 'origin') {
-            if (originMarker) originMarker.remove()
-            originMarker = L.marker([lat, lng])
-                .addTo(leafletMap!)
-                .bindPopup('Origen')
-                .openPopup()
+        if (data.results && data.results.length > 0) {
+            const formattedAddress = data.results[0].formatted
+            address.value[type] = formattedAddress
         } else {
-            if (destinationMarker) destinationMarker.remove()
-            destinationMarker = L.marker([lat, lng])
-                .addTo(leafletMap!)
-                .bindPopup('Destino')
-                .openPopup()
+            address.value[type] = `Ubicación: ${lat.toFixed(4)}, ${lng.toFixed(4)}`
         }
-    } catch (error) {
-        console.error('Error al obtener la dirección:', error)
+    } catch (err) {
+        console.error('Error en reverseGeocode:', err)
+        address.value[type] = `Ubicación: ${lat.toFixed(4)}, ${lng.toFixed(4)}`
     } finally {
         loading.value = false
     }
 }
 
-// Convierte direcciones de texto a coordenadas usando tu backend como proxy
+// GEOCODIFICACIÓN
 const geocodeAddress = async (type: 'origin' | 'destination', skipNotification: boolean = false) => {
     const query = address.value[type]
     if (!query || query.length < 3) return
-
     try {
         loading.value = true
-        await handleNominatimRateLimit()
-
-        // CAMBIO: Usar tu backend en lugar de llamada directa
-        const response = await api.get<NominatimResponse[]>(`/map/geocode?q=${encodeURIComponent(query)}`)
-
-        if (response.data.length === 0) {
+        const result = await geocodeWithOpenCage(query)
+        if (!result) {
             if (!skipNotification) {
-                showNotification(`No se encontró la dirección "${query}". Intenta con una dirección más general o revisa si hay errores.`, 'error')
+                showNotification(`No se encontró la dirección "${query}".`, 'error')
             }
             return
         }
-
-        if (response.data.length > 1 && !skipNotification) {
-            const firstResult = response.data[0]
-            const alternatives = response.data.slice(1, 3)
-
-            const areAlternativesDifferent = alternatives.some((alt: NominatimResponse) => {
-                return alt.display_name.split(',')[0] !== firstResult.display_name.split(',')[0]
-            })
-
-            if (areAlternativesDifferent) {
-                const mainAddress = firstResult.display_name
-                const altAddresses = alternatives.map(a => a.display_name).join('\n- ')
-                showNotification(`Usando: ${mainAddress}\nAlternativas encontradas:\n- ${altAddresses}`, 'info')
-            }
-        }
-
-        const { lat, lon } = response.data[0]
-        const parsedLat = parseFloat(lat)
-        const parsedLng = parseFloat(lon)
-
-        coords.value[type] = { lat: parsedLat, lng: parsedLng }
-
+        coords.value[type] = { lat: result.lat, lng: result.lng }
         if (!skipNotification) {
-            address.value[type] = response.data[0].display_name.split(',').slice(0, 3).join(',')
+            address.value[type] = result.formatted
         }
-
-        // Crear/actualizar marcador en el mapa
         if (type === 'origin') {
             if (originMarker) originMarker.remove()
-            originMarker = L.marker([parsedLat, parsedLng])
-                .addTo(leafletMap!)
-                .bindPopup('Origen')
-                .openPopup()
+            originMarker = L.marker([result.lat, result.lng]).addTo(leafletMap!).bindPopup('Origen').openPopup()
         } else {
             if (destinationMarker) destinationMarker.remove()
-            destinationMarker = L.marker([parsedLat, parsedLng])
-                .addTo(leafletMap!)
-                .bindPopup('Destino')
-                .openPopup()
+            destinationMarker = L.marker([result.lat, result.lng]).addTo(leafletMap!).bindPopup('Destino').openPopup()
         }
-
-        leafletMap?.setView([parsedLat, parsedLng], 13)
-    } catch (error) {
-        console.error('Error al geocodificar:', error)
-        if (!skipNotification) {
-            showNotification('Error al buscar la dirección. Por favor, intenta de nuevo.', 'error')
-        }
+        leafletMap?.setView([result.lat, result.lng], 13)
+    } catch (err) {
+        console.error('Error al geocodificar:', err)
     } finally {
         loading.value = false
     }
 }
 
-// Convierte coordenadas a direcciones legibles usando tu backend como proxy
-const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
-    try {
-        await handleNominatimRateLimit()
-
-        // CAMBIO: Usar tu backend en lugar de llamada directa
-        const response = await api.get<NominatimResponse>(`/map/reverse-geocode?lat=${lat}&lon=${lng}`)
-
-        if (!response.data || !response.data.address) {
-            showNotification('No se pudo determinar la dirección de esta ubicación', 'error')
-            return 'Ubicación desconocida'
-        }
-
-        const a = response.data.address
-        return [a.road || a.street || a.path || '', a.city || a.town || a.village || '', a.country || ''].filter(Boolean).join(', ')
-    } catch (error) {
-        console.error('Error en reverseGeocode:', error)
-        showNotification('Error al obtener la dirección de esta ubicación', 'error')
-        return 'Ubicación desconocida'
+const geocodeWithOpenCage = async (query: string): Promise<{ lat: number; lng: number; formatted: string } | null> => {
+    if (!OPENCAGE_API_KEY) return null
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=${OPENCAGE_API_KEY}&language=es`
+    const response = await api.get<OpenCageResponse>(url, { timeout: 10000 })
+    if (response.data.results.length === 0) return null
+    const result = response.data.results[0]
+    return {
+        lat: result.geometry.lat,
+        lng: result.geometry.lng,
+        formatted: result.formatted
     }
 }
 
-// Calcula la ruta entre origen y destino usando OpenRouteService
+// EMITIR RUTA CON DIRECCIONES LEGIBLES
 const calculateRoute = async (skipNotification: boolean = false) => {
     const { origin, destination } = coords.value
     if (!origin.lat || !destination.lat) return
-
     try {
         loading.value = true
-
-        // Llamada a la API de cálculo de rutas
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 15000)
         const response = await api.post(
             'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
             {
                 coordinates: [
-                    [origin.lng!, origin.lat!], // Nota: OpenRouteService usa [lng, lat]
+                    [origin.lng!, origin.lat!],
                     [destination.lng!, destination.lat!],
                 ],
             },
             {
-                headers: {
-                    Authorization: apiKey,
-                    'Content-Type': 'application/json',
-                },
+                signal: controller.signal,
+                headers: { Authorization: OPENROUTE_API_KEY },
             }
         )
-
+        clearTimeout(timeoutId)
         if (!response.data.features || response.data.features.length === 0) {
             if (!skipNotification) {
-                showNotification('No se pudo encontrar una ruta entre estos puntos. Intenta con ubicaciones más cercanas o accesibles por carretera.', 'error')
+                showNotification('No se pudo encontrar una ruta entre estos puntos.', 'error')
             }
             return
         }
-
-        // Procesar datos de la ruta obtenida
         const feature = response.data.features[0]
         const summary = feature.properties.summary
-        const coordsList = feature.geometry.coordinates.map((c: number[]) => [c[1], c[0]]) // Convertir de [lng, lat] a [lat, lng]
-
-        // Dibujar la ruta en el mapa
+        const coordsList = feature.geometry.coordinates.map((c: number[]) => [c[1], c[0]])
         if (routeLayer) leafletMap?.removeLayer(routeLayer)
         routeLayer = L.polyline(coordsList, { color: 'blue', weight: 5 }).addTo(leafletMap!)
         leafletMap?.fitBounds(L.latLngBounds(coordsList), { padding: [50, 50] })
 
-        // Actualizar información de distancia y duración
-        if (!existingRouteData.value || !skipNotification) {
-            route.value.distance = `${(summary.distance / 1000).toFixed(2)} km`
-            const mins = Math.round(summary.duration / 60)
-            const hrs = Math.floor(mins / 60)
-            route.value.duration = hrs ? `${hrs} h ${mins % 60} min` : `${mins} min`
-        }
+        route.value.distance = `${(summary.distance / 1000).toFixed(2)} km`
+        const mins = Math.round(summary.duration / 60)
+        const hrs = Math.floor(mins / 60)
+        route.value.duration = hrs ? `${hrs} h ${mins % 60} min` : `${mins} min`
 
-        route.value.origin = address.value.origin
-        route.value.destination = address.value.destination
-
-        // Comunicar datos de ruta al componente padre
+        // ✅ EMITIR LAS DIRECCIONES CON NOMBRES DE CALLE
         emit('route-confirmed', {
-            origin: route.value.origin,
-            destination: route.value.destination,
+            origin: address.value.origin,
+            destination: address.value.destination,
             duration: route.value.duration,
             distance: route.value.distance
         })
 
         if (!skipNotification) {
-            showNotification(existingRouteData.value ? '¡Ruta actualizada correctamente!' : '¡Ruta calculada correctamente!', 'success')
+            showNotification(existingRouteData.value ? 'Ruta actualizada' : 'Ruta calculada', 'success')
         }
-
-    } catch (error: any) {
-        console.error('Error al calcular la ruta:', error)
+    } catch (err) {
+        console.error('Error al calcular la ruta:', err)
         if (!skipNotification) {
-            // Manejo específico de errores de la API
-            if (error.response?.status === 403) {
-                showNotification('Error de autenticación con el servicio de rutas. Verifica la API key.', 'error')
-            } else if (error.response?.status === 400) {
-                showNotification('Las ubicaciones seleccionadas no son válidas para calcular una ruta. Intenta con puntos accesibles por carretera.', 'error')
-            } else {
-                showNotification('Error al calcular la ruta. Por favor, intente con otras ubicaciones.', 'error')
-            }
+            showNotification('Error al calcular la ruta.', 'error')
         }
     } finally {
         loading.value = false
     }
 }
 
-// Observa cambios en coordenadas para actualizar el mapa automáticamente
-watch(
-    [() => coords.value.origin, () => coords.value.destination],
-    () => {
-        if (leafletMap) {
-            updateMapWithExistingCoords()
-        }
-    },
-    { deep: true }
-)
+// OBSERVADORES
+watch([() => coords.value.origin, () => coords.value.destination], () => {
+    if (leafletMap) updateMapWithExistingCoords()
+}, { deep: true })
 
-// Observa cuando el usuario borra direcciones para limpiar coordenadas y marcadores correspondientes
-watch(
-    [() => address.value.origin, () => address.value.destination],
-    ([newOrigin, newDestination], [oldOrigin, oldDestination]) => {
-        // Limpiar origen si se borra la dirección
-        if (newOrigin !== oldOrigin && newOrigin === '') {
-            coords.value.origin = { lat: null, lng: null }
-            if (originMarker) {
-                originMarker.remove()
-                originMarker = null
-            }
-        }
-
-        // Limpiar destino si se borra la dirección
-        if (newDestination !== oldDestination && newDestination === '') {
-            coords.value.destination = { lat: null, lng: null }
-            if (destinationMarker) {
-                destinationMarker.remove()
-                destinationMarker = null
-            }
-        }
+watch([() => address.value.origin, () => address.value.destination], ([newO, newD], [oldO, oldD]) => {
+    if (newO !== oldO && newO === '') {
+        coords.value.origin = { lat: null, lng: null }
+        if (originMarker) originMarker.remove()
     }
-)
+    if (newD !== oldD && newD === '') {
+        coords.value.destination = { lat: null, lng: null }
+        if (destinationMarker) destinationMarker.remove()
+    }
+})
 
-// Implementa debounce para evitar llamadas excesivas a la API durante escritura
+// DEBOUNCE PARA INPUTS
 const debounce = (fn: Function, delay: number) => {
     let timeout: number | null = null
     return (...args: any[]) => {
         if (timeout) window.clearTimeout(timeout)
-        timeout = window.setTimeout(() => {
-            fn(...args)
-        }, delay) as unknown as number
+        timeout = window.setTimeout(() => fn(...args), delay)
     }
 }
+const debouncedGeocodeAddress = debounce((type: 'origin' | 'destination') => geocodeAddress(type), 1000)
 
-// Versión debounced de geocodeAddress para usar en el input
-const debouncedGeocodeAddress = debounce((type: 'origin' | 'destination') => geocodeAddress(type), 800)
+// NOTIFICACIONES
+const showNotification = (message: string, type: 'info' | 'error' | 'success') => {
+    notification.value = { message, type, visible: true }
+    setTimeout(() => notification.value.visible = false, 5000)
+}
 
-// Sistema centralizado de notificaciones al usuario
-const showNotification = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
-    notification.value = {
-        message,
-        type,
-        visible: true
+// CICLO DE VIDA
+onMounted(async () => {
+    await nextTick()
+    await initializeMap()
+    if (existingRouteData.value) {
+        await loadExistingRouteData()
     }
+})
 
-    // Auto-ocultar notificación después de un tiempo (más tiempo para errores)
-    setTimeout(() => {
-        notification.value.visible = false
-    }, type === 'error' ? 8000 : 5000)
-}
-
-// Manejo de límites de velocidad de la API de Nominatim
-const handleNominatimRateLimit = () => {
-    return new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 500) + 500))
-}
-
-// Hook de montaje: inicializa el mapa y carga datos existentes si los hay
-onMounted(() => {
-    // Pequeño delay para asegurar que el DOM esté completamente renderizado
-    setTimeout(() => {
-        initializeMap()
-        if (existingRouteData.value) {
-            loadExistingRouteData()
-        }
-    }, 100)
+onUnmounted(() => {
+    leafletMap?.off()
+    leafletMap?.remove()
+    leafletMap = null
 })
 </script>
