@@ -44,14 +44,16 @@
 ```bash
 git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
-bash´´´
-2️⃣ Instalar dependencias
+```
+
+### 2️⃣ Instalar dependencias
 🔸 Frontend
-bash
+```bash
 Copiar código
 cd front
 npm install
 npm run dev
+```
 🔸 Backend
 bash
 Copiar código
