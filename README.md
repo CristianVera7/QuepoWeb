@@ -2,19 +2,79 @@
 <h1 align="center">🧭 QuepoWeb</h1>
 <h3 align="center">Conecta personas con los mismos gustos y reduce la huella de carbono 🌍💚</h3>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Vue-3-green?logo=vue.js" alt="Vue 3" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
-  <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
-  <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
-</p>
+<p align="center"> <img src="./assets/home.png" alt="Vista principal QuepoWeb" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" /> </p>
 
 ---
 
 ## 🌟 Descripción
 
 **QuepoWeb** es una aplicación web que permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono.
+
+---
+
+## 🖼️ Vista previa del proyecto
+
+<h3 align="center">✨ Bienvenido a <strong>QuepoWeb</strong></h3>
+
+<p align="center">
+  Conecta personas con los mismos gustos, comparte trayectos y reduce tu huella de carbono 🌿
+</p>
+
+---
+
+### 🔑 Pantalla de registro
+
+<p align="center">
+  <img src="./assets/login.png" alt="Register Page" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+</p>
+
+<p align="center">
+  Accede de forma segura con autenticación JWT y contraseñas cifradas.
+</p>
+
+---
+
+### 🏠 Página Principal
+
+<p align="center">
+  <img src="./assets/home.png" alt="Home Page" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+</p>
+
+<p align="center">
+  Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño responsive.
+</p>
+
+---
+
+### 🌄 Menú y filtrado de planes
+
+<p align="center">
+  <img src="./assets/header.png" alt="Header y menú desplegado" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+</p>
+
+<p align="center">
+  Navegación clara, accesible y moderna con un menú desplegable intuitivo.
+</p>
+
+---
+
+### ➕ Creación de un nuevo plan
+
+<p align="center">
+  <img src="./assets/post.png" alt="Crear plan" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+</p>
+
+<p align="center">
+  Añade planes personalizados, elige destino, fecha y comparte con otros usuarios.
+</p>
+
+---
+
+<h3 align="center">💚 Promoviendo comunidad y sostenibilidad</h3>
+
+<p align="center">
+  <strong>QuepoWeb</strong> combina tecnología y conciencia ecológica para conectar personas y cuidar el planeta 🌎
+</p>
 
 ---
 
@@ -29,6 +89,14 @@
 ---
 
 ## 🧩 Tecnologías utilizadas
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3-green?logo=vue.js" alt="Vue 3" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
+</p>
 
 | Área | Tecnologías |
 |------|-------------|
@@ -87,77 +155,6 @@ npm run node
 💬 Añadir chat en tiempo real entre usuarios.
 
 💳 Integrar una pasarela de pago.
-
----
-
-## 🖼️ Capturas / Demo 
-
-## 🖼️ Vista previa del proyecto
-
-<h3 align="center">✨ Bienvenido a <strong>QuepoWeb</strong></h3>
-
-<p align="center">
-  Conecta personas con los mismos gustos, comparte trayectos y reduce tu huella de carbono 🌿
-</p>
-
----
-
-### 🔑 Pantalla de registro
-
-<p align="center">
-  <img src="./assets/login.png" alt="Register Page" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-</p>
-
-<p align="center">
-  Accede de forma segura con autenticación JWT y contraseñas cifradas.
-</p>
-
----
-
-### 🏠 Página Principal
-
-<p align="center">
-  <img src="./assets/home-preview.png" alt="Home Page" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-</p>
-
-<p align="center">
-  Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño responsive.
-</p>
-
----
-
-### 🌄 Menú y filtrado de planes
-
-<p align="center">
-  <img src="./assets/header-preview.png" alt="Header y menú desplegado" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-</p>
-
-<p align="center">
-  Navegación clara, accesible y moderna con un menú desplegable intuitivo.
-</p>
-
----
-
-### ➕ Creación de un nuevo plan
-
-<p align="center">
-  <img src="./assets/add-plan-preview.png" alt="Crear plan" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-</p>
-
-<p align="center">
-  Añade planes personalizados, elige destino, fecha y comparte con otros usuarios.
-</p>
-
----
-
-<h3 align="center">💚 Promoviendo comunidad y sostenibilidad</h3>
-
-<p align="center">
-  <strong>QuepoWeb</strong> combina tecnología y conciencia ecológica para conectar personas y cuidar el planeta 🌎
-</p>
-
----
-
 
 ---
 
