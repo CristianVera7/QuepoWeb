@@ -80,7 +80,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 
 - 🔐 **Autenticación segura** con JWT y contraseñas cifradas con Argon2.  
 - 🔄 **Gestión de rutas protegidas** según el estado de autenticación del usuario.  
-- 🧠 **Frontend moderno** con Vue 3, TypeScript, Pinia, Pug y SCSS.  
+- 🪄 **Frontend moderno** con Vue 3, TypeScript, Pinia, Pug y SCSS.  
 - ⚙️ **Backend robusto** con Node.js, Express y MongoDB.  
 - 🧹 **Código limpio y consistente** gracias a Prettier y ESLint.
 
