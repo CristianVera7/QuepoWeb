@@ -1,6 +1,9 @@
 <!-- Banner o título principal -->
 <h1 align="center">🧭 QuepoWeb</h1>
 <h3 align="center">Conecta personas con los mismos gustos y reduce la huella de carbono 🌍💚</h3>
+<h3 align="center">
+  <strong>QuepoWeb</strong> combina tecnología y conciencia ecológica para conectar personas y cuidar el planeta 🌎
+</h3>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Vue-3-green?logo=vue.js" alt="Vue 3" />
@@ -72,14 +75,6 @@
 
 <p align="center">
   Añade planes personalizados, elige destino, fecha y comparte con otros usuarios.
-</p>
-
----
-
-<h3 align="center">💚 Promoviendo comunidad y sostenibilidad</h3>
-
-<p align="center">
-  <strong>QuepoWeb</strong> combina tecnología y conciencia ecológica para conectar personas y cuidar el planeta 🌎
 </p>
 
 ---
