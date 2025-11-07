@@ -101,7 +101,10 @@ npm run node
 Desarrollador Full Stack
 
 <p align="left">
-  📧 ```bash criisv95@gmail.com  ```
+  📧 Email:
+  ```bash 
+  criisv95@gmail.com 
+  ```
   <br/> 
   🔗 <a href="https://www.linkedin.com/in/cristian-vera-desarrollador/">LinkedIn: Cristian Vera - Desarrollador </a> 
 </p>
