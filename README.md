@@ -1,72 +1,90 @@
-# 🧭 QuepoWeb  
-### Conecta personas con los mismos gustos y reduce la huella de carbono  
+<!-- Banner o título principal -->
+<h1 align="center">🧭 QuepoWeb</h1>
+<h3 align="center">Conecta personas con los mismos gustos y reduce la huella de carbono 🌍💚</h3>
 
-**QuepoWeb** es una aplicación web, que permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono. 🌍💚  
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3-green?logo=vue.js" alt="Vue 3" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/License-MIT-blue" alt="License: MIT" />
+</p>
 
 ---
 
-## 🚀 Características principales  
+## 🌟 Descripción
+
+**QuepoWeb** es una aplicación web que permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono.
+
+---
+
+## 🚀 Características principales
 
 - 🔐 **Autenticación segura** con JWT y contraseñas cifradas con Argon2.  
 - 🔄 **Gestión de rutas protegidas** según el estado de autenticación del usuario.  
 - 🧠 **Frontend moderno** con Vue 3, TypeScript, Pinia, Pug y SCSS.  
 - ⚙️ **Backend robusto** con Node.js, Express y MongoDB.  
-- 🧹 **Código limpio y consistente** gracias a Prettier y ESLint.  
+- 🧹 **Código limpio y consistente** gracias a Prettier y ESLint.
 
 ---
 
-## 🧩 Tecnologías utilizadas  
+## 🧩 Tecnologías utilizadas
 
 | Área | Tecnologías |
-|------|--------------|
+|------|-------------|
 | **Frontend** | Vue 3 · TypeScript · Pinia · Pug · SCSS · Prettier · ESLint |
-| **Backend** | Node.js · Express · MongoDB · JWT · Argon2 |
+| **Backend**  | Node.js · Express · MongoDB · JWT · Argon2 |
 | **Herramientas** | Git · VS Code · Postman |
 
 ---
 
-## ⚙️ Instalación y uso  
+## ⚙️ Instalación y uso
 
-### 1️⃣ Clonar el repositorio  
+### 1️⃣ Clonar el repositorio
 ```bash
 git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
-
-### 2️⃣ Instalar dependencias
-
+2️⃣ Instalar dependencias
 🔸 Frontend
+bash
+Copiar código
 cd front
 npm install
 npm run dev
-
 🔸 Backend
+bash
+Copiar código
 cd back
 npm install
 npm run dev
-
-### 3️⃣ Variables de entorno
-
+3️⃣ Variables de entorno
 Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
 
+env
+Copiar código
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/quepoweb
 JWT_SECRET=tu_clave_secreta
-
----
-
-##💡 Próximas mejoras
+💡 Próximas mejoras
 💬 Añadir chat en tiempo real entre usuarios.
 
 💳 Integrar una pasarela de pago.
 
 📱 Mejorar el diseño responsive y la accesibilidad.
 
----
+🖼️ Capturas / Demo (opcional)
+Puedes añadir aquí capturas del proyecto o un enlace a una demo:
 
-##👨‍💻 Autor
+bash
+Copiar código
+/assets/screenshot-1.png
+/assets/screenshot-2.png
+(Elimina esta sección si aún no tienes imágenes.)
+
+👨‍💻 Autor
 Cristian Vera
 Desarrollador Full Stack
 
-📧 criisv95@gmail.com
-🐙 GitHub: CristianVera7
-🔗 LinkedIn: Cristian Vera - Desarrollador
+<p align="left"> 📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a><br/> 🐙 <a href="https://github.com/CristianVera7">GitHub: CristianVera7</a><br/> 🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: Cristian Vera - Desarrollador</a> </p>
+<p align="center"> Hecho con ❤️ por <strong>Cristian Vera</strong> — ¡Siempre aprendiendo y mejorando! </p> ```
