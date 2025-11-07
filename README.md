@@ -46,7 +46,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
     </td>
   </tr> 
 </table> 
-<p align="center"> Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño totalmente responsive. </p>
+<em align="center"> Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño totalmente responsive. </em>
 
 ##
 
