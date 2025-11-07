@@ -8,7 +8,6 @@
   <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
   <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
   <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/License-MIT-blue" alt="License: MIT" />
 </p>
 
 ---
@@ -66,6 +65,9 @@ Copiar código
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/quepoweb
 JWT_SECRET=tu_clave_secreta
+
+---
+
 💡 Próximas mejoras
 💬 Añadir chat en tiempo real entre usuarios.
 
@@ -73,14 +75,8 @@ JWT_SECRET=tu_clave_secreta
 
 📱 Mejorar el diseño responsive y la accesibilidad.
 
-🖼️ Capturas / Demo (opcional)
-Puedes añadir aquí capturas del proyecto o un enlace a una demo:
+🖼️ Capturas / Demo 
 
-bash
-Copiar código
-/assets/screenshot-1.png
-/assets/screenshot-2.png
-(Elimina esta sección si aún no tienes imágenes.)
 
 👨‍💻 Autor
 Cristian Vera
