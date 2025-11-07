@@ -26,35 +26,29 @@
 ## ⚙️ Instalación y uso  
 
 ### 1️⃣ Clonar el repositorio  
-```bash
 git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
 2️⃣ Instalar dependencias
 Frontend
 
-bash
-Copiar código
 cd front
 npm install
 npm run dev
+
 Backend
 
-bash
-Copiar código
 cd back
 npm install
 npm run dev
+
 3️⃣ Variables de entorno
 Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
 
-ini
-Copiar código
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/quepoweb
 JWT_SECRET=tu_clave_secreta
-🌍 Demo
-Puedes probar una versión de prueba del servidor aquí (entorno de test):
-👉 http://109.205.183.241:5000/register
+
+---
 
 💡 Próximas mejoras
 💬 Añadir chat en tiempo real entre usuarios.
@@ -62,6 +56,8 @@ Puedes probar una versión de prueba del servidor aquí (entorno de test):
 💳 Integrar una plataforma de pago.
 
 📱 Mejorar el diseño responsive y la accesibilidad.
+
+---
 
 👨‍💻 Autor
 Cristian Vera
