@@ -103,7 +103,7 @@ Desarrollador Full Stack
 <p align="left">
   📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a>
   <br/> 
-  🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: [Cristian Vera - Desarrollador](https://www.linkedin.com/in/cristian-vera-desarrollador/)</a> 
+  🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: [[Cristian Vera - Desarrollador](https://www.linkedin.com/in/cristian-vera-desarrollador/)](https://www.linkedin.com/in/cristian-vera-desarrollador/)</a> 
 </p>
 
 ---
