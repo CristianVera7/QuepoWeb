@@ -33,7 +33,7 @@ git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
 
 ### 2️⃣ Instalar dependencias
-```bash
+
 🔸 Frontend
 cd front
 npm install
@@ -45,7 +45,7 @@ npm install
 npm run dev
 
 ### 3️⃣ Variables de entorno
-```bash
+
 Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
 
 PORT=5000
