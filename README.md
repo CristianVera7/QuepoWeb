@@ -56,23 +56,24 @@ TOKEN_EXPIRES=18000000
 ```
 
 ### 3️⃣Instalar dependencias
-🔸 Frontend
+🧩 Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-🔸 Backend
+⚙️ Backend
+🔸 En otra terminal:
 ```bash
 cd backend
 npm install
 ```
-Nueva terminal:
+🔸 En una nueva terminal, ejecuta el servidor TypeScript:
 ```bash
 cd backend
 npm run ts
 ```
-Nueva terminal:
+🔸 Y en una tercera terminal, levanta el servidor Node:
 ```bash
 cd backend
 npm run node
