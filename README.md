@@ -46,27 +46,36 @@ git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
 ```
 
-### 2️⃣ Instalar dependencias
+### 2️⃣ Variables de entorno
+Crea un archivo .env dentro de la carpeta back con el siguiente contenido, por ejemplo:
+```bash
+PORT=8000
+URLDB=mongodb://127.0.0.1:27017/quepoDB    
+TOKEN_SECRET=TokenTotalmenteSecreto
+TOKEN_EXPIRES=18000000
+```
+
+### 3️⃣Instalar dependencias
 🔸 Frontend
 ```bash
-Copiar código
-cd front
+cd frontend
 npm install
 npm run dev
 ```
 🔸 Backend
 ```bash
-cd back
+cd backend
 npm install
-npm run dev
 ```
-
-### 3️⃣ Variables de entorno
-Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
+Nueva terminal:
 ```bash
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/quepoweb
-JWT_SECRET=tu_clave_secreta
+cd backend
+npm run ts
+```
+Nueva terminal:
+```bash
+cd backend
+npm run node
 ```
 
 ---
