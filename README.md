@@ -29,7 +29,9 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 </p>
 
 <p align="center">
+  <em>
   Accede de forma segura con autenticación JWT y contraseñas cifradas.
+  </em>
 </p>
 
 ##
@@ -46,7 +48,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
     </td>
   </tr> 
 </table> 
-<em align="center"> Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño totalmente responsive. </em>
+<p align="center"> <em>Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño totalmente responsive. </em></p>
 
 ##
 
@@ -57,7 +59,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 </p>
 
 <p align="center">
-  Navegación clara, accesible y moderna con un menú desplegable intuitivo.
+  <em>Navegación clara, accesible y moderna con un menú desplegable intuitivo.</em>
 </p>
 
 ##
@@ -69,7 +71,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 </p>
 
 <p align="center">
-  Añade planes personalizados, elige destino, fecha y comparte con otros usuarios.
+  <em>Añade planes personalizados, elige destino, fecha y comparte con otros usuarios.</em>
 </p>
 
 ---
