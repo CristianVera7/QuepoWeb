@@ -48,15 +48,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 </table> 
 <p align="center"> Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño totalmente responsive. </p>
 
-<!-- <p align="center">
-  <img src="./assets/home.png" alt="Home Page" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-</p>
-
-<p align="center">
-  Explora planes disponibles o crea el tuyo propio con filtros dinámicos y diseño responsive.
-</p> -->
-
----
+##
 
 ### 🌄 Menú y filtrado de planes
 
@@ -68,7 +60,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
   Navegación clara, accesible y moderna con un menú desplegable intuitivo.
 </p>
 
----
+##
 
 ### ➕ Creación de un nuevo plan
 
