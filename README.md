@@ -31,7 +31,7 @@
 ### 🔑 Pantalla de registro
 
 <div align="center">
-  <img src="./assets/login.png" alt="Register Page" width="500" style="margin-bottom:5px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+  <img src="./assets/login.png" alt="Register Page" width="500" style="margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
   <img src="./assets/responsive.png" alt="Responsive mobile view" width="250" style="margin-left: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
 </div>
 
