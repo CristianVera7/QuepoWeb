@@ -22,12 +22,6 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 
 ## 🖼️ Vista previa del proyecto
 
-<!-- <h3 align="center">✨ Bienvenido a <strong>QuepoWeb</strong></h3>
-
-<p align="center">
-  Conecta personas con los mismos gustos, comparte trayectos y reduce tu huella de carbono 🌿
-</p> -->
-
 ### 🔑 Pantalla de registro
 
 <p align="center">
@@ -38,8 +32,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
   Accede de forma segura con autenticación JWT y contraseñas cifradas.
 </p>
 
----
-
+##
 
 ### 🏠 Página Principal
 
