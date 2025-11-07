@@ -8,7 +8,6 @@
   <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
   <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
   <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/License-MIT-blue" alt="CristianVera" />
 </p>
 
 ---
@@ -72,7 +71,8 @@ JWT_SECRET=tu_clave_secreta
 
 ---
 
-💡 Próximas mejoras
+## 💡 Próximas mejoras
+
 💬 Añadir chat en tiempo real entre usuarios.
 
 💳 Integrar una pasarela de pago.
@@ -81,14 +81,15 @@ JWT_SECRET=tu_clave_secreta
 
 ---
 
-🖼️ Capturas / Demo 
+## 🖼️ Capturas / Demo 
 
 ---
 
-👨‍💻 Autor
+## 👨‍💻 Autor
 
-Cristian Vera
-Desarrollador Full Stack
+### Cristian Vera
+
+### Desarrollador Full Stack
 
 <p align="left"> 📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a><br/> 🐙 <a href="https://github.com/CristianVera7">GitHub: CristianVera7</a><br/> 🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: Cristian Vera - Desarrollador</a> </p>
 ---
