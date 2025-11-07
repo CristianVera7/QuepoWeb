@@ -1,8 +1,7 @@
 # 🧭 QuepoWeb  
 ### Conecta personas con los mismos gustos y reduce la huella de carbono  
 
-**QuepoWeb** es una aplicación web inspirada en *BlaBlaCar*.  
-Permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono. 🌍💚  
+**QuepoWeb** es una aplicación web, que permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono. 🌍💚  
 
 ---
 
@@ -29,11 +28,12 @@ Permite a los usuarios **crear o unirse a planes y actividades al aire libre**, 
 ## ⚙️ Instalación y uso  
 
 ### 1️⃣ Clonar el repositorio  
+```bash
 git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
 
 ### 2️⃣ Instalar dependencias
-
+```bash
 🔸 Frontend
 cd front
 npm install
@@ -45,6 +45,7 @@ npm install
 npm run dev
 
 ### 3️⃣ Variables de entorno
+```bash
 Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
 
 PORT=5000
