@@ -100,7 +100,11 @@ npm run node
 
 Desarrollador Full Stack
 
-<p align="left"> 📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a><br/> 🐙 <a href="https://github.com/CristianVera7">GitHub: CristianVera7</a><br/> 🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: Cristian Vera - Desarrollador</a> </p>
+<p align="left">
+  📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a>
+  <br/> 
+  🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: Cristian Vera - Desarrollador</a> 
+</p>
 
 ---
 
