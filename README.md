@@ -28,8 +28,6 @@
   Conecta personas con los mismos gustos, comparte trayectos y reduce tu huella de carbono 🌿
 </p>
 
----
-
 ### 🔑 Pantalla de registro
 
 <p align="center">
