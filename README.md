@@ -89,16 +89,15 @@ JWT_SECRET=tu_clave_secreta
 
 ### Cristian Vera
 
-### Desarrollador Full Stack
-
----
+Desarrollador Full Stack
 
 <p align="left"> 📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a><br/> 🐙 <a href="https://github.com/CristianVera7">GitHub: CristianVera7</a><br/> 🔗 <a href="https://www.linkedin.com/in/cristianvera">LinkedIn: Cristian Vera - Desarrollador</a> </p>
 
 ---
 
 <p align="center">
-  🌿 <strong>QuepoWeb</strong> promueve comunidad y sostenibilidad. 🌿<br/>
-  Desarrollando con propósito🧠
+  🌿 <strong>QuepoWeb</strong> promueve comunidad, conexión y sostenibilidad. 🌿
+  <br/>
+  💡 Desarrollado con propósito y pasión. 
 </p>
 
