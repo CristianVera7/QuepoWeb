@@ -85,6 +85,7 @@ JWT_SECRET=tu_clave_secreta
 ---
 
 👨‍💻 Autor
+
 Cristian Vera
 Desarrollador Full Stack
 
