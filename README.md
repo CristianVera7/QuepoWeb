@@ -63,6 +63,7 @@ npm install
 npm run dev
 ```
 ⚙️ Backend
+
 🔸 En otra terminal:
 ```bash
 cd backend
