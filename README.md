@@ -22,11 +22,11 @@
 
 ## 🖼️ Vista previa del proyecto
 
-<h3 align="center">✨ Bienvenido a <strong>QuepoWeb</strong></h3>
+<!-- <h3 align="center">✨ Bienvenido a <strong>QuepoWeb</strong></h3>
 
 <p align="center">
   Conecta personas con los mismos gustos, comparte trayectos y reduce tu huella de carbono 🌿
-</p>
+</p> -->
 
 ### 🔑 Pantalla de registro
 
