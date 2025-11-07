@@ -148,18 +148,15 @@ npm run node
 
 ---
 
-<h2 align="center">⚡ Autor</h2>
+## ⚡ Autor
 
-<h3 align="center">👨‍💻 Cristian Vera</h3>
-<p align="center"><em>Desarrollador Full Stack</em></p>
+### 👨‍💻 Cristian Vera  
+#### Desarrollador Full Stack  
 
-<p align="center">
-  📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a> · 
-  🔗 <a href="https://www.linkedin.com/in/cristian-vera-desarrollador/">LinkedIn</a>
+<p align="left">
+  📧 <a href="mailto:criisv95@gmail.com">criisv95@gmail.com</a><br/>
+  🔗 <a href="https://www.linkedin.com/in/cristian-vera-desarrollador/">LinkedIn: Cristian Vera - Desarrollador</a>
 </p>
-
-
-
 
 ---
 
