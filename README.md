@@ -44,6 +44,7 @@
 ```bash
 git clone https://github.com/CristianVera7/QuepoWeb.git
 cd QuepoWeb
+bash´´´
 2️⃣ Instalar dependencias
 🔸 Frontend
 bash
