@@ -88,8 +88,6 @@ npm run node
 
 💳 Integrar una pasarela de pago.
 
-📱 Mejorar el diseño responsive y la accesibilidad.
-
 ---
 
 ## 🖼️ Capturas / Demo 
