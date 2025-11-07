@@ -150,7 +150,7 @@ npm run node
 
 ## ⚡ Autor
 
-### 👨‍💻 Cristian Vera  
+###       Cristian Vera  
 #### Desarrollador Full Stack  
 
 <p align="left">
