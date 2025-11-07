@@ -49,7 +49,7 @@
     <img src="./assets/home.png" alt="Home Page" width="500" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" /> 
   </td> 
     <td align="center" width="40%"> 
-      <img src="./assets/home-responsive.png" alt="Home Responsive" width="200" style="border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" /> 
+      <img src="./assets/responsive.png" alt="Home Responsive" width="200" style="border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" /> 
     </td>
   </tr> 
 </table> 
