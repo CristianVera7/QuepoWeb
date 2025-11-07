@@ -1,6 +1,5 @@
 <!-- Banner o título principal -->
 <h1 align="center">🧭 QuepoWeb</h1>
-<h3 align="center">Conecta personas con los mismos gustos y reduce la huella de carbono 🌍💚</h3>
 <h3 align="center">
   <strong>QuepoWeb</strong> combina tecnología y conciencia ecológica para conectar personas y cuidar el planeta 🌎
 </h3>
