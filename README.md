@@ -2,7 +2,13 @@
 <h1 align="center">🧭 QuepoWeb</h1>
 <h3 align="center">Conecta personas con los mismos gustos y reduce la huella de carbono 🌍💚</h3>
 
-<p align="center"> <img src="./assets/home.png" alt="Vista principal QuepoWeb" width="700" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" /> </p>
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3-green?logo=vue.js" alt="Vue 3" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
+</p>
 
 ---
 
@@ -89,14 +95,6 @@
 ---
 
 ## 🧩 Tecnologías utilizadas
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Vue-3-green?logo=vue.js" alt="Vue 3" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
-  <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" alt="Express" />
-  <img src="https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
-</p>
 
 | Área | Tecnologías |
 |------|-------------|
