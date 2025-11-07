@@ -55,19 +55,19 @@ npm install
 npm run dev
 ```
 🔸 Backend
-bash
-Copiar código
+```bash
 cd back
 npm install
 npm run dev
-3️⃣ Variables de entorno
-Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
+```
 
-env
-Copiar código
+### 3️⃣ Variables de entorno
+Crea un archivo .env dentro de la carpeta back con el siguiente contenido:
+```bash
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/quepoweb
 JWT_SECRET=tu_clave_secreta
+```
 
 ---
 
