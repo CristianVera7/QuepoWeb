@@ -16,7 +16,7 @@
 
 ## 🌟 Descripción
 
-**QuepoWeb** es una aplicación web que permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono.
+Aplicación web que permite a los usuarios **crear o unirse a planes y actividades al aire libre**, compartir coche y fomentar nuevas conexiones sociales, reduciendo así las emisiones contaminantes y la huella de carbono.
 
 ---
 
