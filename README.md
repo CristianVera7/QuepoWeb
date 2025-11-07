@@ -36,7 +36,7 @@ Aplicación web que permite a los usuarios **crear o unirse a planes y actividad
 
 ### 🏠 Página Principal
 
-<p align="center"> <strong>Vista escritorio 🖥️ &nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp; Vista móvil 📱</strong> </p>
+<p align="center">&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp; <strong>Vista escritorio 🖥️ &nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp; Vista móvil 📱</strong> </p>
 <table align="center">
   <tr> <td align="center" width="60%"> 
     <img src="./assets/home.png" alt="Home Page" width="500" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" /> 
