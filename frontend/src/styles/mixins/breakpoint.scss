@@ -1,4 +1,4 @@
-
+@use "sass:map";
 
 // Definición de breakpoints para diseño responsive
 $breakpoints: (
@@ -16,9 +16,9 @@ $breakpoints: (
 // Mixin para media queries
 @mixin respond($breakpoint) {
   // Si el breakpoint existe en el mapa
-  @if map-has-key($breakpoints, $breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
     // Obtiene el valor del breakpoint
-    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
     
     // Media query
     @media (min-width: $breakpoint-value) {
@@ -35,9 +35,9 @@ $breakpoints: (
 // Mixin para media queries máximas (hasta cierto breakpoint)
 @mixin respond-max($breakpoint) {
   // Si el breakpoint existe en el mapa
-  @if map-has-key($breakpoints, $breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
     // Obtiene el valor del breakpoint
-    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
     
     // Media query
     @media (max-width: ($breakpoint-value - 1)) {
@@ -54,10 +54,10 @@ $breakpoints: (
 // Mixin para rangos entre breakpoints
 @mixin respond-between($lower, $upper) {
   // Si ambos breakpoints existen en el mapa
-  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
+  @if map.has-key($breakpoints, $lower) and map.has-key($breakpoints, $upper) {
     // Obtiene los valores de los breakpoints
-    $lower-value: map-get($breakpoints, $lower);
-    $upper-value: map-get($breakpoints, $upper);
+    $lower-value: map.get($breakpoints, $lower);
+    $upper-value: map.get($breakpoints, $upper);
     
     // Media query
     @media (min-width: $lower-value) and (max-width: ($upper-value - 1)) {

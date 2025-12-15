@@ -8,6 +8,17 @@ import { useRegisterStore } from './stores/registerStore'
 // Importar configuración de la API
 import api from './api/index'
 
+import { registerSW } from 'virtual:pwa-register'
+const updateSW = registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    updateSW(true)
+  },
+  onOfflineReady() {
+    console.log('PWA lista para offline')
+  }
+})
+
 // Crea una nueva instancia de la aplicación Vue
 const app = createApp(App)
 

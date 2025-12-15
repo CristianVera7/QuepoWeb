@@ -133,13 +133,14 @@
 }
 
 @mixin hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    & {
+        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
 
     &:hover {
         transform: translateY(-2px);
     }
 
-    // Disable hover effects on touch devices
     @media (hover: none) {
         &:hover {
             transform: none;
@@ -187,7 +188,6 @@
     }
 
     .modal-content-exit {
-        @include glass-effect();
         border-radius: 12px;
         padding: 1.5rem;
         width: 90%;
@@ -197,6 +197,8 @@
         z-index: 10010;
         transform: translateZ(0);
         background-color: #01440a;
+
+        @include glass-effect();
 
         @include mix.respond-max(xs) {
             padding: 1rem;
@@ -247,10 +249,10 @@
             }
 
             button {
-                @include button-base;
                 padding: 0.6rem 1.2rem;
                 min-width: 100px;
 
+                @include button-base;
                 @include mix.respond-max(xs) {
                     width: auto;
                     min-width: auto;
@@ -311,7 +313,6 @@
     }
 
     .plan-card {
-        @include glass-effect(0.95);
         color: #01440a;
         font-family: 'Inter', 'Segoe UI', sans-serif;
         border-radius: 12px;
@@ -322,6 +323,8 @@
         max-width: 100%;
         position: relative;
         transform: scale(1);
+        
+        @include glass-effect(0.95);
 
         @include mix.respond-max(xs) {
             border-radius: 8px;
@@ -389,7 +392,6 @@
             .card-container {
                 width: 100%;
                 height: 100%;
-                @include glass-effect(0.98);
                 border-radius: 16px;
                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
                 position: relative;
@@ -398,6 +400,8 @@
                 flex-direction: column;
                 overflow: hidden;
                 animation: contentSlideIn 0.4s ease-out 0.2s both;
+                
+                @include glass-effect(0.98);
 
                 @include mix.respond-max(sm) {
                     border-radius: 12px;
@@ -475,7 +479,6 @@
             }
 
             .plan-category {
-                @include glass-effect(0.95);
                 background: linear-gradient(135deg, #4CAF50, #43a047);
                 color: #ffffff;
                 padding: 0.35rem 0.75rem;
@@ -485,6 +488,8 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                
+                @include glass-effect(0.95);
 
                 @include mix.respond-max(xs) {
                     font-size: 0.7rem;
@@ -493,7 +498,6 @@
             }
 
             .close-button {
-                @include glass-effect(0.95);
                 background: linear-gradient(135deg, #F44336, #e53935);
                 color: #ffffff;
                 border: none;
@@ -506,6 +510,8 @@
                 cursor: pointer;
                 transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
                 box-shadow: 0 4px 12px rgba(#F44336, 0.4);
+                
+                @include glass-effect(0.95);
 
                 @include mix.respond-max(sm) {
                     width: 35px;
@@ -730,12 +736,12 @@
                             justify-content: center;
 
                             button {
-                                @include button-base;
                                 padding: 0.9rem 2rem;
                                 width: 70%;
                                 margin: 0 auto;
                                 font-size: 1rem;
 
+                                @include button-base;
                                 @include mix.respond(xxl) {
                                     width: 70%;
                                     padding: 0.8rem 1.5rem;
@@ -823,11 +829,11 @@
                                         width: 90%;
                                         border-radius: 8px;
                                         background-color: #ffa931;
-                                        @include button-base;
                                         box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
                                         transition: background-color 0.3s ease,
                                         box-shadow 0.3s ease;
 
+                                        @include button-base;
                                         &:hover {
                                             background-color: #ec971f;
                                             box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
@@ -890,11 +896,11 @@
                                     background-color: #4CAF50;
                                     color: #ffffff;
                                     box-shadow: 0 4px 12px rgba(#4CAF50, 0.3);
-                                    @include button-base;
                                     padding: 0.9rem 0;
                                     margin: 0 auto;
                                     width: 70%;
 
+                                    @include button-base;
                                     @include mix.respond-max(sm) {
                                         width: 80%;
                                     }
@@ -1003,14 +1009,16 @@
         }
 
         .section-box {
-            @include glass-effect(0.9);
-            @include hover-lift;
-            @include gradient-border(#4CAF50);
             border-radius: 12px;
             padding: 1rem;
             margin-bottom: 1rem;
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            
+            @include gradient-border(#4CAF50);
+            @include glass-effect(0.9);
+            
+            @include hover-lift;
 
             &:hover {
                 box-shadow: 0 4px 16px rgba(#4CAF50, 0.15);
@@ -1219,10 +1227,11 @@
                             padding: 1rem;
                             border-radius: 8px;
                             background-color: #ffa931;
-                            @include button-base;
                             //Sombra
                             box-shadow: 0 4px 12px rgba(#f0ad4e, 0.3);
                             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+                            
+                            @include button-base;
 
                             &:hover {
                                 background-color: #ec971f;
@@ -1237,10 +1246,10 @@
                 }
 
                 button {
-                    @include button-base;
                     padding: 0.9rem 0;
                     margin: 0 auto;
                     width: 50%;
+                    @include button-base;
 
                     i {
                         margin-right: 0.7rem;
@@ -1333,8 +1342,8 @@
                         background-color: #ffffff;
                         color: #727272;
                         box-shadow: 0 4px 12px rgba(#8b8b8b, 0.3);
-                        @include button-base;
                         margin: 0 auto;
+                        @include button-base;
 
                         &:hover {
                             background-color: #f7f7f7;
